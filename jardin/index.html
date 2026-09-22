@@ -1,0 +1,736 @@
+<!doctype html>
+<html lang="es"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#E8578B">
+<meta name="author" content="NasriTools">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Mi Jardín de Estudio · NasriTools</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Andika:wght@400;700&family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+:root{
+  --papel:#F8F3FB; --lienzo:#FFFFFF; --hueco:#EFE6F6;
+  --tinta:#3A2450; --tinta-2:#6E5A82; --suave:#A898B8;
+  --rosa:#E8578B; --rosa-claro:#FCE4EE; --lila:#9B7BD4; --lila-claro:#EEE6FA;
+  --sol:#F6B940; --sol-claro:#FDF1D6;
+  --bien:#2F9E7E; --bien-claro:#DDF3EC; --mal:#D5503F; --mal-claro:#FBE4E0;
+  --borde:#E5D8EF; --sombra:0 1px 2px rgba(58,36,80,.06),0 8px 22px rgba(58,36,80,.08);
+  --r:16px;
+  --f-tit:'Baloo 2','Trebuchet MS',sans-serif; --f-lee:'Andika','Comic Sans MS',sans-serif; --f-ui:'Nunito','Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --papel:#1C1426; --lienzo:#261B33; --hueco:#322442; --tinta:#F3EAFB; --tinta-2:#C6B5D8; --suave:#8E7BA3;
+  --rosa:#FF7FAA; --rosa-claro:#4A2336; --lila:#B79BF0; --lila-claro:#35284C; --sol:#FFC85C; --sol-claro:#43361A;
+  --bien:#5FD0AC; --bien-claro:#193B31; --mal:#F08070; --mal-claro:#45221E; --borde:#3C2D50;
+  --sombra:0 1px 2px rgba(0,0,0,.3),0 8px 22px rgba(0,0,0,.35);}}
+:root[data-theme="dark"]{
+  --papel:#1C1426; --lienzo:#261B33; --hueco:#322442; --tinta:#F3EAFB; --tinta-2:#C6B5D8; --suave:#8E7BA3;
+  --rosa:#FF7FAA; --rosa-claro:#4A2336; --lila:#B79BF0; --lila-claro:#35284C; --sol:#FFC85C; --sol-claro:#43361A;
+  --bien:#5FD0AC; --bien-claro:#193B31; --mal:#F08070; --mal-claro:#45221E; --borde:#3C2D50;
+  --sombra:0 1px 2px rgba(0,0,0,.3),0 8px 22px rgba(0,0,0,.35);}
+*{box-sizing:border-box}
+body{background:var(--papel);color:var(--tinta);font-family:var(--f-ui);font-size:16px;line-height:1.55;margin:0}
+h1,h2,h3{font-family:var(--f-tit);font-weight:700;margin:0;line-height:1.15;text-wrap:balance}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+:focus-visible{outline:3px solid var(--rosa);outline-offset:2px;border-radius:8px}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+
+.barra{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:10px 16px;background:var(--lienzo);border-bottom:1px solid var(--borde)}
+.marca{display:flex;align-items:center;gap:8px;font-family:var(--f-tit);font-weight:700;font-size:19px}
+.sep{flex:1}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:999px;background:var(--hueco);font-weight:800;font-size:14px;font-variant-numeric:tabular-nums}
+.chip.rosa{background:var(--rosa-claro);color:var(--rosa)} .chip.sol{background:var(--sol-claro);color:#A2700E}
+:root[data-theme="dark"] .chip.sol{color:var(--sol)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .chip.sol{color:var(--sol)}}
+.icono{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:var(--hueco);font-size:18px}
+
+main{max-width:1020px;margin:0 auto;padding-inline:16px;padding-block:18px 60px}
+.saludo{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
+.saludo h1{font-size:clamp(28px,5vw,40px);color:var(--tinta)}
+.saludo h1 em{font-style:normal;color:var(--rosa)}
+.saludo p{margin:2px 0 0;color:var(--tinta-2);max-width:60ch}
+.progreso{display:flex;align-items:center;gap:12px;margin-top:10px}
+.barra-p{flex:1;max-width:340px;height:12px;border-radius:99px;background:var(--hueco);overflow:hidden}
+.barra-p i{display:block;height:100%;background:linear-gradient(90deg,var(--lila),var(--rosa));border-radius:99px}
+
+.titulo-sec{font-family:var(--f-tit);font-size:22px;margin:26px 0 12px;display:flex;align-items:baseline;gap:10px}
+.titulo-sec small{font-family:var(--f-ui);font-size:14px;color:var(--tinta-2);font-weight:600}
+
+.estante{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:18px}
+.libro{text-align:left;display:flex;flex-direction:column;gap:8px;padding:0}
+.libro .tapa{border-radius:6px 14px 14px 6px;overflow:hidden;box-shadow:var(--sombra),inset 6px 0 0 rgba(0,0,0,.12);transition:transform .2s}
+.libro:hover .tapa{transform:translateY(-4px) rotate(-1deg)}
+.libro svg{display:block;width:100%;height:auto}
+.libro .nm{font-weight:800;font-size:15px}
+.libro .mini{font-size:13px;color:var(--tinta-2);display:flex;justify-content:space-between}
+
+.hoy{background:var(--lienzo);border:1px solid var(--borde);border-radius:var(--r);padding:16px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;box-shadow:var(--sombra)}
+.hoy .flor{font-size:34px}
+.hoy .txt{flex:1;min-width:200px}
+.hoy b{font-family:var(--f-tit);font-size:19px;display:block}
+.hoy span{color:var(--tinta-2);font-size:14px}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;border-radius:999px;background:var(--rosa);color:#fff;font-weight:800;box-shadow:0 3px 0 rgba(0,0,0,.12)}
+.btn:active{transform:translateY(2px);box-shadow:none}
+.btn.sec{background:var(--hueco);color:var(--tinta);box-shadow:none}
+.btn.lila{background:var(--lila)}
+
+.herrs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.herr{background:var(--lienzo);border:1px solid var(--borde);border-radius:var(--r);padding:14px;text-align:left;display:flex;flex-direction:column;gap:3px}
+.herr:hover{border-color:var(--lila)}
+.herr .ic{font-size:24px} .herr .nm{font-weight:800} .herr .ds{font-size:13px;color:var(--tinta-2)}
+
+.volver{display:inline-flex;align-items:center;gap:6px;color:var(--tinta-2);font-weight:700;margin-bottom:12px}
+.cab-mat{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.cab-mat .tapa{width:110px;border-radius:4px 10px 10px 4px;overflow:hidden;box-shadow:var(--sombra)}
+.cab-mat svg{display:block;width:100%;height:auto}
+.tri{font-family:var(--f-tit);font-size:17px;color:var(--tinta-2);margin:18px 0 8px}
+.unis{display:grid;gap:10px}
+.uni{display:flex;align-items:center;gap:12px;background:var(--lienzo);border:1px solid var(--borde);border-radius:var(--r);padding:12px 14px;text-align:left}
+.uni:hover{border-color:var(--lila)}
+.uni .num{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:800;background:var(--hueco);flex:0 0 auto}
+.uni.lista .num{background:var(--bien);color:#fff}
+.uni .t{flex:1;font-weight:700}
+.uni .e{font-size:13px;color:var(--tinta-2)}
+
+.leccion{background:var(--lienzo);border:1px solid var(--borde);border-radius:20px;padding:clamp(16px,3vw,26px);box-shadow:var(--sombra)}
+.explica{font-family:var(--f-lee);font-size:18px;line-height:1.6;max-width:65ch}
+.explica ul{padding-left:20px}
+.ejemplo{background:var(--sol-claro);border-radius:12px;padding:10px 14px;font-family:var(--f-lee);font-size:18px;margin:10px 0}
+.preg{font-family:var(--f-lee);font-size:21px;margin:10px 0 14px}
+.ops{display:grid;gap:10px}
+.op{padding:12px 16px;border-radius:14px;background:var(--hueco);text-align:left;font-family:var(--f-lee);font-size:18px;border:2px solid transparent}
+.op:hover{border-color:var(--lila)}
+.op.si{background:var(--bien-claro);border-color:var(--bien)} .op.no{background:var(--mal-claro);border-color:var(--mal)}
+.entrada{display:flex;gap:10px;flex-wrap:wrap}
+.entrada input{flex:1;min-width:140px;font-family:var(--f-lee);font-size:20px;padding:10px 14px;border-radius:14px;border:2px solid var(--borde);background:var(--papel);color:var(--tinta)}
+.veredicto{margin-top:12px;padding:10px 14px;border-radius:12px;font-weight:700}
+.veredicto.si{background:var(--bien-claro);color:var(--bien)} .veredicto.no{background:var(--mal-claro);color:var(--mal)}
+.pasos{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.pasos i{width:26px;height:8px;border-radius:99px;background:var(--hueco)}
+.pasos i.si{background:var(--bien)} .pasos i.no{background:var(--mal)} .pasos i.ya{background:var(--lila)}
+.fin{text-align:center;padding:10px}
+.fin .grande{font-size:56px}
+.mandos{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+
+.velo{position:fixed;inset:0;background:rgba(28,20,38,.5);z-index:50;display:grid;place-items:center;padding:16px}
+.modal{background:var(--lienzo);border-radius:20px;max-width:620px;width:100%;max-height:88vh;overflow-y:auto;padding:22px;box-shadow:var(--sombra);position:relative}
+.modal h2{margin-bottom:8px}
+.cerrar{position:absolute;top:12px;right:12px}
+table.glosa{width:100%;border-collapse:collapse;font-size:15px}
+.glosa td,.glosa th{padding:7px 6px;border-bottom:1px solid var(--borde);text-align:left}
+.glosa td[dir=rtl]{text-align:right;font-size:16px}
+.buscador{width:100%;padding:10px 12px;border-radius:12px;border:2px solid var(--borde);background:var(--papel);color:var(--tinta);font-size:16px;margin-bottom:10px}
+.ar{direction:rtl;text-align:right;font-family:'Segoe UI',Tahoma,sans-serif;line-height:1.8}
+.lectura{font-family:var(--f-lee);font-size:20px;line-height:1.7;background:var(--papel);padding:14px;border-radius:12px}
+.tabla-num{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;font-variant-numeric:tabular-nums}
+.tabla-num div{background:var(--hueco);padding:8px;border-radius:10px;text-align:center;font-family:var(--f-lee);font-size:17px}
+.enlace{color:var(--rosa);font-weight:800}
+.parar{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:60;background:var(--tinta);color:var(--papel);box-shadow:var(--sombra)}
+.nota{font-size:13px;color:var(--tinta-2)}
+</style>
+
+</head><body>
+<header class="barra">
+  <span class="marca" aria-label="Mi Jardín de Estudio">
+    <svg width="30" height="30" viewBox="0 0 40 40" aria-hidden="true"><g fill="#E8578B"><circle cx="20" cy="10" r="7"/><circle cx="29.5" cy="17" r="7"/><circle cx="26" cy="28" r="7"/><circle cx="14" cy="28" r="7"/><circle cx="10.5" cy="17" r="7"/></g><circle cx="20" cy="20" r="6" fill="#F6B940"/></svg>
+    Mi Jardín
+  </span>
+  <span class="sep"></span>
+  <span class="chip sol" title="Estrellas">⭐ <b id="pts">0</b></span>
+  <span class="chip rosa" title="Días seguidos">🌸 <b id="racha">0</b> días</span>
+  <button class="icono" id="btn-familia" title="دليل العائلة" aria-label="Guía para la familia">👪</button>
+  <button class="icono" id="btn-tema" title="Cambiar tema" aria-label="Cambiar tema">🌙</button>
+</header>
+<main id="vista"></main>
+<button class="btn parar" id="parar" hidden onclick="callar()" aria-label="Parar la voz">⏹ Parar voz</button>
+<div class="velo" id="velo" hidden><div class="modal" id="modal" role="dialog" aria-modal="true"></div></div>
+
+<script>
+/* ============ PORTADAS (inspiradas en los libros de verdad) ============ */
+const PORT={
+mat:`<svg viewBox="0 0 300 390" role="img" aria-label="Mate+ 4"><rect width="300" height="390" fill="#E0413F"/>
+ <text x="26" y="72" font-family="Baloo 2,sans-serif" font-size="62" font-weight="800" fill="#fff">Mate+</text>
+ <text x="28" y="98" font-family="Nunito,sans-serif" font-size="15" font-weight="700" fill="#fff">Matemáticas para pensar</text>
+ <text x="262" y="72" text-anchor="middle" font-family="Baloo 2,sans-serif" font-size="58" font-weight="800" fill="#fff">4</text>
+ <path d="M150 150c30 0 40 20 40 40 20 0 40 10 40 40s-20 40-40 40c0 20-10 40-40 40s-40-20-40-40c-20 0-40-10-40-40s20-40 40-40c0-20 10-40 40-40z" fill="#3FA36B"/>
+ <circle cx="150" cy="205" r="18" fill="#F4A259"/><rect x="138" y="222" width="24" height="46" rx="10" fill="#F28C38"/>
+ <line x1="196" y1="178" x2="178" y2="300" stroke="#F28C38" stroke-width="7"/><line x1="196" y1="178" x2="214" y2="300" stroke="#F28C38" stroke-width="7"/>
+ <text x="274" y="370" text-anchor="end" font-family="Nunito,sans-serif" font-size="17" font-weight="800" fill="#fff">Santillana</text></svg>`,
+len:`<svg viewBox="0 0 300 390" role="img" aria-label="Lengua+ 4"><rect width="300" height="390" fill="#A99BD6"/>
+ <text x="24" y="72" font-family="Baloo 2,sans-serif" font-size="56" font-weight="800" fill="#fff">Lengua+</text>
+ <text x="26" y="98" font-family="Nunito,sans-serif" font-size="14" font-weight="700" fill="#fff">Tareas y destrezas comunicativas</text>
+ <text x="262" y="72" text-anchor="middle" font-family="Baloo 2,sans-serif" font-size="58" font-weight="800" fill="#fff">4</text>
+ <path d="M150 145c28 0 38 20 38 40 20 0 40 10 40 40s-20 40-40 40c0 20-10 40-38 40s-40-20-40-40c-20 0-40-10-40-40s20-40 40-40c0-20 12-40 40-40z" fill="#E7C7DC"/>
+ <polygon points="70,300 230,250 250,310 100,340" fill="#3DAA4A"/>
+ <circle cx="150" cy="210" r="17" fill="#F2B8A2"/><path d="M134 200c4-16 26-18 32-2" fill="#5BC06A"/>
+ <rect x="138" y="226" width="26" height="42" rx="10" fill="#A2413B"/>
+ <text x="274" y="370" text-anchor="end" font-family="Nunito,sans-serif" font-size="17" font-weight="800" fill="#fff">Santillana</text></svg>`,
+nat:`<svg viewBox="0 0 300 390" role="img" aria-label="Ciencias de la Naturaleza 4"><rect width="300" height="390" fill="#7CC243"/>
+ <text x="24" y="58" font-family="Nunito,sans-serif" font-size="27" font-weight="600" fill="#fff">Ciencias de</text>
+ <text x="24" y="90" font-family="Nunito,sans-serif" font-size="27" font-weight="600" fill="#fff">la Naturaleza</text>
+ <text x="266" y="72" text-anchor="middle" font-family="Nunito,sans-serif" font-size="54" font-weight="300" fill="#fff">4</text>
+ <circle cx="228" cy="140" r="36" fill="#F6C35B"/>
+ <path d="M150 330V170M150 230l-70-30M150 200l70-20" stroke="#B5562E" stroke-width="16" stroke-linecap="round" fill="none"/>
+ <g fill="#2E8B3D"><ellipse cx="80" cy="185" rx="16" ry="9"/><ellipse cx="210" cy="170" rx="16" ry="9"/><ellipse cx="130" cy="160" rx="14" ry="8"/><ellipse cx="185" cy="230" rx="16" ry="9"/></g>
+ <circle cx="205" cy="150" r="16" fill="#8A5A3B"/><circle cx="110" cy="200" r="12" fill="#222"/><path d="M110 200l-26 10 26 4z" fill="#F4B53F"/>
+ <rect y="315" width="300" height="75" fill="#F4F4F0"/>
+ <text x="274" y="362" text-anchor="end" font-family="Nunito,sans-serif" font-size="17" font-weight="800" fill="#333">Santillana</text></svg>`,
+soc:`<svg viewBox="0 0 300 390" role="img" aria-label="Ciencias Sociales 4"><rect width="300" height="390" fill="#9C86D1"/>
+ <text x="24" y="70" font-family="Nunito,sans-serif" font-size="29" font-weight="600" fill="#fff">Ciencias Sociales</text>
+ <text x="268" y="72" text-anchor="middle" font-family="Nunito,sans-serif" font-size="54" font-weight="300" fill="#fff">4</text>
+ <ellipse cx="160" cy="240" rx="120" ry="80" fill="#6BBE45"/>
+ <polygon points="120,120 200,120 160,100" fill="#E9A26B"/><rect x="124" y="120" width="72" height="8" fill="#D98A52"/>
+ <g fill="#fff"><rect x="128" y="130" width="9" height="42"/><rect x="146" y="130" width="9" height="42"/><rect x="164" y="130" width="9" height="42"/><rect x="182" y="130" width="9" height="42"/></g>
+ <path d="M70 270h150l-20 36H86z" fill="#8B5530"/><polygon points="140,190 140,268 200,250" fill="#EDE3D2"/>
+ <rect y="300" width="300" height="90" fill="#F4F4F0"/><path d="M0 300q40-14 80 0t80 0 80 0 60 0v12H0z" fill="#58C3E8"/>
+ <text x="274" y="362" text-anchor="end" font-family="Nunito,sans-serif" font-size="17" font-weight="800" fill="#333">Santillana</text></svg>`
+};
+
+/* ============ MATERIAS Y UNIDADES (4.º de Primaria) ============ */
+const op=(q,o,r,p)=>({t:'op',q,o,r,p}), es=(q,r,p)=>({t:'esc',q,r:[].concat(r),p});
+const MATERIAS=[
+{id:'mat',nom:'Matemáticas',libro:'Mate+ 4 · Serie Participa',unis:[
+ {t:'Números de hasta seis cifras',tri:1,exp:`<p>Después de las unidades, decenas y centenas vienen los <b>millares</b>: unidades de millar (UM), decenas de millar (DM) y centenas de millar (CM).</p><ul><li>En <b>345.672</b>: 3 CM, 4 DM, 5 UM, 6 C, 7 D y 2 U.</li><li>Para comparar, cuenta primero las cifras; si tienen las mismas, compara de izquierda a derecha.</li><li>Para <b>redondear</b> a la centena, mira la cifra de las decenas: si es 5 o más, subes.</li></ul>`,ejemplo:'345.672 = 300.000 + 40.000 + 5.000 + 600 + 70 + 2',
+  ej:[op('¿Qué cifra ocupa las decenas de millar en 345.672?',['3','4','5'],1,'Cuenta desde la derecha: U, D, C, UM, DM.'),
+      es('Escribe con cifras: doscientos mil cuatrocientos',['200400'],'200.000 + 400.'),
+      op('¿Qué número es MAYOR?',['98.765','123.456','99.999'],1,'123.456 tiene seis cifras; los otros, cinco.'),
+      es('300.000 + 40.000 + 5.000 + 20 = ',['345020']),
+      es('El número siguiente a 99.999 es...',['100000'],'Uno más: cien mil.'),
+      op('Redondea 4.683 a la centena',['4.600','4.700','5.000'],1,'Las decenas son 8: subes a 4.700.')],
+  reto:[es('🔥 El número anterior a 500.000 es...',['499999']),
+        es('🔥 ¿Cuántas centenas hay en total en 3.400?',['34'],'3.400 : 100 = 34.'),
+        op('🔥 En 708.215, el 8 vale...',['8.000','80.000','800'],0,'Está en las unidades de millar.')]},
+ {t:'Sumas y restas grandes',tri:1,exp:`<p>Coloca los números en columna: <b>unidades debajo de unidades</b>. Empieza siempre por la derecha.</p><ul><li>Si una columna pasa de 9, te llevas 1 a la siguiente.</li><li><b>Prueba de la resta:</b> resultado + lo que restas = el número de arriba.</li><li>Para <b>estimar</b>, redondea primero y suma los números redondos.</li></ul>`,ejemplo:'4.567 + 2.845 = 7.412',
+  ej:[es('4.567 + 2.845 = ',['7412']),
+      es('8.003 − 2.456 = ',['5547'],'Pide prestado varias veces.'),
+      es('Si 900 − 350 = 550, entonces 550 + 350 = ',['900'],'Es la prueba de la resta.'),
+      op('Un pueblo tiene 12.450 habitantes y llegan 1.380 más. ¿Cuántos son ahora?',['13.830','11.070','13.730'],0),
+      es('Estima: 3.900 + 5.100 es más o menos...',['9000'],'4.000 + 5.000.'),
+      es('10.000 − 1 = ',['9999'])],
+  reto:[es('🔥 25.678 + 14.322 = ',['40000']),
+        es('🔥 50.000 − 23.456 = ',['26544']),
+        op('🔥 Tenía 2.500 €, gasto 780 € y cobro 1.200 €. ¿Cuánto tengo?',['2.920 €','3.480 €','2.080 €'],0,'2.500 − 780 = 1.720; 1.720 + 1.200.')]},
+ {t:'Multiplicar por dos cifras',tri:1,exp:`<p>Para multiplicar por un número de dos cifras, haces <b>dos multiplicaciones</b> y las sumas.</p><ul><li>45 × 12: primero 45 × 2 = 90, luego 45 × 10 = 450. Suma: 540.</li><li>Multiplicar por <b>10, 100 o 1.000</b>: añade uno, dos o tres ceros.</li><li>El orden no cambia el resultado: 7 × 48 = 48 × 7.</li></ul>`,ejemplo:'45 × 12 = 90 + 450 = 540',
+  ej:[es('234 × 3 = ',['702']),
+      es('45 × 12 = ',['540']),
+      es('36 × 100 = ',['3600'],'Añade dos ceros.'),
+      op('Una caja tiene 24 lápices. ¿Cuántos hay en 15 cajas?',['360','39','340'],0,'24 × 15.'),
+      es('El triple de 150 es...',['450'],'150 × 3.'),
+      es('125 × 10 = ',['1250'])],
+  reto:[es('🔥 208 × 25 = ',['5200']),
+        es('🔥 99 × 11 = ',['1089'],'99 × 10 + 99.'),
+        es('🔥 7 × 48 = 48 × ...',['7'])]},
+ {t:'La división',tri:2,exp:`<p>Dividir es <b>repartir en partes iguales</b>. Sus partes: dividendo, divisor, cociente y resto.</p><ul><li>Si el resto es 0, la división es <b>exacta</b>.</li><li>El resto siempre es más pequeño que el divisor.</li><li><b>Prueba:</b> divisor × cociente + resto = dividendo.</li></ul>`,ejemplo:'45 : 7 → cociente 6, resto 3 (7 × 6 + 3 = 45)',
+  ej:[es('84 : 4 = ',['21']),
+      es('96 : 8 = ',['12']),
+      op('Si 45 : 7 da cociente 6, el resto es...',['3','6','7'],0,'7 × 6 = 42; 45 − 42.'),
+      es('Reparto 120 cromos entre 6 amigas. Cada una recibe...',['20']),
+      op('¿Cuál es una división EXACTA?',['25 : 4','36 : 6','17 : 3'],1),
+      es('7 × 6 + 3 = ',['45'],'Es la prueba de la división.')],
+  reto:[es('🔥 756 : 6 = ',['126']),
+        es('🔥 1.000 : 8 = ',['125']),
+        op('🔥 50 alumnas, 8 en cada mesa. ¿Cuántas mesas hacen falta?',['7','6','8'],0,'50 : 8 = 6 y sobran 2: hace falta otra mesa.')]},
+ {t:'Las fracciones',tri:2,exp:`<p>Una fracción dice en cuántas partes iguales dividimos algo (<b>denominador</b>, abajo) y cuántas tomamos (<b>numerador</b>, arriba).</p><ul><li>3/8 de pizza: 8 trozos, tomas 3.</li><li>Con el mismo denominador, es mayor la que tiene el numerador mayor.</li><li>Para calcular 2/3 de 12: 12 : 3 = 4, y 4 × 2 = 8.</li></ul>`,ejemplo:'1/4 de 20 = 20 : 4 = 5',
+  ej:[op('Una pizza tiene 8 trozos y comes 3. ¿Qué fracción comes?',['3/8','8/3','3/5'],0),
+      op('¿Qué fracción es MAYOR?',['2/7','5/7','3/7'],1),
+      es('La mitad de 18 es...',['9']),
+      es('1/4 de 20 = ',['5']),
+      op('En 3/5, el denominador es...',['3','5','8'],1,'El de abajo.'),
+      es('2/3 de 12 = ',['8'],'12 : 3 = 4; 4 × 2.')],
+  reto:[es('🔥 3/4 de 40 = ',['30']),
+        op('🔥 ¿Qué fracción es igual a una unidad entera?',['6/6','1/6','6/1'],0),
+        es('🔥 1/3 de una hora son ... minutos',['20'],'60 : 3.')]},
+ {t:'Números decimales y dinero',tri:3,exp:`<p>La <b>coma</b> separa la parte entera de la decimal. La primera cifra tras la coma son las <b>décimas</b>; la segunda, las <b>centésimas</b>.</p><ul><li>2,45 € = 2 euros y 45 céntimos = 245 céntimos.</li><li>0,5 es la mitad; 0,25 es un cuarto.</li><li>Para comparar: 2,7 es mayor que 2,17 porque 7 décimas son más que 1 décima.</li></ul>`,ejemplo:'3,50 € + 1,25 € = 4,75 €',
+  ej:[op('0,5 es lo mismo que...',['la mitad','un cuarto','cinco enteros'],0),
+      es('2,45 € son ... céntimos',['245']),
+      es('3,50 € + 1,25 € = ',['4,75']),
+      op('¿Qué número es MAYOR?',['2,7','2,07','2,17'],0,'Compara las décimas: 7, 0 y 1.'),
+      es('Pago con 10 € algo que cuesta 6,40 €. Me devuelven ... €',['3,60','3,6']),
+      es('En 4,38 la cifra de las décimas es...',['3'])],
+  reto:[es('🔥 3 × 1,25 € = ',['3,75']),
+        op('🔥 0,25 € son...',['25 céntimos','2,5 céntimos','250 céntimos'],0),
+        es('🔥 10 − 7,55 = ',['2,45'])]},
+ {t:'Longitud, masa, capacidad y tiempo',tri:3,exp:`<ul><li><b>Longitud:</b> 1 km = 1.000 m · 1 m = 100 cm · 1 cm = 10 mm.</li><li><b>Masa:</b> 1 kg = 1.000 g · medio kilo = 500 g.</li><li><b>Capacidad:</b> 1 l = 1.000 ml · medio litro = 500 ml.</li><li><b>Tiempo:</b> 1 hora = 60 minutos · 1 minuto = 60 segundos.</li></ul>`,ejemplo:'2,5 km = 2.500 m',
+  ej:[es('1 km = ... m',['1000']),
+      es('3 m = ... cm',['300']),
+      es('2 kg = ... g',['2000']),
+      es('1 litro = ... ml',['1000']),
+      op('¿En qué medirías el agua de una bañera?',['litros','kilos','metros'],0),
+      es('Una hora y cuarto son ... minutos',['75'])],
+  reto:[es('🔥 2,5 km = ... m',['2500']),
+        es('🔥 Medio kilo = ... g',['500']),
+        es('🔥 3 horas = ... minutos',['180'])]},
+ {t:'Ángulos, polígonos y perímetro',tri:3,exp:`<ul><li>Ángulo <b>recto</b> = 90°; <b>agudo</b>, menos de 90°; <b>obtuso</b>, más de 90°; <b>llano</b> = 180°.</li><li>Triángulos: <b>equilátero</b> (3 lados iguales), <b>isósceles</b> (2), <b>escaleno</b> (ninguno).</li><li>El <b>perímetro</b> es la suma de todos los lados.</li><li>El diámetro de una circunferencia mide el doble que el radio.</li></ul>`,ejemplo:'Cuadrado de 5 cm: 5 + 5 + 5 + 5 = 20 cm',
+  ej:[op('Un ángulo de 90° se llama...',['recto','agudo','obtuso'],0),
+      op('Un ángulo menor de 90° es...',['agudo','obtuso','llano'],0),
+      es('¿Cuántos lados tiene un hexágono?',['6','seis']),
+      op('Un triángulo con los tres lados iguales es...',['equilátero','isósceles','escaleno'],0),
+      es('Perímetro de un cuadrado de 5 cm de lado: ... cm',['20']),
+      op('Dos rectas que nunca se cortan son...',['paralelas','secantes','perpendiculares'],0)],
+  reto:[es('🔥 Perímetro de un rectángulo de 8 cm por 3 cm: ... cm',['22'],'8 + 3 + 8 + 3.'),
+        es('🔥 ¿Cuántos grados tiene un ángulo llano?',['180']),
+        op('🔥 El radio mide 4 cm. El diámetro mide...',['8 cm','2 cm','4 cm'],0)]}
+]},
+{id:'len',nom:'Lengua',libro:'Lengua+ 4 · Serie Participa',unis:[
+ {t:'La sílaba tónica y la tilde',tri:1,exp:`<p>La <b>sílaba tónica</b> es la que suena más fuerte.</p><ul><li><b>Agudas</b>: la última (ca-<b>mión</b>). Tilde si acaban en n, s o vocal.</li><li><b>Llanas</b>: la penúltima (<b>ár</b>-bol). Tilde si NO acaban en n, s o vocal.</li><li><b>Esdrújulas</b>: la antepenúltima (<b>pá</b>-ja-ro). Llevan tilde siempre.</li></ul>`,ejemplo:'sofá (aguda) · lápiz (llana) · música (esdrújula)',
+  ej:[op('¿Cuál es la sílaba tónica de «ventana»?',['ven','ta','na'],1),
+      op('«Camión» es una palabra...',['aguda','llana','esdrújula'],0),
+      op('«Lápiz» es una palabra...',['aguda','llana','esdrújula'],1),
+      op('«Música» es una palabra...',['aguda','llana','esdrújula'],2),
+      op('¿Cuál está bien escrita?',['arbol','árbol','arból'],1,'Llana acabada en l: lleva tilde.'),
+      op('Las esdrújulas llevan tilde...',['siempre','nunca','solo si acaban en n'],0)],
+  reto:[op('🔥 ¿Cuál es aguda y lleva tilde?',['reloj','sofá','mesa'],1),
+        op('🔥 «Examen» es llana y acaba en n, así que...',['no lleva tilde','lleva tilde'],0),
+        op('🔥 ¿Cuál está bien escrita?',['murciélago','murcielago','murcíelago'],0)]},
+ {t:'El sustantivo',tri:1,exp:`<p>Los <b>sustantivos</b> nombran personas, animales, cosas o lugares.</p><ul><li><b>Comunes</b> (ciudad) y <b>propios</b> (Murcia), que van con mayúscula.</li><li>Tienen <b>género</b> (masculino/femenino) y <b>número</b> (singular/plural).</li><li><b>Colectivos</b>: nombran un grupo (enjambre, bosque).</li><li><b>Diminutivos</b> (casita) y <b>aumentativos</b> (casona).</li></ul>`,ejemplo:'lápiz → lápices · pez → peces',
+  ej:[op('¿Cuál es un sustantivo propio?',['ciudad','Murcia','río'],1),
+      op('El femenino de «actor» es...',['actora','actriz','actoresa'],1),
+      es('Escribe el plural de «lápiz»',['lápices']),
+      op('Colectivo de «abejas»',['enjambre','rebaño','manada'],0),
+      op('«Casita» es un...',['diminutivo','aumentativo','colectivo'],0),
+      es('Escribe el plural de «pez»',['peces'])],
+  reto:[op('🔥 Colectivo de «árboles»',['bosque','flota','jauría'],0),
+        es('🔥 Plural de «ratón»',['ratones']),
+        op('🔥 Aumentativo de «casa»',['casona','casita','caserío'],0)]},
+ {t:'El adjetivo',tri:1,exp:`<p>El <b>adjetivo</b> dice cómo es el sustantivo y concuerda con él en <b>género y número</b>.</p><ul><li>Positivo: alto · Comparativo: más alto que · Superlativo: altísimo.</li><li>Muchos adjetivos salen de sustantivos: sol → soleado.</li></ul>`,ejemplo:'la niña alegre · las flores rojas',
+  ej:[op('En «la niña alegre», el adjetivo es...',['la','niña','alegre'],2),
+      op('Lo contrario de «alto» es...',['bajo','grande','largo'],0),
+      es('Completa: las flores (rojo) → las flores ...',['rojas']),
+      op('Superlativo de «grande»',['grandísimo','más grande','grande'],0),
+      op('El adjetivo concuerda con el sustantivo en...',['género y número','solo número','nada'],0),
+      es('Adjetivo que viene de «sol»: un día ...',['soleado'])],
+  reto:[op('🔥 «Más alto que» es grado...',['comparativo','superlativo','positivo'],0),
+        es('🔥 Superlativo de «fácil»',['facilísimo']),
+        op('🔥 El adjetivo de «Mi perro tiene el pelo suave» es...',['suave','pelo','tiene'],0)]},
+ {t:'Determinantes y pronombres',tri:2,exp:`<ul><li><b>Artículos:</b> el, la, los, las, un, una…</li><li><b>Demostrativos:</b> este, ese, aquel (dicen cerca o lejos).</li><li><b>Posesivos:</b> mi, tu, su, nuestro (dicen de quién es).</li><li><b>Numerales:</b> tres, primero…</li><li><b>Pronombres personales:</b> yo, tú, él, ella, nosotras, vosotros, ellas… sustituyen al nombre.</li></ul>`,ejemplo:'Lucía canta → Ella canta',
+  ej:[op('¿Cuál es un artículo?',['la','mesa','bonita'],0),
+      op('En «este libro», «este» es...',['demostrativo','posesivo','artículo'],0),
+      op('«Mi», «tu», «su» son...',['posesivos','numerales','verbos'],0),
+      op('Pronombre para «Ana y yo»',['nosotras','ellas','vosotras'],0),
+      op('«Lucía canta» → «... canta»',['Ella','Él','Nosotras'],0),
+      op('En «tres gatos», «tres» es...',['numeral','posesivo','demostrativo'],0)],
+  reto:[op('🔥 En «aquellas montañas», «aquellas» indica...',['lejanía','cercanía','posesión'],0),
+        op('🔥 «Pedro y tú» → pronombre',['vosotros','nosotros','ellos'],0),
+        op('🔥 En «nuestra clase», «nuestra» es...',['posesivo','artículo','demostrativo'],0)]},
+ {t:'El verbo',tri:2,exp:`<p>El <b>verbo</b> dice acciones. Su nombre es el <b>infinitivo</b>: cantar (1.ª conjugación), comer (2.ª), vivir (3.ª).</p><ul><li>Tiempos: <b>pasado</b> (canté), <b>presente</b> (canto), <b>futuro</b> (cantaré).</li><li>Persona y número: yo (1.ª sing.), nosotros (1.ª plural)…</li></ul>`,ejemplo:'Ayer jugué · Hoy juego · Mañana jugaré',
+  ej:[op('Infinitivo de «cantaba»',['cantar','canto','cantado'],0),
+      op('«Comeré» está en...',['futuro','pasado','presente'],0),
+      op('«Ayer jugué» está en...',['pasado','presente','futuro'],0),
+      op('«Vivir» es de la...',['tercera conjugación','primera conjugación','segunda conjugación'],0),
+      es('Presente de «saltar» con «yo»: yo ...',['salto']),
+      op('«Nosotros corremos» está en...',['1.ª persona plural','3.ª persona singular','2.ª persona plural'],0)],
+  reto:[es('🔥 Futuro: yo (bailar) → yo ...',['bailaré']),
+        op('🔥 «Temer» es de la...',['segunda conjugación','primera conjugación','tercera conjugación'],0),
+        es('🔥 Pasado: ella (escribir) → ella ...',['escribió'])]},
+ {t:'Ortografía: b/v, g/j y h',tri:3,exp:`<ul><li>Con <b>b</b>: los pasados en -aba (cantaba), y las palabras con bl, br (hablar, libro).</li><li>Con <b>v</b>: después de n (enviar) y los adjetivos en -avo, -ivo (octavo, activo).</li><li>Con <b>j</b>: palabras acabadas en -aje (viaje).</li><li>Con <b>g</b>: los verbos en -ger, -gir (coger, dirigir).</li><li>Con <b>h</b>: las que empiezan por hie-, hue- (hielo, huevo).</li></ul>`,ejemplo:'cantaba · viaje · huevo · enviar',
+  ej:[op('¿Cuál está bien escrita?',['hablar','ablar','havlar'],0),
+      op('¿Cuál está bien escrita?',['cantaba','cantava'],0),
+      op('¿Cuál está bien escrita?',['jirafa','girafa'],0),
+      op('¿Cuál está bien escrita?',['hielo','ielo','yelo'],0),
+      op('¿Cuál está bien escrita?',['enviar','embiar','enbiar'],0),
+      op('¿Cuál está bien escrita?',['coger','cojer'],0)],
+  reto:[op('🔥 ¿Cuál está bien escrita?',['huevo','güevo','uevo'],0),
+        op('🔥 ¿Cuál está bien escrita?',['viaje','viage'],0),
+        op('🔥 ¿Cuál está bien escrita?',['activo','actibo'],0)]},
+ {t:'La oración: sujeto y predicado',tri:3,exp:`<p>La <b>oración</b> tiene sentido completo. Se divide en <b>sujeto</b> (quién) y <b>predicado</b> (qué se dice del sujeto). El núcleo del predicado es el <b>verbo</b>.</p><ul><li>Enunciativa: Hace frío. · Interrogativa: ¿Hace frío? · Exclamativa: ¡Qué frío!</li></ul>`,ejemplo:'[Mi abuela] [cocina paella]',
+  ej:[op('Sujeto de «Las niñas juegan al fútbol»',['Las niñas','juegan','al fútbol'],0),
+      op('El núcleo del predicado es...',['el verbo','el sustantivo','el adjetivo'],0),
+      op('¿Cuál es interrogativa?',['¿Vienes mañana?','Vengo mañana.','¡Qué bien!'],0),
+      op('Predicado de «Mi abuela cocina paella»',['cocina paella','Mi abuela','paella'],0),
+      op('¿Cuál es exclamativa?',['¡Qué frío hace!','Hace frío.','¿Hace frío?'],0),
+      es('El verbo de «El gato duerme en el sofá» es...',['duerme'])],
+  reto:[op('🔥 Sujeto de «Ayer llegaron mis primas»',['mis primas','Ayer','llegaron'],0,'¿Quién llegó?'),
+        es('🔥 El verbo de «Mañana iremos al parque»',['iremos']),
+        op('🔥 «¡Cuidado!» es una oración...',['exclamativa','interrogativa','enunciativa'],0)]}
+]},
+{id:'nat',nom:'Ciencias de la Naturaleza',libro:'Ciencias de la Naturaleza 4',unis:[
+ {t:'La digestión',tri:1,exp:`<p>El <b>aparato digestivo</b> transforma los alimentos en nutrientes.</p><ul><li>Recorrido: boca → esófago → estómago → intestino delgado → intestino grueso → ano.</li><li>En la boca se forma el <b>bolo alimenticio</b> con la saliva.</li><li>En el intestino delgado los nutrientes pasan a la <b>sangre</b>.</li><li>El <b>hígado</b> y el páncreas ayudan con sus jugos.</li></ul>`,ejemplo:'Boca → esófago → estómago → intestinos',
+  ej:[op('¿Cuál es el orden correcto?',['boca → esófago → estómago → intestino','boca → estómago → esófago → intestino','esófago → boca → intestino → estómago'],0),
+      op('Los alimentos se mezclan con los jugos gástricos en...',['el estómago','la boca','el esófago'],0),
+      op('Los nutrientes pasan a la sangre en...',['el intestino delgado','el intestino grueso','la boca'],0),
+      es('¿Cuántos dientes definitivos tiene un adulto?',['32']),
+      op('Órgano que fabrica la bilis',['el hígado','el corazón','el pulmón'],0),
+      op('La saliva sirve para...',['ablandar y empezar a digerir','respirar','ver mejor'],0)],
+  reto:[op('🔥 El bolo alimenticio se forma en...',['la boca','el intestino','el hígado'],0),
+        op('🔥 En el intestino grueso...',['se absorbe agua y se forman las heces','se mastica','se fabrica saliva'],0),
+        op('🔥 La nutrición incluye...',['digestión, respiración, circulación y excreción','solo comer','solo dormir'],0)]},
+ {t:'Respiración, circulación y excreción',tri:1,exp:`<ul><li><b>Respiración:</b> tomamos oxígeno y expulsamos dióxido de carbono. El intercambio ocurre en los <b>alvéolos</b> de los pulmones.</li><li><b>Circulación:</b> el corazón (4 cavidades) bombea la sangre. Las <b>arterias</b> la llevan desde el corazón; las <b>venas</b>, hacia él.</li><li><b>Excreción:</b> los <b>riñones</b> limpian la sangre y forman la orina.</li></ul>`,ejemplo:'Oxígeno entra · dióxido de carbono sale',
+  ej:[op('Gas que tomamos al respirar',['oxígeno','dióxido de carbono','helio'],0),
+      op('Gas que expulsamos',['dióxido de carbono','oxígeno','hidrógeno'],0),
+      es('¿Cuántas cavidades tiene el corazón?',['4','cuatro']),
+      op('Vasos que llevan la sangre DESDE el corazón',['arterias','venas','capilares'],0),
+      op('El intercambio de gases ocurre en...',['los alvéolos','el estómago','los riñones'],0),
+      op('Órganos que forman la orina',['los riñones','los pulmones','el estómago'],0)],
+  reto:[op('🔥 Las venas llevan la sangre...',['hacia el corazón','desde el corazón','solo a los pies'],0),
+        op('🔥 Músculo que está debajo de los pulmones',['el diafragma','el bíceps','el corazón'],0),
+        op('🔥 La orina se guarda en...',['la vejiga','el hígado','el estómago'],0)]},
+ {t:'La salud',tri:1,exp:`<ul><li><b>Dieta equilibrada:</b> comer variado, con fruta y verdura cada día.</li><li>Proteínas: huevo, pescado, legumbres. Energía: pan, pasta, arroz.</li><li>Dormir entre 9 y 11 horas a tu edad.</li><li>Hacer ejercicio y lavarse las manos evita enfermedades.</li></ul>`,ejemplo:'Fruta + verdura + ejercicio + descanso',
+  ej:[op('Una dieta equilibrada es...',['comer variado de todos los grupos','comer solo carne','comer muchos dulces'],0),
+      op('¿Cuántas horas debe dormir una niña de 9 años?',['entre 9 y 11 horas','4 horas','15 horas'],0),
+      op('Alimento rico en proteínas',['el huevo','el azúcar','el aceite'],0),
+      op('Para evitar contagios...',['lavarse las manos','compartir el vaso','no ventilar'],0),
+      op('La fruta hay que comerla...',['todos los días','nunca','solo en verano'],0),
+      op('El ejercicio físico...',['fortalece músculos y corazón','es malo para la salud','solo sirve a mayores'],0)],
+  reto:[op('🔥 Alimentos que dan mucha energía',['pan, pasta y arroz','agua','lechuga'],0),
+        op('🔥 Las legumbres son, por ejemplo...',['lentejas y garbanzos','manzanas','leche'],0),
+        op('🔥 Una caries es...',['un agujero en un diente','un hueso roto','un resfriado'],0)]},
+ {t:'Los animales',tri:2,exp:`<ul><li><b>Vertebrados</b> (con esqueleto interno): mamíferos, aves, peces, reptiles y anfibios.</li><li><b>Invertebrados</b> (sin huesos): insectos (6 patas), arácnidos (8 patas), moluscos, gusanos…</li><li><b>Vivíparos</b> nacen del vientre de la madre; <b>ovíparos</b>, de huevos.</li></ul>`,ejemplo:'La ballena es un mamífero · la rana es un anfibio',
+  ej:[op('¿Cuál es vertebrado?',['la sardina','la mosca','el pulpo'],0),
+      op('Los mamíferos...',['maman leche de su madre','tienen plumas','no respiran'],0),
+      op('La rana es un...',['anfibio','reptil','pez'],0),
+      op('Invertebrado con 6 patas',['insecto','araña','gusano'],0),
+      es('¿Cuántas patas tiene una araña?',['8','ocho']),
+      op('¿Cuál es ovíparo?',['la gallina','el perro','la ballena'],0)],
+  reto:[op('🔥 La ballena es un...',['mamífero','pez','anfibio'],0),
+        op('🔥 El murciélago es un...',['mamífero','ave','insecto'],0),
+        op('🔥 Los reptiles tienen la piel cubierta de...',['escamas','plumas','pelo'],0)]},
+ {t:'Las plantas',tri:2,exp:`<p>Las plantas fabrican su alimento con la <b>fotosíntesis</b>: en las hojas, con luz, agua y dióxido de carbono. Liberan <b>oxígeno</b>.</p><ul><li>La raíz absorbe agua y sales; la <b>savia</b> sube por el tallo.</li><li>La <b>clorofila</b> es lo que las hace verdes.</li><li>La flor da el fruto, y dentro del fruto está la semilla.</li></ul>`,ejemplo:'Luz + agua + CO₂ → alimento + oxígeno',
+  ej:[op('Las plantas fabrican su alimento en...',['las hojas','las raíces','las flores'],0),
+      op('Para la fotosíntesis necesitan...',['luz, agua y dióxido de carbono','solo tierra','oscuridad'],0),
+      op('Las plantas liberan...',['oxígeno','humo','sal'],0),
+      op('Absorben el agua por...',['las raíces','los pétalos','el fruto'],0),
+      op('La semilla está dentro del...',['fruto','tallo','la hoja'],0),
+      op('La savia sube por...',['el tallo','el aire','la flor'],0)],
+  reto:[op('🔥 La polinización la hacen...',['los insectos y el viento','las piedras','los peces'],0),
+        op('🔥 Una planta sin flores es...',['el helecho','el rosal','el naranjo'],0),
+        op('🔥 El pigmento verde se llama...',['clorofila','melanina','hemoglobina'],0)]},
+ {t:'Los ecosistemas',tri:3,exp:`<p>Un <b>ecosistema</b> son los seres vivos y el lugar donde viven.</p><ul><li><b>Productores</b>: las plantas. <b>Consumidores</b>: herbívoros y carnívoros. <b>Descomponedores</b>: hongos y bacterias.</li><li>La <b>cadena alimentaria</b> dice quién come a quién.</li></ul>`,ejemplo:'hierba → conejo → zorro',
+  ej:[op('Un ecosistema es...',['los seres vivos y el lugar donde viven','solo los animales','solo las plantas'],0),
+      op('Los productores son...',['las plantas','los leones','las setas'],0),
+      op('¿Qué cadena es correcta?',['hierba → conejo → zorro','zorro → hierba → conejo','conejo → zorro → hierba'],0),
+      op('¿Cuál es herbívoro?',['la vaca','el lobo','el águila'],0),
+      op('Los descomponedores son...',['hongos y bacterias','águilas','peces'],0),
+      op('Para cuidar el medio ambiente...',['reciclar y ahorrar agua','tirar plástico al río','dejar el grifo abierto'],0)],
+  reto:[op('🔥 Un carnívoro es...',['el lince','la cabra','el conejo'],0),
+        op('🔥 Si desaparecen los conejos, el zorro...',['tendrá menos comida','tendrá más comida','no cambia nada'],0),
+        op('🔥 El mar es un ecosistema...',['acuático','terrestre','aéreo'],0)]},
+ {t:'La materia y la energía',tri:3,exp:`<ul><li>La materia puede estar en estado <b>sólido</b>, <b>líquido</b> o <b>gaseoso</b>.</li><li>El agua se congela a 0 °C y hierve a 100 °C.</li><li><b>Evaporación</b>: de líquido a gas. <b>Fusión</b>: de sólido a líquido.</li><li>Energías <b>renovables</b>: solar, eólica, hidráulica. No renovables: petróleo, carbón.</li></ul>`,ejemplo:'hielo (sólido) → agua (líquido) → vapor (gas)',
+  ej:[op('Los estados de la materia son...',['sólido, líquido y gaseoso','frío y caliente','duro y blando'],0),
+      op('El agua hierve a...',['100 °C','0 °C','50 °C'],0),
+      op('Al congelarse, el agua pasa a estado...',['sólido','gaseoso','líquido'],0),
+      op('Energía renovable',['solar','petróleo','carbón'],0),
+      op('Un imán atrae...',['el hierro','la madera','el plástico'],0),
+      op('El paso de líquido a gas es la...',['evaporación','fusión','solidificación'],0)],
+  reto:[op('🔥 La energía del viento se llama...',['eólica','solar','nuclear'],0),
+        op('🔥 El hielo se derrite: es la...',['fusión','evaporación','condensación'],0),
+        op('🔥 El petróleo es una energía...',['no renovable','renovable'],0)]}
+]},
+{id:'soc',nom:'Ciencias Sociales',libro:'Ciencias Sociales 4 · Región de Murcia',unis:[
+ {t:'El relieve de España',tri:1,exp:`<ul><li>En el centro está la <b>Meseta Central</b>, una gran llanura alta.</li><li>Los <b>Pirineos</b> hacen frontera con Francia.</li><li>El pico más alto de la Península es el <b>Mulhacén</b> (Sierra Nevada); el de España, el <b>Teide</b> (Canarias).</li><li>Islas: <b>Baleares</b> (Mediterráneo) y <b>Canarias</b> (Atlántico).</li></ul>`,ejemplo:'Meseta · Pirineos · Sierra Nevada · Teide',
+  ej:[op('La gran llanura del centro de España es...',['la Meseta Central','los Pirineos','el valle del Ebro'],0),
+      op('El pico más alto de España es...',['el Teide','el Mulhacén','el Aneto'],0),
+      op('El pico más alto de la Península es...',['el Mulhacén','el Teide','el Veleta'],0),
+      op('La cordillera que hace frontera con Francia',['los Pirineos','Sierra Nevada','los Montes de Toledo'],0),
+      op('Una llanura es un terreno...',['llano','muy alto','cubierto de agua'],0),
+      op('Islas del Mediterráneo',['Baleares','Canarias','Azores'],0)],
+  reto:[op('🔥 Las Canarias están en...',['el océano Atlántico','el mar Mediterráneo','el mar Cantábrico'],0),
+        op('🔥 Sierra Nevada está en la...',['cordillera Penibética','cordillera Cantábrica','Sistema Central'],0),
+        op('🔥 Una península es tierra rodeada de agua...',['por todas partes menos por una','por todas partes','por ninguna parte'],0)]},
+ {t:'Ríos, mares y costas',tri:1,exp:`<ul><li>El río más largo de la Península es el <b>Tajo</b>.</li><li>El <b>Ebro</b> desemboca en el Mediterráneo; el Duero, el Tajo y el Guadalquivir, en el Atlántico.</li><li>El río de la Región de Murcia es el <b>Segura</b>.</li><li>Mares: Cantábrico (norte) y Mediterráneo (este). Océano Atlántico (oeste y sur).</li></ul>`,ejemplo:'El Segura pasa por Murcia · el Guadalquivir, por Sevilla',
+  ej:[op('El río más largo de la Península es...',['el Tajo','el Ebro','el Segura'],0),
+      op('El Ebro desemboca en...',['el mar Mediterráneo','el océano Atlántico','el mar Cantábrico'],0),
+      op('El río de la Región de Murcia es...',['el Segura','el Duero','el Miño'],0),
+      op('La desembocadura es...',['donde el río llega al mar','donde nace el río','un puente'],0),
+      op('El mar del norte de España es...',['el Cantábrico','el Mediterráneo','el mar Rojo'],0),
+      op('Un afluente es...',['un río que desemboca en otro río','un río que llega al mar','un lago'],0)],
+  reto:[op('🔥 El Mar Menor está en...',['la Región de Murcia','Galicia','Asturias'],0),
+        op('🔥 El Guadalquivir pasa por...',['Sevilla','Madrid','Bilbao'],0),
+        op('🔥 El caudal de un río es...',['la cantidad de agua que lleva','su longitud','su color'],0)]},
+ {t:'El tiempo y el clima',tri:1,exp:`<ul><li>El <b>tiempo atmosférico</b> es lo que pasa en el aire un día concreto; el <b>clima</b>, el tiempo habitual durante muchos años.</li><li>Instrumentos: termómetro (temperatura), pluviómetro (lluvia), veleta (dirección del viento), anemómetro (velocidad del viento).</li><li>Climas de España: mediterráneo, oceánico, continental, de montaña y subtropical (Canarias).</li></ul>`,ejemplo:'Murcia: clima mediterráneo, veranos calurosos y secos',
+  ej:[op('El tiempo atmosférico es...',['lo que pasa en el aire un día concreto','el clima de muchos años','la hora del reloj'],0),
+      op('Instrumento que mide la temperatura',['el termómetro','el pluviómetro','la veleta'],0),
+      op('Instrumento que mide la lluvia',['el pluviómetro','el termómetro','el anemómetro'],0),
+      op('La veleta indica...',['la dirección del viento','la temperatura','la lluvia'],0),
+      op('Veranos calurosos y secos, junto al Mediterráneo',['clima mediterráneo','clima oceánico','clima de montaña'],0),
+      op('Clima del norte, con lluvias todo el año',['oceánico','mediterráneo','subtropical'],0)],
+  reto:[op('🔥 El clima de Canarias es...',['subtropical','de montaña','oceánico'],0),
+        op('🔥 El anemómetro mide...',['la velocidad del viento','la lluvia','la humedad'],0),
+        op('🔥 El clima es el tiempo habitual de un lugar...',['durante muchos años','solo hoy','solo en invierno'],0)]},
+ {t:'Cómo se organiza España',tri:2,exp:`<ul><li>La ley más importante es la <b>Constitución</b> de 1978.</li><li>España tiene <b>17 comunidades autónomas</b> y 2 ciudades autónomas: <b>Ceuta y Melilla</b>.</li><li>Las <b>Cortes Generales</b> (Congreso y Senado) hacen las leyes.</li><li>Cada municipio lo gobierna su <b>ayuntamiento</b>.</li><li>La capital de España es Madrid; la de la Región de Murcia, Murcia.</li></ul>`,ejemplo:'Constitución · 17 comunidades · Cortes · ayuntamientos',
+  ej:[es('¿Cuántas comunidades autónomas tiene España?',['17','diecisiete']),
+      op('Las ciudades autónomas son...',['Ceuta y Melilla','Madrid y Barcelona','Murcia y Cartagena'],0),
+      op('La ley más importante de España es...',['la Constitución','el reglamento del cole','una ordenanza'],0),
+      op('La Constitución es del año...',['1978','1492','2000'],0),
+      op('La capital de España es...',['Madrid','Sevilla','Toledo'],0),
+      op('La capital de la Región de Murcia es...',['Murcia','Cartagena','Lorca'],0)],
+  reto:[op('🔥 Un municipio lo gobierna...',['el ayuntamiento','el Senado','el colegio'],0),
+        op('🔥 Las leyes de España las hacen...',['las Cortes Generales','los alcaldes','los colegios'],0),
+        op('🔥 Las Cortes Generales son...',['el Congreso y el Senado','el ayuntamiento','los jueces'],0)]},
+ {t:'La Prehistoria',tri:2,exp:`<p>La <b>Prehistoria</b> va desde los primeros humanos hasta la invención de la <b>escritura</b>.</p><ul><li><b>Paleolítico:</b> nómadas, cazadores y recolectores; pinturas en cuevas como Altamira.</li><li><b>Neolítico:</b> aparecen la agricultura y la ganadería; se vuelven sedentarios.</li><li><b>Edad de los Metales:</b> cobre, bronce y hierro; monumentos como los dólmenes.</li></ul>`,ejemplo:'Paleolítico → Neolítico → Edad de los Metales',
+  ej:[op('La Prehistoria termina con...',['la invención de la escritura','los romanos','la rueda'],0),
+      op('Sus etapas son...',['Paleolítico, Neolítico y Edad de los Metales','Edad Antigua y Media','Moderna y Contemporánea'],0),
+      op('En el Paleolítico las personas eran...',['nómadas, cazadoras y recolectoras','agricultoras','romanas'],0),
+      op('En el Neolítico aparecen...',['la agricultura y la ganadería','la escritura','los coches'],0),
+      op('En la cueva de Altamira hay...',['pinturas rupestres','castillos','iglesias'],0),
+      op('Un dolmen es...',['un monumento de grandes piedras','una vasija','una herramienta'],0)],
+  reto:[op('🔥 Sedentario significa...',['que vive siempre en el mismo sitio','que viaja siempre','que caza'],0),
+        op('🔥 El primer metal que se trabajó fue...',['el cobre','el hierro','el oro blanco'],0),
+        op('🔥 Las pinturas rupestres se hacían en...',['cuevas y rocas','papel','madera'],0)]},
+ {t:'La Edad Antigua',tri:3,exp:`<p>La <b>Edad Antigua</b> empieza con la escritura.</p><ul><li>En la Península vivían <b>íberos</b> y <b>celtas</b>.</li><li><b>Fenicios, griegos</b> y cartagineses fundaron colonias en la costa. Cartagena era <b>Carthago Nova</b>.</li><li>Los <b>romanos</b> llamaron a la Península <b>Hispania</b> y trajeron el latín, las calzadas, los acueductos y los teatros.</li></ul>`,ejemplo:'Íberos y celtas → griegos y fenicios → romanos (Hispania)',
+  ej:[op('La Edad Antigua empieza con...',['la escritura','los dinosaurios','la imprenta'],0),
+      op('Pueblos que vivían en la Península antes de los romanos',['íberos y celtas','vikingos','aztecas'],0),
+      op('Fundaron colonias en la costa...',['griegos y fenicios','chinos','incas'],0),
+      op('Los romanos llamaron a la Península...',['Hispania','Iberlandia','Gallaecia'],0),
+      op('Obra romana para llevar agua',['el acueducto','el dolmen','el castillo'],0),
+      op('La lengua de los romanos era...',['el latín','el inglés','el árabe'],0)],
+  reto:[op('🔥 Carthago Nova es hoy...',['Cartagena','Madrid','Cádiz'],0),
+        op('🔥 Un teatro romano muy famoso está en...',['Mérida','Bilbao','Oviedo'],0),
+        op('🔥 Las termas romanas eran...',['baños públicos','templos','murallas'],0)]}
+]}
+];
+
+/* ============ PRÁCTICA SIN FIN (matemáticas) ============ */
+const az=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const miles=n=>n.toLocaleString('es-ES');
+const coma=n=>n.toFixed(2).replace('.',',');
+const GEN={
+ 'Números de hasta seis cifras':()=>{const n=az(100000,999999);return [
+   es(`Número siguiente a ${miles(n)}`,[String(n+1)]),es(`Número anterior a ${miles(n)}`,[String(n-1)]),
+   es(`${miles(Math.floor(n/1000)*1000)} + ${n%1000} = `,[String(n)])][az(0,2)];},
+ 'Sumas y restas grandes':()=>{const a=az(1000,9999),b=az(1000,9999);return Math.random()<.5?es(`${miles(a)} + ${miles(b)} = `,[String(a+b)]):es(`${miles(Math.max(a,b))} − ${miles(Math.min(a,b))} = `,[String(Math.abs(a-b))]);},
+ 'Multiplicar por dos cifras':()=>{const a=az(12,99),b=az(11,49);return es(`${a} × ${b} = `,[String(a*b)]);},
+ 'La división':()=>{const d=az(2,9),c=az(11,120);return es(`${miles(d*c)} : ${d} = `,[String(c)]);},
+ 'Las fracciones':()=>{const d=[2,3,4,5,6,8,10][az(0,6)],n=az(1,d-1),k=az(2,9);return es(`${n}/${d} de ${d*k} = `,[String(n*k)]);},
+ 'Números decimales y dinero':()=>{const a=az(100,900)/100,b=az(100,900)/100;return es(`${coma(a)} € + ${coma(b)} € = `,[coma(a+b)]);},
+ 'Longitud, masa, capacidad y tiempo':()=>{const n=az(2,9);return [es(`${n} km = ... m`,[String(n*1000)]),es(`${n} m = ... cm`,[String(n*100)]),es(`${n} kg = ... g`,[String(n*1000)]),es(`${n} horas = ... minutos`,[String(n*60)])][az(0,3)];},
+ 'Ángulos, polígonos y perímetro':()=>{const a=az(3,15),b=az(2,12);return es(`Perímetro de un rectángulo de ${a} cm por ${b} cm: ... cm`,[String(2*(a+b))]);}
+};
+
+/* ============ GLOSARIO, DICTADO, LECTURA ============ */
+const GLOSA=[['sustantivo','اسم'],['adjetivo','صفة'],['verbo','فعل'],['sujeto','فاعل / مسند إليه'],['predicado','مسند'],['sílaba','مقطع'],['tilde','علامة النبر'],['oración','جملة'],
+ ['suma','جمع'],['resta','طرح'],['multiplicación','ضرب'],['división','قسمة'],['cociente','ناتج القسمة'],['resto','الباقي'],['fracción','كسر'],['numerador','البسط'],['denominador','المقام'],['decimal','عدد عشري'],['perímetro','المحيط'],['ángulo','زاوية'],['recta','مستقيم'],['triángulo','مثلث'],['metro','متر'],['kilo','كيلو'],['litro','لتر'],
+ ['aparato digestivo','الجهاز الهضمي'],['estómago','معدة'],['intestino','أمعاء'],['pulmones','رئتان'],['corazón','قلب'],['sangre','دم'],['riñones','كليتان'],['vertebrado','فقاري'],['invertebrado','لافقاري'],['mamífero','ثديي'],['raíz','جذر'],['hoja','ورقة'],['fotosíntesis','البناء الضوئي'],['ecosistema','نظام بيئي'],
+ ['relieve','التضاريس'],['llanura','سهل'],['montaña','جبل'],['río','نهر'],['desembocadura','مصبّ'],['clima','مناخ'],['comunidad autónoma','منطقة ذاتية الحكم'],['Constitución','الدستور'],['ayuntamiento','البلدية'],['Prehistoria','ما قبل التاريخ'],['Edad Antigua','العصر القديم'],['romanos','الرومان']];
+const DICT=['murciélago','árbol','canción','pájaro','lápiz','camión','música','fácil','teléfono','azúcar','jirafa','huevo','bicicleta','estómago','corazón','pulmón','montaña','océano','ciudad','hierba','viaje','cantaba','máquina','fácilmente'];
+const LECTURA=`Aquella mañana, Carla abrió la ventana y vio que el jardín estaba lleno de mariposas. Había de todos los colores: amarillas, blancas y una azul que brillaba con el sol. Carla bajó despacio para no asustarlas y se sentó junto a los rosales. Su abuela le había contado que las mariposas ayudan a las flores a tener semillas, porque llevan el polen de una flor a otra. Carla sacó su cuaderno y empezó a dibujarlas. Contó doce mariposas en total. Cuando terminó, pensó que el jardín era como un pequeño ecosistema, donde cada ser vivo tiene su trabajo. Sonrió, guardó el cuaderno en la mochila y salió corriendo hacia el colegio.`;
+
+/* ============ ESTADO ============ */
+const HOY=new Date().toISOString().slice(0,10);
+let E={nombre:'',pts:0,racha:0,ultimo:'',hechas:{},retos:{}};
+let DB=null,tGuarda=null;
+try{const s=localStorage.getItem('jardin4');if(s)E=Object.assign(E,JSON.parse(s));}catch(e){}
+function guardar(){
+  try{localStorage.setItem('jardin4',JSON.stringify(E));}catch(e){}
+  if(DB){clearTimeout(tGuarda);tGuarda=setTimeout(()=>DB.doc('progreso/alumna').set(JSON.parse(JSON.stringify(E))).catch(()=>{}),900);}
+}
+function marcarDia(){if(E.ultimo===HOY)return;const ay=new Date(Date.now()-864e5).toISOString().slice(0,10);E.racha=E.ultimo===ay?E.racha+1:1;E.ultimo=HOY;}
+function sumar(n){E.pts+=n;marcarDia();guardar();pintarBarra();}
+const listo=(m,i)=>!!E.hechas[m+'-'+i];
+const total=()=>MATERIAS.reduce((a,m)=>a+m.unis.length,0);
+const hechas=()=>MATERIAS.reduce((a,m)=>a+m.unis.filter((u,i)=>listo(m.id,i)).length,0);
+function triActual(){const m=new Date().getMonth()+1;return m>=9?1:m<=3?2:3;}
+
+/* ============ UTILIDADES ============ */
+const $=s=>document.querySelector(s);
+const escH=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function norm(s){return String(s).toLowerCase().trim().normalize('NFD').replace(/[̀-ͯ]/g,'')
+  .replace(/[€\s]/g,'').replace(/(\d)\.(?=\d{3}(\D|$))/g,'$1').replace(/(\d)\.(\d)/g,'$1,$2').replace(/,0+$/,'').replace(/(,\d)0$/,'$1');}
+/* Voz de mujer en español: la primera que encuentre el navegador (Windows, Android, Apple o Google). */
+const MUJER=/helena|laura|elvira|elena|paloma|lucia|lucía|monica|mónica|paulina|sabina|dalia|marisol|esperanza|conchita|penelope|female|mujer/i;
+let VOZ=null;
+function elegirVoz(){try{const vs=speechSynthesis.getVoices().filter(v=>/^es/i.test(v.lang));
+  VOZ=vs.find(v=>/es-ES/i.test(v.lang)&&MUJER.test(v.name))||vs.find(v=>MUJER.test(v.name))||vs.find(v=>/google/i.test(v.name)&&/es-ES/i.test(v.lang))||vs.find(v=>/es-ES/i.test(v.lang))||vs[0]||null;}catch(e){}}
+try{elegirVoz();speechSynthesis.onvoiceschanged=elegirVoz;}catch(e){}
+/* Pulsar un altavoz mientras habla = parar. El botón flotante «Parar» también corta en cualquier momento. */
+function hablar(t,alternar){try{
+  if(alternar&&speechSynthesis.speaking){callar();return;}
+  const u=new SpeechSynthesisUtterance(t);u.lang='es-ES';u.rate=.9;u.pitch=1.15;if(VOZ)u.voice=VOZ;
+  u.onend=u.onerror=()=>{if(!speechSynthesis.speaking)$('#parar').hidden=true;};
+  speechSynthesis.cancel();speechSynthesis.speak(u);$('#parar').hidden=false;}catch(e){}}
+function callar(){try{speechSynthesis.cancel();}catch(e){}$('#parar').hidden=true;}
+function leerPregunta(){const q=L.lista[L.k];hablar(q.q.replace(/🔥/g,'').replace(/\.\.\./g,', ')+(q.t==='op'?'. '+q.o.join('. '):''),true);}
+function pintarBarra(){$('#pts').textContent=E.pts;$('#racha').textContent=E.racha;}
+function abrir(h){$('#modal').innerHTML=`<button class="icono cerrar" onclick="cerrar()" aria-label="Cerrar">✕</button>`+h;$('#velo').hidden=false;}
+function cerrar(){$('#velo').hidden=true;callar();clearInterval(CR);}
+$('#velo').addEventListener('click',e=>{if(e.target.id==='velo')cerrar();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')cerrar();});
+
+/* ============ VISTAS ============ */
+function inicio(){callar();
+  const p=Math.round(100*hechas()/total());
+  const sig=siguiente();
+  $('#vista').innerHTML=`
+  <section class="saludo">
+    <div>
+      <h1>${E.nombre?`¡Hola, <em>${escH(E.nombre)}</em>!`:'¡Hola, <em>estrella</em>!'}</h1>
+      <p>Tus cuatro libros de 4.º de Primaria. Cada lección que terminas hace crecer tu jardín.</p>
+      <div class="progreso"><div class="barra-p"><i style="width:${p}%"></i></div><b>${hechas()} / ${total()} lecciones</b></div>
+    </div>
+  </section>
+  ${!E.nombre?`<div class="hoy" style="margin-bottom:16px"><span class="flor">🌷</span><div class="txt"><b>¿Cómo te llamas?</b><span>Escribe tu nombre para que el jardín sea tuyo.</span></div>
+    <div class="entrada" style="flex:1;min-width:220px"><input id="nom" placeholder="Tu nombre" autocomplete="off"><button class="btn" onclick="ponNombre()">Guardar</button></div></div>`:''}
+  ${sig?`<div class="hoy"><span class="flor">🌼</span><div class="txt"><b>Hoy toca: ${escH(sig.u.t)}</b><span>${escH(sig.m.nom)} · ${sig.u.tri}.º trimestre</span></div><button class="btn" onclick="leccion('${sig.m.id}',${sig.i})">Empezar</button></div>`
+       :`<div class="hoy"><span class="flor">🏆</span><div class="txt"><b>¡Has terminado todo el jardín!</b><span>Repite los retos 🔥 para ganar más estrellas.</span></div></div>`}
+  <h2 class="titulo-sec">📝 Deberes de Matemáticas <small>10 ejercicios nuevos cada día</small></h2>
+  ${tarjetaDeberes()}
+  <h2 class="titulo-sec">Mis libros <small>toca un libro para ver sus lecciones</small></h2>
+  <div class="estante">${MATERIAS.map(m=>{const h=m.unis.filter((u,i)=>listo(m.id,i)).length;
+    return `<button class="libro" onclick="materia('${m.id}')"><div class="tapa">${PORT[m.id]}</div>
+      <span class="nm">${escH(m.nom)}</span><span class="mini"><span>${escH(m.libro)}</span><span>${h}/${m.unis.length}</span></span></button>`;}).join('')}</div>
+  <h2 class="titulo-sec">Caja de herramientas <small>para practicar cuando quieras</small></h2>
+  <div class="herrs">${HERR.map(h=>`<button class="herr" onclick="${h.f}()"><span class="ic">${h.ic}</span><span class="nm">${h.nm}</span><span class="ds">${h.ds}</span></button>`).join('')}</div>
+  <h2 class="titulo-sec">Mi libro digital</h2>
+  <div class="hoy"><span class="flor">💻</span><div class="txt"><b>Aula Virtual Santillana</b><span>Los cuatro libros son de Santillana. Con el código de licencia (dentro de la tapa o del colegio) se ven en el ordenador.</span></div>
+  <a class="btn lila" href="https://aulavirtual.santillana.es" target="_blank" rel="noopener">Abrir</a></div>`;
+}
+function siguiente(){
+  for(const t of [triActual(),1,2,3])for(const m of MATERIAS)for(let i=0;i<m.unis.length;i++)if(m.unis[i].tri===t&&!listo(m.id,i))return {m,u:m.unis[i],i};
+  return null;
+}
+/* ============ DEBERES DE MATEMÁTICAS ============ */
+/* 10 ejercicios por día de las unidades de matemáticas hasta el trimestre actual.
+   Se guardan al generarlos: los deberes de hoy no cambian aunque cierre y vuelva a abrir. */
+function deberesHoy(){
+  if(E.deb&&E.deb.fecha===HOY)return E.deb;
+  const mat=MATERIAS.find(m=>m.id==='mat');
+  const unis=mat.unis.filter(u=>u.tri<=triActual());
+  const lista=Array.from({length:10},(_,j)=>{const u=unis[j%unis.length];
+    return j%4===3?u.ej[az(0,u.ej.length-1)]:GEN[u.t]();}).sort(()=>Math.random()-.5);
+  E.deb={fecha:HOY,lista,nota:null};guardar();return E.deb;
+}
+function tarjetaDeberes(){
+  const d=deberesHoy(),hist=Object.entries(E.debHist||{}).sort().slice(-7);
+  const fecha=new Date().toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long'});
+  return `<div class="hoy"><span class="flor">${d.nota?'✅':'📝'}</span><div class="txt">
+    <b>${d.nota?`Deberes hechos: ${d.nota}`:'Deberes de hoy sin hacer'}</b><span style="text-transform:capitalize">${fecha}</span>
+    ${hist.length?`<div class="mandos" style="margin-top:6px">${hist.map(([f,n])=>`<span class="chip" title="${f}">${f.slice(8)}/${f.slice(5,7)} · ${n}</span>`).join('')}</div>`:''}</div>
+    <button class="btn" onclick="hacerDeberes()">${d.nota?'Repasar':'Hacer los deberes'}</button></div>`;
+}
+function hacerDeberes(){const d=deberesHoy();L={id:'deb',i:0,modo:'deb',lista:d.lista,k:0,res:[],hecha:false};pregunta();}
+
+function ponNombre(){const v=$('#nom').value.trim();if(!v)return;E.nombre=v.slice(0,24);guardar();inicio();}
+
+function materia(id){callar();
+  const m=MATERIAS.find(x=>x.id===id);
+  $('#vista').innerHTML=`<button class="volver" onclick="inicio()">← Mis libros</button>
+  <div class="cab-mat"><div class="tapa">${PORT[id]}</div><div><h1 style="font-size:32px">${escH(m.nom)}</h1><p class="nota">${escH(m.libro)} · Santillana</p></div></div>
+  ${[1,2,3].map(t=>{const us=m.unis.map((u,i)=>({u,i})).filter(x=>x.u.tri===t);if(!us.length)return '';
+    return `<h3 class="tri">${t}.º trimestre</h3><div class="unis">${us.map(({u,i})=>`
+      <button class="uni ${listo(id,i)?'lista':''}" onclick="leccion('${id}',${i})"><span class="num">${listo(id,i)?'✓':i+1}</span>
+      <span class="t">${escH(u.t)}<br><span class="e">${E.retos[id+'-'+i]?'🔥 Reto superado':listo(id,i)?'Lección terminada · falta el reto 🔥':'6 ejercicios + reto'}</span></span><span>›</span></button>`).join('')}</div>`;}).join('')}`;
+  scrollTo(0,0);
+}
+
+/* ============ LECCIÓN ============ */
+let L=null;
+function leccion(id,i){callar();
+  const m=MATERIAS.find(x=>x.id===id),u=m.unis[i];
+  $('#vista').innerHTML=`<button class="volver" onclick="materia('${id}')">← ${escH(m.nom)}</button>
+  <div class="leccion"><h1 style="font-size:28px;margin-bottom:10px">${escH(u.t)}</h1>
+   <div class="explica">${u.exp}</div><div class="ejemplo">✏️ ${escH(u.ejemplo)}</div>
+   <div class="mandos"><button class="btn" onclick="empezar('${id}',${i},'ej')">Hacer los ejercicios</button>
+   <button class="btn sec" onclick="empezar('${id}',${i},'reto')">🔥 Reto</button>
+   ${GEN[u.t]?`<button class="btn sec" onclick="empezar('${id}',${i},'gen')">♾️ Práctica sin fin</button>`:''}
+   <button class="btn sec" onclick="hablar(document.querySelector('.explica').innerText,true)">🔊 Escuchar</button></div></div>`;
+  scrollTo(0,0);
+}
+function empezar(id,i,modo){
+  const u=MATERIAS.find(x=>x.id===id).unis[i];
+  const lista=modo==='gen'?Array.from({length:8},()=>GEN[u.t]()):u[modo];
+  L={id,i,modo,lista,k:0,res:[],hecha:false};pregunta();
+}
+function pregunta(){callar();
+  const q=L.lista[L.k],deb=L.modo==='deb';
+  const titulo=deb?'Inicio':MATERIAS.find(x=>x.id===L.id).unis[L.i].t;
+  L.hecha=false;
+  $('#vista').innerHTML=`<button class="volver" onclick="${deb?'inicio()':`leccion('${L.id}',${L.i})`}">← ${escH(titulo)}</button>
+  <div class="leccion">${deb?'<h1 style="font-size:24px;margin-bottom:8px">📝 Deberes de Matemáticas</h1>':''}<div class="pasos">${L.lista.map((x,j)=>`<i class="${L.res[j]===true?'si':L.res[j]===false?'no':j===L.k?'ya':''}"></i>`).join('')}</div>
+   <p class="nota">${L.modo==='reto'?'🔥 Reto':L.modo==='gen'?'♾️ Práctica sin fin':deb?'Deber':'Ejercicio'} ${L.k+1} de ${L.lista.length}</p>
+   <div class="preg" style="display:flex;gap:10px;align-items:flex-start"><button class="icono" onclick="leerPregunta()" aria-label="Leer la pregunta en voz alta" title="Escuchar">🔊</button><span>${escH(q.q)}</span></div>
+   ${q.t==='op'?`<div class="ops">${q.o.map((o,j)=>`<button class="op" data-j="${j}" onclick="responder(${j})">${escH(o)}</button>`).join('')}</div>`
+     :`<form class="entrada" onsubmit="event.preventDefault();responder($('#resp').value)"><input id="resp" autocomplete="off" inputmode="${/\d/.test(q.r[0])?'decimal':'text'}" placeholder="Tu respuesta"><button class="btn">Comprobar</button></form>`}
+   <div id="ver"></div></div>`;
+  const inp=$('#resp');if(inp)inp.focus();
+}
+function responder(v){
+  if(L.hecha)return;const q=L.lista[L.k];
+  const bien=q.t==='op'?v===q.r:q.r.some(r=>norm(r)===norm(v));
+  if(q.t==='esc'&&!String(v).trim())return;
+  L.hecha=true;L.res[L.k]=bien;
+  if(q.t==='op')document.querySelectorAll('.op').forEach(b=>{const j=+b.dataset.j;if(j===q.r)b.classList.add('si');else if(j===v)b.classList.add('no');b.disabled=true;});
+  if(bien&&L.modo!=='deb')sumar(L.modo==='reto'?20:10);
+  const correcta=q.t==='op'?q.o[q.r]:q.r[0];
+  const frase=bien?['¡Muy bien! 🌸','¡Genial! ⭐','¡Perfecto! 🌷'][az(0,2)]:`Casi. La respuesta es: ${correcta}`;
+  hablar(frase.replace(/[^\p{L}\p{N}\s,.:¡!¿?\/-]/gu,''));
+  $('#ver').innerHTML=`<div class="veredicto ${bien?'si':'no'}">${escH(frase)}${q.p?`<br><span style="font-weight:600">${escH(q.p)}</span>`:''}</div>
+   <div class="mandos"><button class="btn" id="bsig" onclick="seguir()">${L.k<L.lista.length-1?'Siguiente →':'Ver resultado'}</button></div>`;
+  $('#bsig').focus();
+}
+function seguir(){L.k++;if(L.k<L.lista.length)pregunta();else final();}
+function final(){
+  const ok=L.res.filter(Boolean).length,n=L.lista.length,key=L.id+'-'+L.i;
+  const aprobado=ok>=Math.ceil(n*.6);
+  if(L.modo==='deb'){const primera=!E.deb.nota;E.deb.nota=`${ok}/${n}`;E.debHist=Object.assign({},E.debHist,{[HOY]:E.deb.nota});
+    if(primera)sumar(ok*2);else guardar();
+    $('#vista').innerHTML=`<div class="leccion fin"><div class="grande">${ok===n?'🏆':aprobado?'✅':'🌱'}</div>
+     <h1>Deberes: ${ok} de ${n}</h1><p>${ok===n?'¡Todos bien! Mañana tendrás deberes nuevos.':aprobado?'¡Deberes hechos! Mañana, más.':'Repasa las lecciones de Matemáticas y vuelve a intentarlo.'}</p>
+     <div class="mandos" style="justify-content:center"><button class="btn" onclick="hacerDeberes()">Repasar</button><button class="btn sec" onclick="inicio()">Inicio</button></div></div>`;
+    return;}
+  if(aprobado&&L.modo==='ej'&&!E.hechas[key]){E.hechas[key]=HOY;sumar(30);}
+  if(aprobado&&L.modo==='reto'&&!E.retos[key]){E.retos[key]=HOY;sumar(50);}
+  $('#vista').innerHTML=`<div class="leccion fin"><div class="grande">${ok===n?'🏆':aprobado?'🌻':'🌱'}</div>
+   <h1>${ok} de ${n}</h1><p>${ok===n?'¡Todo perfecto!':aprobado?'¡Lección superada! Tu jardín ha crecido.':'Casi lo tienes. Lee otra vez la explicación y vuelve a intentarlo.'}</p>
+   <div class="mandos" style="justify-content:center"><button class="btn" onclick="empezar('${L.id}',${L.i},'${L.modo}')">Otra vez</button>
+   <button class="btn sec" onclick="materia('${L.id}')">Volver al libro</button><button class="btn sec" onclick="inicio()">Inicio</button></div></div>`;
+}
+
+/* ============ HERRAMIENTAS ============ */
+const HERR=[
+ {ic:'✖️',nm:'Tablas de multiplicar',ds:'Del 2 al 10, con juego',f:'hTablas'},
+ {ic:'➗',nm:'Multiplica y divide',ds:'Cuentas de 4.º sin parar',f:'hCalculo'},
+ {ic:'🔊',nm:'Dictado con tildes',ds:'Escucha y escribe',f:'hDictado'},
+ {ic:'⏱️',nm:'Leer en voz alta',ds:'Tus palabras por minuto',f:'hLectura'},
+ {ic:'🗣️',nm:'Castellano ↔ عربي',ds:'Palabras de clase',f:'hGlosario'}
+];
+let TQ=null;
+function hTablas(){abrir(`<h2>Tablas de multiplicar</h2><p class="nota">Elige una tabla para verla, o juega con todas.</p>
+  <div class="mandos">${[2,3,4,5,6,7,8,9,10].map(n=>`<button class="btn sec" onclick="verTabla(${n})">${n}</button>`).join('')}<button class="btn" onclick="juegoTabla()">🎲 Jugar</button></div><div id="tz" style="margin-top:12px"></div>`);}
+function verTabla(n){$('#tz').innerHTML=`<div class="tabla-num">${Array.from({length:10},(_,i)=>`<div>${n} × ${i+1} = <b>${n*(i+1)}</b></div>`).join('')}</div>`;}
+function juegoTabla(){const a=az(2,10),b=az(2,10);TQ=a*b;$('#tz').innerHTML=`<div class="preg">${a} × ${b} = ?</div>
+  <form class="entrada" onsubmit="event.preventDefault();compTabla()"><input id="tr" inputmode="numeric" autocomplete="off"><button class="btn">Comprobar</button></form><div id="tv"></div>`;$('#tr').focus();}
+function compTabla(){const ok=+$('#tr').value===TQ;if(ok)sumar(2);$('#tv').innerHTML=`<div class="veredicto ${ok?'si':'no'}">${ok?'¡Bien! +2 ⭐':'Era '+TQ}</div><div class="mandos"><button class="btn" onclick="juegoTabla()">Otra</button></div>`;}
+let CQ=null;
+function hCalculo(){abrir(`<h2>Multiplica y divide</h2><div id="cz"></div>`);nuevoCalc();}
+function nuevoCalc(){let q;if(Math.random()<.5){const a=az(12,99),b=az(2,9);q=[`${a} × ${b}`,a*b];}else{const d=az(2,9),c=az(12,99);q=[`${d*c} : ${d}`,c];}
+  CQ=q[1];$('#cz').innerHTML=`<div class="preg">${q[0]} = ?</div><form class="entrada" onsubmit="event.preventDefault();compCalc()"><input id="cr" inputmode="numeric" autocomplete="off"><button class="btn">Comprobar</button></form><div id="cv"></div>`;$('#cr').focus();}
+function compCalc(){const ok=+$('#cr').value===CQ;if(ok)sumar(3);$('#cv').innerHTML=`<div class="veredicto ${ok?'si':'no'}">${ok?'¡Bien! +3 ⭐':'Era '+CQ}</div><div class="mandos"><button class="btn" onclick="nuevoCalc()">Otra</button></div>`;}
+let DW='';
+function hDictado(){abrir(`<h2>Dictado con tildes</h2><p class="nota">Pulsa el altavoz y escribe la palabra. ¡Cuidado con las tildes!</p><div id="dz"></div>`);nuevaPal();}
+function nuevaPal(){DW=DICT[az(0,DICT.length-1)];$('#dz').innerHTML=`<div class="mandos"><button class="btn lila" onclick="hablar(DW)">🔊 Escuchar</button></div>
+  <form class="entrada" style="margin-top:10px" onsubmit="event.preventDefault();compDict()"><input id="dr" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="btn">Comprobar</button></form><div id="dv"></div>`;hablar(DW);}
+function compDict(){const v=$('#dr').value.trim().toLowerCase(),ok=v===DW;const casi=!ok&&norm(v)===norm(DW);if(ok)sumar(3);
+  $('#dv').innerHTML=`<div class="veredicto ${ok?'si':'no'}">${ok?'¡Perfecto! +3 ⭐':casi?`Casi: falta o sobra una tilde → <b>${DW}</b>`:`Se escribe: <b>${DW}</b>`}</div><div class="mandos"><button class="btn" onclick="nuevaPal()">Otra palabra</button></div>`;}
+let CR=null,CT=0;
+function hLectura(){abrir(`<h2>Leer en voz alta</h2><p class="nota">Pulsa «Empezar», lee el texto en voz alta y pulsa «Terminé».</p>
+  <div class="lectura">${LECTURA}</div><div class="mandos"><button class="btn" id="bl" onclick="lectura()">Empezar</button><span class="chip" id="lc">0 s</span></div><div id="lv"></div>`);}
+function lectura(){const b=$('#bl');
+  if(!CR){CT=Date.now();CR=setInterval(()=>{$('#lc').textContent=Math.round((Date.now()-CT)/1000)+' s';},250);b.textContent='Terminé';return;}
+  clearInterval(CR);CR=null;const s=(Date.now()-CT)/1000,p=Math.round(LECTURA.split(/\s+/).length/(s/60));b.textContent='Otra vez';sumar(5);
+  $('#lv').innerHTML=`<div class="veredicto si">${p} palabras por minuto. ${p>=90?'¡Lees muy bien para 4.º!':'En 4.º se busca llegar a unas 90–110. ¡Sigue practicando!'}</div>`;}
+function hGlosario(){abrir(`<h2>Castellano ↔ عربي</h2><p class="nota">Las palabras de clase que más se repiten, con su traducción para casa.</p>
+  <input class="buscador" id="gq" placeholder="Busca una palabra…" oninput="filtra(this.value)"><div style="overflow-x:auto"><table class="glosa"><thead><tr><th>Castellano</th><th style="text-align:right">عربي</th><th></th></tr></thead><tbody id="gtb"></tbody></table></div>`);filtra('');}
+function filtra(q){const n=norm(q);$('#gtb').innerHTML=GLOSA.filter(r=>!n||norm(r[0]).includes(n)||r[1].includes(q.trim())).map(r=>`<tr><td>${escH(r[0])}</td><td dir="rtl">${escH(r[1])}</td><td><button class="btn sec" style="padding:4px 10px" onclick='hablar(${JSON.stringify(r[0])},true)'>🔊</button></td></tr>`).join('');}
+
+$('#btn-familia').onclick=()=>abrir(`<div class="ar"><h2>دليل العائلة</h2>
+ <p>هذه البوّابة مبنيّة على كتب ابنتكم الأربعة للسنة الرابعة ابتدائي (Santillana): الرياضيات، واللغة الإسبانية، وعلوم الطبيعة، والعلوم الاجتماعية.</p>
+ <p><b>كيف تُستعمل كل يوم (20 دقيقة):</b></p>
+ <ul><li>تضغط على «Hoy toca» فيظهر لها الدرس المناسب للفصل الحالي.</li><li>تقرأ الشرح (أو تضغط 🔊 لتسمعه)، ثم تحلّ 6 تمارين.</li><li>إذا أجابت عن 4 من 6 أو أكثر، يُحسب الدرس منتهياً وتنمو «حديقتها».</li><li>بعدها تجرّب «التحدّي 🔥» لنجوم إضافية.</li></ul>
+ <p><b>أدوات إضافية:</b> جدول الضرب، والإملاء بالنبرات، والقراءة بصوت عالٍ (تقيس عدد الكلمات في الدقيقة؛ المطلوب في الرابعة نحو 90–110)، وقاموس إسباني↔عربي لمصطلحات الدروس.</p>
+ <p><b>ملاحظة:</b> كتاب العلوم الاجتماعية طبعة إقليم مورسيا، لذلك فيه نهر Segura وMar Menor وCartagena. إن كانت المدرسة في منطقة أخرى، فقارنوا الدروس بما يُدرَّس في الصف.</p>
+ <p><b>الكتاب الرقمي:</b> من «Mi libro digital» تفتحون Aula Virtual Santillana برمز الترخيص الموجود داخل غلاف الكتاب أو من المدرسة. الكتب المستعملة غالباً رمزها مستهلك.</p>
+ <p class="nota">التقدّم يُحفظ تلقائياً. الدروس والتمارين مكتوبة خصيصاً لهذه البوّابة على منهج السنة الرابعة، وليست نسخة من صفحات الكتب.</p></div>`);
+
+/* ============ TEMA + ARRANQUE ============ */
+$('#btn-tema').onclick=()=>{const d=document.documentElement,oscuro=d.dataset.theme?d.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;d.dataset.theme=oscuro?'light':'dark';};
+pintarBarra();inicio();
+if(window.claude&&claude.use)claude.use('db').then(db=>{if(!db)return;DB=db;
+  db.doc('progreso/alumna').get().then(d=>{const v=d&&(d.data?d.data():d);if(v&&typeof v==='object'&&(v.pts||0)>=E.pts){E=Object.assign(E,v);pintarBarra();inicio();}}).catch(()=>{});}).catch(()=>{});
+</script>
+<footer style="text-align:center;padding:18px 16px 28px;color:var(--tinta-2);font-size:13px">Hecho con cariño por <b>NasriTools</b> · © 2026</footer>
+</body></html>
