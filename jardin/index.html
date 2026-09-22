@@ -88,7 +88,13 @@ main{max-width:1020px;margin:0 auto;padding-inline:16px;padding-block:18px 60px}
 .herr:hover{border-color:var(--lila)}
 .herr .ic{font-size:24px} .herr .nm{font-weight:800} .herr .ds{font-size:13px;color:var(--tinta-2)}
 
-.volver{display:inline-flex;align-items:center;gap:6px;color:var(--tinta-2);font-weight:700;margin-bottom:12px}
+/* Botón «volver»: grande, con color y una flecha en círculo, para que se vea que es para ir atrás */
+.volver{display:inline-flex;align-items:center;gap:10px;margin-bottom:14px;padding:8px 18px 8px 8px;border-radius:999px;
+  background:var(--lila-claro);color:var(--tinta);font-family:var(--f-tit);font-weight:700;font-size:18px;
+  border:2px solid var(--lila);box-shadow:0 3px 0 rgba(155,123,212,.35);transition:transform .15s}
+.volver .flecha{width:36px;height:36px;border-radius:50%;background:var(--lila);color:#fff;display:grid;place-items:center;font-size:22px;line-height:1}
+.volver:hover{transform:translateX(-3px)}
+.volver:active{transform:translateY(2px);box-shadow:none}
 .cab-mat{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
 .cab-mat .tapa{width:110px;border-radius:4px 10px 10px 4px;overflow:hidden;box-shadow:var(--sombra)}
 .cab-mat svg{display:block;width:100%;height:auto}
@@ -653,7 +659,7 @@ function ponNombre(){const v=$('#nom').value.trim();if(!v)return;E.nombre=v.slic
 
 function materia(id){callar();
   const m=MATERIAS.find(x=>x.id===id);
-  $('#vista').innerHTML=`<button class="volver" onclick="inicio()">← Mis libros</button>
+  $('#vista').innerHTML=`<button class="volver" onclick="inicio()"><span class="flecha" aria-hidden="true">←</span>Mis libros</button>
   <div class="cab-mat"><div class="tapa">${PORT[id]}</div><div><h1 style="font-size:32px">${escH(m.nom)}</h1><p class="nota">${escH(m.libro)} · Santillana</p></div></div>
   ${[1,2,3].map(t=>{const us=m.unis.map((u,i)=>({u,i})).filter(x=>x.u.tri===t);if(!us.length)return '';
     return `<h3 class="tri">${t}.º trimestre</h3><div class="unis">${us.map(({u,i})=>`
@@ -666,7 +672,7 @@ function materia(id){callar();
 let L=null;
 function leccion(id,i){callar();
   const m=MATERIAS.find(x=>x.id===id),u=m.unis[i];
-  $('#vista').innerHTML=`<button class="volver" onclick="materia('${id}')">← ${escH(m.nom)}</button>
+  $('#vista').innerHTML=`<button class="volver" onclick="materia('${id}')"><span class="flecha" aria-hidden="true">←</span>${escH(m.nom)}</button>
   <div class="leccion"><h1 style="font-size:28px;margin-bottom:10px">${escH(u.t)}</h1>
    <div class="explica">${u.exp}</div><div class="ejemplo">✏️ ${escH(u.ejemplo)}</div>
    <div class="mandos"><button class="btn" onclick="empezar('${id}',${i},'ej')">Hacer los ejercicios</button>
@@ -684,7 +690,7 @@ function pregunta(){callar();
   const q=L.lista[L.k],deb=L.modo==='deb';
   const titulo=deb?'Inicio':MATERIAS.find(x=>x.id===L.id).unis[L.i].t;
   L.hecha=false;
-  $('#vista').innerHTML=`<button class="volver" onclick="${deb?'inicio()':`leccion('${L.id}',${L.i})`}">← ${escH(titulo)}</button>
+  $('#vista').innerHTML=`<button class="volver" onclick="${deb?'inicio()':`leccion('${L.id}',${L.i})`}"><span class="flecha" aria-hidden="true">←</span>${escH(titulo)}</button>
   <div class="leccion">${deb?'<h1 style="font-size:24px;margin-bottom:8px">📝 Deberes de Matemáticas</h1>':''}<div style="display:flex;align-items:center;gap:14px;margin-bottom:6px"><div class="estrella-prog" id="eprog" style="--p:${L.k/L.lista.length}" title="Tu estrella se enciende con cada ejercicio">${estrellaSola()}</div>
    <div class="pasos" style="margin:0">${L.lista.map((x,j)=>`<i class="${L.res[j]===true?'si':L.res[j]===false?'no':j===L.k?'ya':''}"></i>`).join('')}</div></div>
    <p class="nota">${L.modo==='reto'?'🔥 Reto':L.modo==='gen'?'♾️ Práctica sin fin':deb?'Deber':'Ejercicio'} ${L.k+1} de ${L.lista.length}</p>
