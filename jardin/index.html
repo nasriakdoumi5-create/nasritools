@@ -7,6 +7,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
+<meta charset="utf-8">
 <title>Mi Jardín de Estudio · NasriTools</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -135,6 +136,13 @@ table.glosa{width:100%;border-collapse:collapse;font-size:15px}
 .enlace{color:var(--rosa);font-weight:800}
 .modal.ancho{max-width:1100px;height:90vh;display:flex;flex-direction:column;padding:14px}
 .modal.ancho iframe{flex:1;width:100%;border:1px solid var(--borde);border-radius:12px;background:#fff}
+/* Nombre con estrella: la punta de la estrella baja y se mete en la «V» de la y */
+.nombre-marca{font-family:var(--f-tit);font-weight:800;line-height:1;letter-spacing:-.01em;white-space:nowrap;
+  background:linear-gradient(100deg,var(--lila) 0%,var(--rosa) 55%,#F08A4B 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.nombre-marca .y{position:relative;display:inline-block}
+.nombre-marca .estrella{position:absolute;left:50%;bottom:.40em;width:.50em;height:.50em;transform:translateX(-38%) rotate(-8deg);
+  filter:drop-shadow(0 .03em .05em rgba(232,87,139,.45));animation:brilla 3.2s ease-in-out infinite}
+@keyframes brilla{0%,100%{transform:translateX(-38%) rotate(-8deg) scale(1)}50%{transform:translateX(-38%) rotate(6deg) scale(1.08)}}
 .parar{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:60;background:var(--tinta);color:var(--papel);box-shadow:var(--sombra)}
 .nota{font-size:13px;color:var(--tinta-2)}
 </style>
@@ -143,7 +151,7 @@ table.glosa{width:100%;border-collapse:collapse;font-size:15px}
 <header class="barra">
   <span class="marca" aria-label="Mi Jardín de Estudio">
     <svg width="30" height="30" viewBox="0 0 40 40" aria-hidden="true"><g fill="#E8578B"><circle cx="20" cy="10" r="7"/><circle cx="29.5" cy="17" r="7"/><circle cx="26" cy="28" r="7"/><circle cx="14" cy="28" r="7"/><circle cx="10.5" cy="17" r="7"/></g><circle cx="20" cy="20" r="6" fill="#F6B940"/></svg>
-    Mi Jardín
+    <span id="marca-barra">Mi Jardín</span>
   </span>
   <span class="sep"></span>
   <span class="chip sol" title="Estrellas">⭐ <b id="pts">0</b></span>
@@ -514,7 +522,7 @@ const GLOSA=[['sustantivo','اسْمٌ'],['adjetivo','صِفَةٌ'],['verbo','�
  ['relieve','التَّضاريسُ'],['llanura','سَهْلٌ'],['montaña','جَبَلٌ'],['río','نَهْرٌ'],['desembocadura','مَصَبٌّ'],['clima','مُناخٌ'],['comunidad autónoma','مِنْطَقَةٌ ذاتِيَّةُ الحُكْمِ'],['Constitución','الدُّسْتورُ'],['ayuntamiento','البَلَدِيَّةُ'],['Prehistoria','ما قَبْلَ التّاريخِ'],['Edad Antigua','العَصْرُ القَديمُ'],['romanos','الرّومانُ'],
  ['familia','عائِلَةٌ'],['madre','أُمٌّ'],['padre','أَبٌ'],['hermana','أُخْتٌ'],['hermano','أَخٌ'],['colegio','مَدْرَسَةٌ'],['maestra','مُعَلِّمَةٌ'],['libro','كِتابٌ'],['cuaderno','دَفْتَرٌ'],['lápiz','قَلَمُ رَصاصٍ'],
  ['agua','ماءٌ'],['pan','خُبْزٌ'],['casa','بَيْتٌ'],['sol','شَمْسٌ'],['luna','قَمَرٌ'],['estrella','نَجْمَةٌ'],['flor','زَهْرَةٌ'],['árbol','شَجَرَةٌ'],['gracias','شُكْرًا'],['buenos días','صَباحُ الخَيْرِ']];
-const sinTashkil=s=>s.replace(/[ً-ْٰ]/g,'');
+const sinTashkil=s=>s.replace(/[\u064B-\u0652\u0670]/g,'');
 const DICT=['murciélago','árbol','canción','pájaro','lápiz','camión','música','fácil','teléfono','azúcar','jirafa','huevo','bicicleta','estómago','corazón','pulmón','montaña','océano','ciudad','hierba','viaje','cantaba','máquina','fácilmente'];
 const LECTURA=`Aquella mañana, Carla abrió la ventana y vio que el jardín estaba lleno de mariposas. Había de todos los colores: amarillas, blancas y una azul que brillaba con el sol. Carla bajó despacio para no asustarlas y se sentó junto a los rosales. Su abuela le había contado que las mariposas ayudan a las flores a tener semillas, porque llevan el polen de una flor a otra. Carla sacó su cuaderno y empezó a dibujarlas. Contó doce mariposas en total. Cuando terminó, pensó que el jardín era como un pequeño ecosistema, donde cada ser vivo tiene su trabajo. Sonrió, guardó el cuaderno en la mochila y salió corriendo hacia el colegio.`;
 
@@ -558,11 +566,20 @@ function hablar(t,alternar,ar){try{
   speechSynthesis.cancel();speechSynthesis.speak(u);$('#parar').hidden=false;}catch(e){}}
 function callar(){try{speechSynthesis.cancel();}catch(e){}$('#parar').hidden=true;}
 function leerPregunta(){const q=L.lista[L.k];hablar(q.q.replace(/🔥/g,'').replace(/\.\.\./g,', ')+(q.t==='op'?'. '+q.o.join('. '):''),true);}
-function pintarBarra(){$('#pts').textContent=E.pts;$('#racha').textContent=E.racha;}
+function pintarBarra(){$('#pts').textContent=E.pts;$('#racha').textContent=E.racha;if(E.nombre)$('#marca-barra').innerHTML=marca(E.nombre,'24px');}
 function abrir(h){$('#modal').innerHTML=`<button class="icono cerrar" onclick="cerrar()" aria-label="Cerrar">✕</button>`+h;$('#velo').hidden=false;}
 function cerrar(){$('#modal').classList.remove('ancho');$('#velo').hidden=true;callar();clearInterval(CR);}
 $('#velo').addEventListener('click',e=>{if(e.target.id==='velo')cerrar();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')cerrar();});
+
+/* ============ NOMBRE CON ESTRELLA ============ */
+const NOMBRE='Romaysae';
+const ESTRELLA=`<svg class="estrella" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="gE" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD66B"/><stop offset="1" stop-color="#F6A623"/></linearGradient></defs>
+  <polygon points="50,98 38.2,66.2 4.3,64.8 31,43.8 21.8,11.2 50,30 78.2,11.2 69,43.8 95.7,64.8 61.8,66.2" fill="url(#gE)" stroke="#E8578B" stroke-width="4" stroke-linejoin="round"/></svg>`;
+function marca(nombre,px){const i=nombre.toLowerCase().indexOf('y');const e=escH(nombre);
+  const cuerpo=i<0?e:`${escH(nombre.slice(0,i))}<span class="y">${escH(nombre[i])}${ESTRELLA}</span>${escH(nombre.slice(i+1))}`;
+  return `<span class="nombre-marca" style="font-size:${px}" aria-label="${e}">${cuerpo}</span>`;}
+if(!E.nombre)E.nombre=NOMBRE;
 
 /* ============ VISTAS ============ */
 function inicio(){callar();
@@ -571,7 +588,7 @@ function inicio(){callar();
   $('#vista').innerHTML=`
   <section class="saludo">
     <div>
-      <h1>${E.nombre?`¡Hola, <em>${escH(E.nombre)}</em>!`:'¡Hola, <em>estrella</em>!'}</h1>
+      <h1 style="display:flex;align-items:baseline;gap:.25em;flex-wrap:wrap;padding-top:.3em">¡Hola, ${marca(E.nombre,'1.35em')}!</h1>
       <p>Tus cuatro libros de 4.º de Primaria. Cada lección que terminas hace crecer tu jardín.</p>
       <div class="progreso"><div class="barra-p"><i style="width:${p}%"></i></div><b>${hechas()} / ${total()} lecciones</b></div>
     </div>
