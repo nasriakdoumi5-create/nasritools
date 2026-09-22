@@ -32,6 +32,9 @@ json.dump({"name": "Mi Jardín de Estudio · NasriTools", "short_name": "Mi Jard
 
 body = open(SRC, encoding="utf-8").read()
 body = re.sub(r"<title>.*?</title>", "<title>Mi Jardín de Estudio · NasriTools</title>", body, count=1)
+# Off claude.ai there is no shared db: progress lives in this device's localStorage only.
+body = re.sub(r"^if\(window\.claude.*?\n(?=</script>)", "", body, flags=re.S | re.M)
+assert "claude" not in body.lower(), "Claude reference left in the NasriTools build"
 head = """<!doctype html>
 <html lang="es"><head>
 <meta charset="utf-8">

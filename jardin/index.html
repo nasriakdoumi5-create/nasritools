@@ -729,8 +729,6 @@ $('#btn-familia').onclick=()=>abrir(`<div class="ar"><h2>دليل العائلة
 /* ============ TEMA + ARRANQUE ============ */
 $('#btn-tema').onclick=()=>{const d=document.documentElement,oscuro=d.dataset.theme?d.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;d.dataset.theme=oscuro?'light':'dark';};
 pintarBarra();inicio();
-if(window.claude&&claude.use)claude.use('db').then(db=>{if(!db)return;DB=db;
-  db.doc('progreso/alumna').get().then(d=>{const v=d&&(d.data?d.data():d);if(v&&typeof v==='object'&&(v.pts||0)>=E.pts){E=Object.assign(E,v);pintarBarra();inicio();}}).catch(()=>{});}).catch(()=>{});
 </script>
 <footer style="text-align:center;padding:18px 16px 28px;color:var(--tinta-2);font-size:13px">Hecho con cariño por <b>NasriTools</b> · © 2026</footer>
 </body></html>
