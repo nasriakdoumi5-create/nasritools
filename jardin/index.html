@@ -888,9 +888,28 @@ function lectura(){const b=$('#bl');
   $('#lv').innerHTML=`<div class="veredicto si">${p} palabras por minuto. ${p>=90?'¡Lees muy bien para 4.º!':'En 4.º se busca llegar a unas 90–110. ¡Sigue practicando!'}</div>`;}
 function hGlosario(){abrir(`<h2>Castellano ↔ عربي</h2><p class="nota">Pulsa 🔊 para oír la palabra en castellano o en árabe. El árabe lleva sus vocales (حَرَكات) para leerlo bien.</p>
   <div class="mandos" style="margin:0 0 12px"><button class="btn lila" onclick="juegoAr()">🎲 Juego: ¿cómo se dice en árabe?</button></div><div id="jz" style="margin-bottom:12px"></div>
-  <input class="buscador" id="gq" placeholder="Busca una palabra…" oninput="filtra(this.value)"><div style="overflow-x:auto"><table class="glosa"><thead><tr><th>Castellano</th><th style="text-align:right">عربي</th></tr></thead><tbody id="gtb"></tbody></table></div>`);filtra('');}
-function filtra(q){const n=norm(q),a=sinTashkil(q.trim());
-  $('#gtb').innerHTML=GLOSA.filter(r=>!n||norm(r[0]).includes(n)||(a&&sinTashkil(r[1]).includes(a))).map(r=>`<tr>
+  <input class="buscador" id="gq" placeholder="Busca cualquier palabra, en castellano o en árabe…" oninput="filtra(this.value)"><div style="overflow-x:auto"><table class="glosa"><thead><tr><th>Castellano</th><th style="text-align:right">عربي</th></tr></thead><tbody id="trad"></tbody><tbody id="gtb"></tbody></table></div>`);filtra('');}
+/* Diccionario completo: si la palabra no está en la lista de clase, se traduce al momento (castellano ↔ árabe).
+   Solo se envía la palabra buscada. Sin internet, se queda con la lista de clase. */
+const TRAD={};let tTrad=null;
+function traducir(q){const ar=/[؀-ۿ]/.test(q),k=(ar?'ar:':'es:')+q.toLowerCase();
+  if(TRAD[k])return Promise.resolve(TRAD[k]);
+  const u=`https://translate.googleapis.com/translate_a/single?client=gtx&sl=${ar?'ar':'es'}&tl=${ar?'es':'ar'}&dt=t&q=${encodeURIComponent(q)}`;
+  return fetch(u).then(r=>r.json()).then(j=>{const t=(j[0]||[]).map(x=>x[0]).join('').trim();if(!t)throw 0;
+    return TRAD[k]=ar?[t,q]:[q,t];});}
+function filaTrad(r,nota){return `<tr style="background:var(--sol-claro)">
+  <td><button class="btn sec" style="padding:4px 10px" onclick='hablar(${JSON.stringify(r[0])},true)' aria-label="Escuchar en castellano">🔊</button> ${escH(r[0])}${nota?`<br><span class="nota">${nota}</span>`:''}</td>
+  <td dir="rtl" style="font-size:20px">${escH(r[1])} <button class="btn sec" style="padding:4px 10px" onclick='hablar(${JSON.stringify(r[1])},true,true)' aria-label="استمع بالعربية">🔊</button></td></tr>`;}
+function filtra(q){const n=norm(q),a=sinTashkil(q.trim()),limpio=q.trim();
+  const locales=GLOSA.filter(r=>!n||norm(r[0]).includes(n)||(a&&sinTashkil(r[1]).includes(a)));
+  const exacta=locales.some(r=>norm(r[0])===n||sinTashkil(r[1])===a);
+  clearTimeout(tTrad);
+  if(limpio.length>=2&&!exacta){
+    tTrad=setTimeout(()=>{const z=$('#trad');if(z)z.innerHTML=`<tr><td colspan="2" class="nota">Buscando «${escH(limpio)}»…</td></tr>`;
+      traducir(limpio).then(r=>{if($('#gq')&&$('#gq').value.trim()===limpio&&$('#trad'))$('#trad').innerHTML=filaTrad(r,'Diccionario completo');})
+        .catch(()=>{if($('#trad'))$('#trad').innerHTML=`<tr><td colspan="2" class="nota">Sin conexión: solo están las palabras de clase.</td></tr>`;});},450);}
+  if(!(limpio.length>=2&&!exacta)&&$('#trad'))$('#trad').innerHTML='';
+  $('#gtb').innerHTML=locales.map(r=>`<tr>
     <td><button class="btn sec" style="padding:4px 10px" onclick='hablar(${JSON.stringify(r[0])},true)' aria-label="Escuchar en castellano">🔊</button> ${escH(r[0])}</td>
     <td dir="rtl" style="font-size:20px">${escH(r[1])} <button class="btn sec" style="padding:4px 10px" onclick='hablar(${JSON.stringify(r[1])},true,true)' aria-label="استمع بالعربية">🔊</button></td></tr>`).join('');}
 /* Juego: sale una palabra en castellano, se oye en árabe y se elige la traducción. */
