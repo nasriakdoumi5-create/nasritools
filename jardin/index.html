@@ -133,6 +133,8 @@ table.glosa{width:100%;border-collapse:collapse;font-size:15px}
 .tabla-num{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;font-variant-numeric:tabular-nums}
 .tabla-num div{background:var(--hueco);padding:8px;border-radius:10px;text-align:center;font-family:var(--f-lee);font-size:17px}
 .enlace{color:var(--rosa);font-weight:800}
+.modal.ancho{max-width:1100px;height:90vh;display:flex;flex-direction:column;padding:14px}
+.modal.ancho iframe{flex:1;width:100%;border:1px solid var(--borde);border-radius:12px;background:#fff}
 .parar{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:60;background:var(--tinta);color:var(--papel);box-shadow:var(--sombra)}
 .nota{font-size:13px;color:var(--tinta-2)}
 </style>
@@ -558,7 +560,7 @@ function callar(){try{speechSynthesis.cancel();}catch(e){}$('#parar').hidden=tru
 function leerPregunta(){const q=L.lista[L.k];hablar(q.q.replace(/🔥/g,'').replace(/\.\.\./g,', ')+(q.t==='op'?'. '+q.o.join('. '):''),true);}
 function pintarBarra(){$('#pts').textContent=E.pts;$('#racha').textContent=E.racha;}
 function abrir(h){$('#modal').innerHTML=`<button class="icono cerrar" onclick="cerrar()" aria-label="Cerrar">✕</button>`+h;$('#velo').hidden=false;}
-function cerrar(){$('#velo').hidden=true;callar();clearInterval(CR);}
+function cerrar(){$('#modal').classList.remove('ancho');$('#velo').hidden=true;callar();clearInterval(CR);}
 $('#velo').addEventListener('click',e=>{if(e.target.id==='velo')cerrar();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')cerrar();});
 
@@ -591,7 +593,7 @@ function inicio(){callar();
   <ol class="nota" style="margin:8px 0 0;padding-left:18px"><li>Pulsa «Abrir» y entra con el <b>usuario y la contraseña que da el colegio</b> (no vienen en el libro: pídelos a la tutora).</li>
   <li>Dentro, si tenéis un <b>código de licencia</b> (a veces en la primera página del libro), añádelo desde tu cuenta.</li>
   <li>Si los libros son de segunda mano, el código ya suele estar usado: el colegio puede dar uno nuevo.</li></ol></div>
-  <a class="btn lila" href="https://av.santillana.es/av/login/auth" target="_blank" rel="noopener">Abrir</a></div>`;
+  <div class="mandos" style="margin:0;flex-direction:column"><button class="btn lila" onclick="libroDigital()">Abrir aquí</button><a class="btn sec" href="https://av.santillana.es/av/login/auth" target="_blank" rel="noopener">En otra pestaña</a></div></div>`;
 }
 function siguiente(){
   for(const t of [triActual(),1,2,3])for(const m of MATERIAS)for(let i=0;i<m.unis.length;i++)if(m.unis[i].tri===t&&!listo(m.id,i))return {m,u:m.unis[i],i};
@@ -693,6 +695,13 @@ function final(){
    <div class="mandos" style="justify-content:center"><button class="btn" onclick="empezar('${L.id}',${L.i},'${L.modo}')">Otra vez</button>
    <button class="btn sec" onclick="materia('${L.id}')">Volver al libro</button><button class="btn sec" onclick="inicio()">Inicio</button></div></div>`;
 }
+
+/* ============ LIBRO DIGITAL: Santillana dentro de una ventana ============ */
+function libroDigital(){abrir(`<h2 style="margin-right:44px">📚 Mi libro digital · Santillana</h2>
+  <p class="nota" style="margin:0 0 8px">Entra con el usuario del colegio. Si la ventana no te deja entrar, pulsa «En otra pestaña».</p>
+  <iframe src="https://av.santillana.es/av/login/auth" title="Aula Virtual Santillana" allow="fullscreen; autoplay"></iframe>
+  <div class="mandos" style="margin-top:8px"><a class="btn sec" href="https://av.santillana.es/av/login/auth" target="_blank" rel="noopener">En otra pestaña</a></div>`);
+  $('#modal').classList.add('ancho');}
 
 /* ============ HERRAMIENTAS ============ */
 const HERR=[
