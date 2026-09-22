@@ -807,8 +807,8 @@ function cajaBienvenida(){const t={c:'#F48FB1',l:'#F6B940'};
    ${['⭐','🌹','✨','🌸'].map((e,i)=>`<span class="sube" style="--dx:${[-30,24,-10,34][i]}px;animation-delay:${i*1.05}s">${e}</span>`).join('')}</button>`;}
 function lluviaBienvenida(){const r=document.createElement('div');r.className='lluvia-libre';document.body.appendChild(r);
   const b=$('.bienvenida').getBoundingClientRect();r.innerHTML=`<div class="caja" style="position:fixed;left:${b.left}px;top:${b.top}px;width:${b.width}px;height:${b.height}px"></div>`;
-  if(!matchMedia('(prefers-reduced-motion: reduce)').matches)caer(r,['🌹','🌸','🌷','⭐','🌟','✨','💖']);
-  setTimeout(()=>r.remove(),11000);}
+  if(!matchMedia('(prefers-reduced-motion: reduce)').matches)lluvia(r,{p:['🌹','🌸','🌷','⭐','🌟','✨','💖']});
+  setTimeout(()=>r.remove(),12000);}
 /* Lluvia desde arriba: cada rosa o estrella sale de un sitio distinto, a su ritmo, y cae meciéndose hasta abajo. */
 function caer(r,set){const W=innerWidth,H=innerHeight;
   const ps=Array.from({length:70},()=>{const e=document.createElement('span');e.className='p';e.textContent=set[az(0,set.length-1)];
@@ -826,17 +826,23 @@ function regalo(key){
   r.innerHTML=`<div class="caja tiembla">${cajaSVG(t)}</div><div class="msj"><b>${t.m}</b><button class="btn">¡Gracias!</button></div>`;
   document.body.appendChild(r);
   const cerrarR=()=>{r.remove();};r.querySelector('.msj .btn').onclick=cerrarR;
-  setTimeout(()=>{r.classList.add('abierta');hablar(t.m.replace(/[¡!]/g,''));if(!quieto){lluvia(r,t);caer(r,t.p);}},1000);
+  setTimeout(()=>{r.classList.add('abierta');hablar(t.m.replace(/[¡!]/g,''));if(!quieto)lluvia(r,t);},1000);
   setTimeout(()=>r.querySelector('.msj').classList.add('ver'),quieto?1200:2600);
 }
+/* Las rosas y estrellas BROTAN de la boca de la caja, en oleadas, suben como una fuente,
+   se abren por toda la pantalla y caen meciéndose como pétalos hasta abajo. */
 function lluvia(r,t){
-  const caja=r.querySelector('.caja').getBoundingClientRect(),x0=caja.left+caja.width/2,y0=caja.top+caja.height*.35;
-  const ps=Array.from({length:30},()=>{const e=document.createElement('span');e.className='p';e.textContent=t.p[az(0,t.p.length-1)];
-    e.style.fontSize=az(22,44)+'px';r.appendChild(e);const a=(-Math.PI/2)+(Math.random()-.5)*2.2,v=7+Math.random()*9;
-    return {e,x:x0,y:y0,vx:Math.cos(a)*v,vy:Math.sin(a)*v,g:.18+Math.random()*.1,rot:Math.random()*360,vr:(Math.random()-.5)*8};});
-  const H=innerHeight+80;let vivos=ps.length;
-  (function paso(){vivos=0;for(const p of ps){if(p.y>H)continue;vivos++;p.vy+=p.g;p.vx*=.992;p.x+=p.vx;p.y+=p.vy;p.rot+=p.vr;
-    p.e.style.transform=`translate(${p.x}px,${p.y}px) rotate(${p.rot}deg)`;}
+  const caja=r.querySelector('.caja').getBoundingClientRect(),x0=caja.left+caja.width/2,y0=caja.top+caja.height*.3;
+  const W=innerWidth,H=innerHeight+60,ps=[];
+  for(let k=0;k<80;k++){const e=document.createElement('span');e.className='p';e.textContent=t.p[az(0,t.p.length-1)];
+    e.style.fontSize=az(20,42)+'px';e.style.opacity=0;r.appendChild(e);
+    const alto=Math.min(y0-20,H*.85),vy=-Math.sqrt(2*.16*(alto*(.45+Math.random()*.55))),  // sube lo justo para repartirse por toda la altura
+      tx=20+Math.random()*(W-60),vx=(tx-x0)*.5/(-vy/.16);                            // y va a caer en un punto cualquiera de la anchura
+    ps.push({e,x:x0+(Math.random()-.5)*caja.width*.4,y:y0,vx,vy,tx,sale:k*2,fase:Math.random()*6.3,amp:8+Math.random()*18,rot:Math.random()*360,vr:(Math.random()-.5)*6});}
+  let t0=0;(function paso(){t0++;let vivos=0;
+    for(const p of ps){if(p.y>H)continue;vivos++;if(t0<p.sale)continue;p.e.style.opacity=1;
+      p.vy=Math.min(p.vy+.16,3.2);if(p.vy<0)p.x+=p.vx;else p.x+=(p.tx-p.x)*.02;p.y+=p.vy;p.rot+=p.vr;const cae=p.vy>0?Math.sin(p.fase+t0/30)*p.amp:0;
+      p.e.style.transform=`translate(${p.x+cae}px,${p.y}px) rotate(${p.rot}deg)`;}
     if(vivos&&r.isConnected)requestAnimationFrame(paso);})();
 }
 
