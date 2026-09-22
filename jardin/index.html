@@ -503,10 +503,14 @@ const GEN={
 };
 
 /* ============ GLOSARIO, DICTADO, LECTURA ============ */
-const GLOSA=[['sustantivo','اسم'],['adjetivo','صفة'],['verbo','فعل'],['sujeto','فاعل / مسند إليه'],['predicado','مسند'],['sílaba','مقطع'],['tilde','علامة النبر'],['oración','جملة'],
- ['suma','جمع'],['resta','طرح'],['multiplicación','ضرب'],['división','قسمة'],['cociente','ناتج القسمة'],['resto','الباقي'],['fracción','كسر'],['numerador','البسط'],['denominador','المقام'],['decimal','عدد عشري'],['perímetro','المحيط'],['ángulo','زاوية'],['recta','مستقيم'],['triángulo','مثلث'],['metro','متر'],['kilo','كيلو'],['litro','لتر'],
- ['aparato digestivo','الجهاز الهضمي'],['estómago','معدة'],['intestino','أمعاء'],['pulmones','رئتان'],['corazón','قلب'],['sangre','دم'],['riñones','كليتان'],['vertebrado','فقاري'],['invertebrado','لافقاري'],['mamífero','ثديي'],['raíz','جذر'],['hoja','ورقة'],['fotosíntesis','البناء الضوئي'],['ecosistema','نظام بيئي'],
- ['relieve','التضاريس'],['llanura','سهل'],['montaña','جبل'],['río','نهر'],['desembocadura','مصبّ'],['clima','مناخ'],['comunidad autónoma','منطقة ذاتية الحكم'],['Constitución','الدستور'],['ayuntamiento','البلدية'],['Prehistoria','ما قبل التاريخ'],['Edad Antigua','العصر القديم'],['romanos','الرومان']];
+/* El árabe va con tashkil (vocales) para que se lea bien en voz alta y los niños aprendan a leerlo. */
+const GLOSA=[['sustantivo','اسْمٌ'],['adjetivo','صِفَةٌ'],['verbo','فِعْلٌ'],['sujeto','فاعِلٌ'],['predicado','مُسْنَدٌ'],['sílaba','مَقْطَعٌ'],['tilde','عَلامَةُ النَّبْرِ'],['oración','جُمْلَةٌ'],
+ ['suma','جَمْعٌ'],['resta','طَرْحٌ'],['multiplicación','ضَرْبٌ'],['división','قِسْمَةٌ'],['cociente','ناتِجُ القِسْمَةِ'],['resto','الباقي'],['fracción','كَسْرٌ'],['numerador','البَسْطُ'],['denominador','المَقامُ'],['decimal','عَدَدٌ عَشْرِيٌّ'],['perímetro','المُحيطُ'],['ángulo','زاوِيَةٌ'],['recta','خَطٌّ مُسْتَقيمٌ'],['triángulo','مُثَلَّثٌ'],['metro','مِتْرٌ'],['kilo','كيلوغْرامٌ'],['litro','لِتْرٌ'],
+ ['aparato digestivo','الجِهازُ الهَضْمِيُّ'],['estómago','مَعِدَةٌ'],['intestino','أَمْعاءٌ'],['pulmones','رِئَتانِ'],['corazón','قَلْبٌ'],['sangre','دَمٌ'],['riñones','كُلْيَتانِ'],['vertebrado','فَقارِيٌّ'],['invertebrado','لافَقارِيٌّ'],['mamífero','ثَدْيِيٌّ'],['raíz','جَذْرٌ'],['hoja','وَرَقَةٌ'],['fotosíntesis','البِناءُ الضَّوْئِيُّ'],['ecosistema','نِظامٌ بيئِيٌّ'],
+ ['relieve','التَّضاريسُ'],['llanura','سَهْلٌ'],['montaña','جَبَلٌ'],['río','نَهْرٌ'],['desembocadura','مَصَبٌّ'],['clima','مُناخٌ'],['comunidad autónoma','مِنْطَقَةٌ ذاتِيَّةُ الحُكْمِ'],['Constitución','الدُّسْتورُ'],['ayuntamiento','البَلَدِيَّةُ'],['Prehistoria','ما قَبْلَ التّاريخِ'],['Edad Antigua','العَصْرُ القَديمُ'],['romanos','الرّومانُ'],
+ ['familia','عائِلَةٌ'],['madre','أُمٌّ'],['padre','أَبٌ'],['hermana','أُخْتٌ'],['hermano','أَخٌ'],['colegio','مَدْرَسَةٌ'],['maestra','مُعَلِّمَةٌ'],['libro','كِتابٌ'],['cuaderno','دَفْتَرٌ'],['lápiz','قَلَمُ رَصاصٍ'],
+ ['agua','ماءٌ'],['pan','خُبْزٌ'],['casa','بَيْتٌ'],['sol','شَمْسٌ'],['luna','قَمَرٌ'],['estrella','نَجْمَةٌ'],['flor','زَهْرَةٌ'],['árbol','شَجَرَةٌ'],['gracias','شُكْرًا'],['buenos días','صَباحُ الخَيْرِ']];
+const sinTashkil=s=>s.replace(/[ً-ْٰ]/g,'');
 const DICT=['murciélago','árbol','canción','pájaro','lápiz','camión','música','fácil','teléfono','azúcar','jirafa','huevo','bicicleta','estómago','corazón','pulmón','montaña','océano','ciudad','hierba','viaje','cantaba','máquina','fácilmente'];
 const LECTURA=`Aquella mañana, Carla abrió la ventana y vio que el jardín estaba lleno de mariposas. Había de todos los colores: amarillas, blancas y una azul que brillaba con el sol. Carla bajó despacio para no asustarlas y se sentó junto a los rosales. Su abuela le había contado que las mariposas ayudan a las flores a tener semillas, porque llevan el polen de una flor a otra. Carla sacó su cuaderno y empezó a dibujarlas. Contó doce mariposas en total. Cuando terminó, pensó que el jardín era como un pequeño ecosistema, donde cada ser vivo tiene su trabajo. Sonrió, guardó el cuaderno en la mochila y salió corriendo hacia el colegio.`;
 
@@ -536,11 +540,16 @@ const MUJER=/helena|laura|elvira|elena|paloma|lucia|lucía|monica|mónica|paulin
 let VOZ=null;
 function elegirVoz(){try{const vs=speechSynthesis.getVoices().filter(v=>/^es/i.test(v.lang));
   VOZ=vs.find(v=>/es-ES/i.test(v.lang)&&MUJER.test(v.name))||vs.find(v=>MUJER.test(v.name))||vs.find(v=>/google/i.test(v.name)&&/es-ES/i.test(v.lang))||vs.find(v=>/es-ES/i.test(v.lang))||vs[0]||null;}catch(e){}}
-try{elegirVoz();speechSynthesis.onvoiceschanged=elegirVoz;}catch(e){}
+/* Voz árabe: de mujer si el aparato la tiene (Hoda, Salma, Zariyah, Laila…), si no, la árabe que haya. */
+const MUJER_AR=/hoda|salma|zariyah|laila|layla|mariam|amira|fatima|female|mujer/i;
+let VOZ_AR=null;
+function elegirVozAr(){try{const vs=speechSynthesis.getVoices().filter(v=>/^ar/i.test(v.lang));VOZ_AR=vs.find(v=>MUJER_AR.test(v.name))||vs[0]||null;}catch(e){}}
+try{elegirVoz();elegirVozAr();speechSynthesis.onvoiceschanged=()=>{elegirVoz();elegirVozAr();};}catch(e){}
 /* Pulsar un altavoz mientras habla = parar. El botón flotante «Parar» también corta en cualquier momento. */
-function hablar(t,alternar){try{
+function hablar(t,alternar,ar){try{
   if(alternar&&speechSynthesis.speaking){callar();return;}
-  const u=new SpeechSynthesisUtterance(t);u.lang='es-ES';u.rate=.9;u.pitch=1.15;if(VOZ)u.voice=VOZ;
+  const u=new SpeechSynthesisUtterance(t);
+  if(ar){u.lang='ar-SA';u.rate=.8;if(VOZ_AR)u.voice=VOZ_AR;}else{u.lang='es-ES';u.rate=.9;u.pitch=1.15;if(VOZ)u.voice=VOZ;}
   u.onend=u.onerror=()=>{if(!speechSynthesis.speaking)$('#parar').hidden=true;};
   speechSynthesis.cancel();speechSynthesis.speak(u);$('#parar').hidden=false;}catch(e){}}
 function callar(){try{speechSynthesis.cancel();}catch(e){}$('#parar').hidden=true;}
@@ -713,9 +722,22 @@ function lectura(){const b=$('#bl');
   if(!CR){CT=Date.now();CR=setInterval(()=>{$('#lc').textContent=Math.round((Date.now()-CT)/1000)+' s';},250);b.textContent='Terminé';return;}
   clearInterval(CR);CR=null;const s=(Date.now()-CT)/1000,p=Math.round(LECTURA.split(/\s+/).length/(s/60));b.textContent='Otra vez';sumar(5);
   $('#lv').innerHTML=`<div class="veredicto si">${p} palabras por minuto. ${p>=90?'¡Lees muy bien para 4.º!':'En 4.º se busca llegar a unas 90–110. ¡Sigue practicando!'}</div>`;}
-function hGlosario(){abrir(`<h2>Castellano ↔ عربي</h2><p class="nota">Las palabras de clase que más se repiten, con su traducción para casa.</p>
-  <input class="buscador" id="gq" placeholder="Busca una palabra…" oninput="filtra(this.value)"><div style="overflow-x:auto"><table class="glosa"><thead><tr><th>Castellano</th><th style="text-align:right">عربي</th><th></th></tr></thead><tbody id="gtb"></tbody></table></div>`);filtra('');}
-function filtra(q){const n=norm(q);$('#gtb').innerHTML=GLOSA.filter(r=>!n||norm(r[0]).includes(n)||r[1].includes(q.trim())).map(r=>`<tr><td>${escH(r[0])}</td><td dir="rtl">${escH(r[1])}</td><td><button class="btn sec" style="padding:4px 10px" onclick='hablar(${JSON.stringify(r[0])},true)'>🔊</button></td></tr>`).join('');}
+function hGlosario(){abrir(`<h2>Castellano ↔ عربي</h2><p class="nota">Pulsa 🔊 para oír la palabra en castellano o en árabe. El árabe lleva sus vocales (حَرَكات) para leerlo bien.</p>
+  <div class="mandos" style="margin:0 0 12px"><button class="btn lila" onclick="juegoAr()">🎲 Juego: ¿cómo se dice en árabe?</button></div><div id="jz" style="margin-bottom:12px"></div>
+  <input class="buscador" id="gq" placeholder="Busca una palabra…" oninput="filtra(this.value)"><div style="overflow-x:auto"><table class="glosa"><thead><tr><th>Castellano</th><th style="text-align:right">عربي</th></tr></thead><tbody id="gtb"></tbody></table></div>`);filtra('');}
+function filtra(q){const n=norm(q),a=sinTashkil(q.trim());
+  $('#gtb').innerHTML=GLOSA.filter(r=>!n||norm(r[0]).includes(n)||(a&&sinTashkil(r[1]).includes(a))).map(r=>`<tr>
+    <td><button class="btn sec" style="padding:4px 10px" onclick='hablar(${JSON.stringify(r[0])},true)' aria-label="Escuchar en castellano">🔊</button> ${escH(r[0])}</td>
+    <td dir="rtl" style="font-size:20px">${escH(r[1])} <button class="btn sec" style="padding:4px 10px" onclick='hablar(${JSON.stringify(r[1])},true,true)' aria-label="استمع بالعربية">🔊</button></td></tr>`).join('');}
+/* Juego: sale una palabra en castellano, se oye en árabe y se elige la traducción. */
+let JQ=null;
+function juegoAr(){const i=az(0,GLOSA.length-1),malas=GLOSA.filter((r,j)=>j!==i).sort(()=>Math.random()-.5).slice(0,2);
+  const ops=[GLOSA[i],...malas].sort(()=>Math.random()-.5);JQ=GLOSA[i];
+  $('#jz').innerHTML=`<div class="preg">¿Cómo se dice <b>${escH(JQ[0])}</b> en árabe?</div>
+   <div class="ops">${ops.map(r=>`<button class="op" dir="rtl" style="text-align:right;font-size:22px" onclick='compAr(this,${JSON.stringify(r[1])})'>${escH(r[1])}</button>`).join('')}</div><div id="jv"></div>`;}
+function compAr(b,v){if($('#jv').innerHTML)return;const ok=v===JQ[1];b.classList.add(ok?'si':'no');if(ok)sumar(3);
+  document.querySelectorAll('#jz .op').forEach(x=>{if(x.textContent.trim()===JQ[1])x.classList.add('si');x.disabled=true;});hablar(JQ[1],false,true);
+  $('#jv').innerHTML=`<div class="veredicto ${ok?'si':'no'}">${ok?'¡Muy bien! +3 ⭐ · أَحْسَنْتِ':'Es: <span dir="rtl">'+escH(JQ[1])+'</span>'}</div><div class="mandos"><button class="btn" onclick="juegoAr()">Otra</button></div>`;}
 
 $('#btn-familia').onclick=()=>abrir(`<div class="ar"><h2>دليل العائلة</h2>
  <p>هذه البوّابة مبنيّة على كتب ابنتكم الأربعة للسنة الرابعة ابتدائي (Santillana): الرياضيات، واللغة الإسبانية، وعلوم الطبيعة، والعلوم الاجتماعية.</p>
