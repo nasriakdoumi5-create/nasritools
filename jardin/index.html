@@ -603,11 +603,15 @@ function norm(s){return String(s).toLowerCase().trim().normalize('NFD').replace(
 const MUJER=/helena|laura|elvira|elena|paloma|lucia|lucía|monica|mónica|paulina|sabina|dalia|marisol|esperanza|conchita|penelope|female|mujer/i;
 let VOZ=null;
 function elegirVoz(){try{const vs=speechSynthesis.getVoices().filter(v=>/^es/i.test(v.lang));
-  VOZ=vs.find(v=>/es-ES/i.test(v.lang)&&MUJER.test(v.name))||vs.find(v=>MUJER.test(v.name))||vs.find(v=>/google/i.test(v.name)&&/es-ES/i.test(v.lang))||vs.find(v=>/es-ES/i.test(v.lang))||vs[0]||null;}catch(e){}}
+  /* Primero las voces «naturales» (neuronales), que suenan como una persona: Edge (… Online (Natural)), Google, Apple Premium. */
+  const natural=v=>/natural|neural|online|premium|enhanced|google/i.test(v.name);
+  VOZ=vs.find(v=>natural(v)&&/es-ES/i.test(v.lang)&&(MUJER.test(v.name)||/google/i.test(v.name)))||vs.find(v=>natural(v)&&MUJER.test(v.name))||
+    vs.find(v=>/es-ES/i.test(v.lang)&&MUJER.test(v.name))||vs.find(v=>MUJER.test(v.name))||vs.find(v=>/google/i.test(v.name)&&/es-ES/i.test(v.lang))||vs.find(v=>/es-ES/i.test(v.lang))||vs[0]||null;}catch(e){}}
 /* Voz árabe: de mujer si el aparato la tiene (Hoda, Salma, Zariyah, Laila…), si no, la árabe que haya. */
 const MUJER_AR=/hoda|salma|zariyah|laila|layla|mariam|amira|fatima|female|mujer/i;
 let VOZ_AR=null;
-function elegirVozAr(){try{const vs=speechSynthesis.getVoices().filter(v=>/^ar/i.test(v.lang));VOZ_AR=vs.find(v=>MUJER_AR.test(v.name))||vs[0]||null;}catch(e){}}
+function elegirVozAr(){try{const vs=speechSynthesis.getVoices().filter(v=>/^ar/i.test(v.lang)),nat=v=>/natural|neural|online|premium|enhanced|google/i.test(v.name);
+  VOZ_AR=vs.find(v=>nat(v)&&MUJER_AR.test(v.name))||vs.find(v=>nat(v))||vs.find(v=>MUJER_AR.test(v.name))||vs[0]||null;}catch(e){}}
 try{elegirVoz();elegirVozAr();speechSynthesis.onvoiceschanged=()=>{elegirVoz();elegirVozAr();};}catch(e){}
 /* Pulsar un altavoz mientras habla = parar. El botón flotante «Parar» también corta en cualquier momento. */
 function hablar(t,alternar,ar){try{
@@ -822,12 +826,12 @@ function regalo(key){
   r.innerHTML=`<div class="caja tiembla">${cajaSVG(t)}</div><div class="msj"><b>${t.m}</b><button class="btn">¡Gracias!</button></div>`;
   document.body.appendChild(r);
   const cerrarR=()=>{r.remove();};r.querySelector('.msj .btn').onclick=cerrarR;
-  setTimeout(()=>{r.classList.add('abierta');hablar(t.m.replace(/[¡!]/g,''));if(!quieto)lluvia(r,t);},1000);
+  setTimeout(()=>{r.classList.add('abierta');hablar(t.m.replace(/[¡!]/g,''));if(!quieto){lluvia(r,t);caer(r,t.p);}},1000);
   setTimeout(()=>r.querySelector('.msj').classList.add('ver'),quieto?1200:2600);
 }
 function lluvia(r,t){
   const caja=r.querySelector('.caja').getBoundingClientRect(),x0=caja.left+caja.width/2,y0=caja.top+caja.height*.35;
-  const ps=Array.from({length:90},()=>{const e=document.createElement('span');e.className='p';e.textContent=t.p[az(0,t.p.length-1)];
+  const ps=Array.from({length:30},()=>{const e=document.createElement('span');e.className='p';e.textContent=t.p[az(0,t.p.length-1)];
     e.style.fontSize=az(22,44)+'px';r.appendChild(e);const a=(-Math.PI/2)+(Math.random()-.5)*2.2,v=7+Math.random()*9;
     return {e,x:x0,y:y0,vx:Math.cos(a)*v,vy:Math.sin(a)*v,g:.18+Math.random()*.1,rot:Math.random()*360,vr:(Math.random()-.5)*8};});
   const H=innerHeight+80;let vivos=ps.length;
