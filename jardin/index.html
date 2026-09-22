@@ -185,6 +185,16 @@ table.glosa{width:100%;border-collapse:collapse;font-size:15px}
 .regalo-it{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 6px;border-radius:var(--r);background:var(--lienzo);border:1px solid var(--borde);font-size:12px;color:var(--tinta-2);text-align:center;line-height:1.25}
 .regalo-it:hover{border-color:var(--rosa)}
 .aviso-regalo{display:flex;align-items:center;gap:10px;background:var(--rosa-claro);border-radius:14px;padding:6px 12px 6px 6px;font-weight:700;font-size:14px;color:var(--tinta)}
+/* Caja de bienvenida junto al nombre: siempre abierta, llena de rosas y estrellas */
+.bienvenida{position:relative;width:118px;height:118px;flex:0 0 auto;cursor:pointer;background:none;border:0;padding:0}
+.bienvenida svg{position:absolute;left:0;bottom:0;width:100%;height:auto;overflow:visible}
+.bienvenida .ramo{position:absolute;left:50%;bottom:46%;width:0;height:0}
+.bienvenida .ramo span{position:absolute;font-size:24px;line-height:1;transform:translate(-50%,0);animation:mece 3s ease-in-out infinite;filter:drop-shadow(0 1px 1px rgba(0,0,0,.15))}
+@keyframes mece{0%,100%{rotate:-6deg}50%{rotate:6deg}}
+.bienvenida .sube{position:absolute;left:50%;bottom:55%;font-size:16px;opacity:0;animation:sube 4.2s ease-out infinite}
+@keyframes sube{0%{transform:translate(0,0) scale(.6);opacity:0}15%{opacity:1}100%{transform:translate(var(--dx),-80px) scale(1);opacity:0}}
+.bienvenida:hover .ramo span{animation-duration:1.2s}
+.lluvia-libre{position:fixed;inset:0;z-index:65;pointer-events:none;overflow:hidden}
 .parar{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:60;background:var(--tinta);color:var(--papel);box-shadow:var(--sombra)}
 .nota{font-size:13px;color:var(--tinta-2)}
 </style>
@@ -630,6 +640,7 @@ function inicio(){callar();
   const sig=siguiente();
   $('#vista').innerHTML=`
   <section class="saludo">
+    ${cajaBienvenida()}
     <div>
       <h1 style="display:flex;align-items:baseline;gap:.25em;flex-wrap:wrap;padding-top:.3em">¡Hola, ${marca(E.nombre,'1.35em')}!</h1>
       <p>Tus cuatro libros de 4.º de Primaria. Cada lección que terminas hace crecer tu jardín.</p>
@@ -642,9 +653,6 @@ function inicio(){callar();
        :`<div class="hoy"><span class="flor">🏆</span><div class="txt"><b>¡Has terminado todo el jardín!</b><span>Repite los retos 🔥 para ganar más estrellas.</span></div></div>`}
   <h2 class="titulo-sec">📝 Deberes de Matemáticas <small>10 ejercicios nuevos cada día</small></h2>
   ${tarjetaDeberes()}
-  <h2 class="titulo-sec">🎁 Mis regalos <small>${hechas()} de ${total()} abiertos · cada lección terminada abre uno</small></h2>
-  <div class="regalos">${MATERIAS.flatMap(m=>m.unis.map((u,i)=>`<button class="regalo-it" onclick="leccion('${m.id}',${i})" title="${escH(m.nom)}: ${escH(u.t)}">
-    ${miniCaja(m.id+'-'+i+'-ej',listo(m.id,i))}<span>${escH(u.t)}</span></button>`)).join('')}</div>
   <h2 class="titulo-sec">Mis libros <small>toca un libro para ver sus lecciones</small></h2>
   <div class="estante">${MATERIAS.map(m=>{const h=m.unis.filter((u,i)=>listo(m.id,i)).length;
     return `<button class="libro" onclick="materia('${m.id}')"><div class="tapa">${PORT[m.id]}</div>
@@ -679,7 +687,7 @@ function tarjetaDeberes(){
   return `<div class="hoy"><span class="flor">${d.nota?'✅':'📝'}</span><div class="txt">
     <b>${d.nota?`Deberes hechos: ${d.nota}`:'Deberes de hoy sin hacer'}</b><span style="text-transform:capitalize">${fecha}</span>
     ${hist.length?`<div class="mandos" style="margin-top:6px">${hist.map(([f,n])=>`<span class="chip" title="${f}">${f.slice(8)}/${f.slice(5,7)} · ${n}</span>`).join('')}</div>`:''}</div>
-    ${miniCaja('deb-'+HOY,!!d.nota)}<button class="btn" onclick="hacerDeberes()">${d.nota?'Repasar':'Hacer los deberes'}</button></div>`;
+    <button class="btn" onclick="hacerDeberes()">${d.nota?'Repasar':'Hacer los deberes'}</button></div>`;
 }
 function hacerDeberes(){const d=deberesHoy();L={id:'deb',i:0,modo:'deb',lista:d.lista,k:0,res:[],hecha:false};pregunta();}
 
@@ -692,7 +700,7 @@ function materia(id){callar();
   ${[1,2,3].map(t=>{const us=m.unis.map((u,i)=>({u,i})).filter(x=>x.u.tri===t);if(!us.length)return '';
     return `<h3 class="tri">${t}.º trimestre</h3><div class="unis">${us.map(({u,i})=>`
       <button class="uni ${listo(id,i)?'lista':''}" onclick="leccion('${id}',${i})"><span class="num">${listo(id,i)?'✓':i+1}</span>
-      <span class="t">${escH(u.t)}<br><span class="e">${E.retos[id+'-'+i]?'🔥 Reto superado':listo(id,i)?'Lección terminada · falta el reto 🔥':'Termina los 6 ejercicios y abre tu regalo 🎁'}</span></span>${miniCaja(id+'-'+i+'-ej',listo(id,i))}</button>`).join('')}</div>`;}).join('')}`;
+      <span class="t">${escH(u.t)}<br><span class="e">${E.retos[id+'-'+i]?'🔥 Reto superado':listo(id,i)?'Lección terminada · falta el reto 🔥':'6 ejercicios + reto'}</span></span><span>›</span></button>`).join('')}</div>`;}).join('')}`;
   scrollTo(0,0);
 }
 
@@ -786,6 +794,17 @@ function cajaSVG(t){return `<svg viewBox="0 0 200 190" aria-hidden="true">
   <rect x="22" y="78" width="156" height="14" fill="rgba(0,0,0,.08)"/>
   <g class="tapa-c"><rect x="12" y="52" width="176" height="32" rx="8" fill="${t.c}"/><rect x="88" y="52" width="24" height="32" fill="${t.l}"/>
    <path d="M100 52c-18-30-52-26-44-6 5 12 30 8 44 6zM100 52c18-30 52-26 44-6-5 12-30 8-44 6z" fill="${t.l}"/><circle cx="100" cy="50" r="9" fill="${t.l}"/></g></svg>`;}
+/* Caja de bienvenida: abierta siempre. Al tocarla suelta una lluvia de rosas y estrellas. */
+const RAMO=[['🌹',-30,40],['🌸',-12,58],['⭐',6,66],['🌷',22,52],['🌹',36,34],['🌟',-40,16],['💖',0,34],['🌸',44,12],['✨',-22,26]];
+function cajaBienvenida(){const t={c:'#F48FB1',l:'#F6B940'};
+  return `<button class="bienvenida" onclick="lluviaBienvenida()" aria-label="Caja de bienvenida: tócala">
+   ${cajaSVG(t).replace('class="tapa-c"','class="tapa-c" transform="translate(70 -40) rotate(30 100 68)"')}
+   <span class="ramo">${RAMO.map(([e,x,y],i)=>`<span style="left:${x}px;bottom:${y-20}px;animation-delay:${-i*.4}s">${e}</span>`).join('')}</span>
+   ${['⭐','🌹','✨','🌸'].map((e,i)=>`<span class="sube" style="--dx:${[-30,24,-10,34][i]}px;animation-delay:${i*1.05}s">${e}</span>`).join('')}</button>`;}
+function lluviaBienvenida(){const r=document.createElement('div');r.className='lluvia-libre';document.body.appendChild(r);
+  const b=$('.bienvenida').getBoundingClientRect();r.innerHTML=`<div class="caja" style="position:fixed;left:${b.left}px;top:${b.top}px;width:${b.width}px;height:${b.height}px"></div>`;
+  if(!matchMedia('(prefers-reduced-motion: reduce)').matches)lluvia(r,{p:['🌹','🌸','🌷','⭐','🌟','✨','💖']});
+  hablar('¡Bienvenida, '+E.nombre+'!');setTimeout(()=>r.remove(),6000);}
 function miniCaja(key,abierta){const t=tema(key);
   return `<span class="mini-caja ${abierta?'abierta':'cerrada'}" title="${abierta?'Regalo abierto':'Termina la lección para abrirlo'}">${cajaSVG(t)}${abierta?`<span class="asoma">${t.p[0]}</span>`:'<span class="candado">🔒</span>'}</span>`;}
 function regalo(key){
