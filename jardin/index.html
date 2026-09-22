@@ -173,6 +173,18 @@ table.glosa{width:100%;border-collapse:collapse;font-size:15px}
   border-radius:20px;padding:16px 22px;text-align:center;box-shadow:var(--sombra);width:min(360px,90vw);opacity:0;transition:opacity .5s}
 .regalo .msj.ver{opacity:1}
 .regalo .msj b{font-family:var(--f-tit);font-size:22px;display:block;margin-bottom:10px}
+/* Cajas pequeñas: cerradas con candado hasta terminar la lección */
+.mini-caja{position:relative;width:48px;flex:0 0 auto;display:inline-block}
+.mini-caja svg{width:100%;height:auto;display:block;overflow:visible}
+.mini-caja.cerrada svg{filter:saturate(.7)}
+.mini-caja .candado{position:absolute;right:-6px;bottom:-4px;font-size:18px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.25))}
+.mini-caja.abierta .tapa-c{transform:translate(20%,-55%) rotate(24deg);transform-box:fill-box;transform-origin:50% 100%}
+.mini-caja .asoma{position:absolute;left:50%;top:-10px;transform:translateX(-50%);font-size:20px}
+.mini-caja.cerrada:hover svg{animation:tiembla .5s ease-in-out}
+.regalos{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:12px}
+.regalo-it{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 6px;border-radius:var(--r);background:var(--lienzo);border:1px solid var(--borde);font-size:12px;color:var(--tinta-2);text-align:center;line-height:1.25}
+.regalo-it:hover{border-color:var(--rosa)}
+.aviso-regalo{display:flex;align-items:center;gap:10px;background:var(--rosa-claro);border-radius:14px;padding:6px 12px 6px 6px;font-weight:700;font-size:14px;color:var(--tinta)}
 .parar{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:60;background:var(--tinta);color:var(--papel);box-shadow:var(--sombra)}
 .nota{font-size:13px;color:var(--tinta-2)}
 </style>
@@ -630,6 +642,9 @@ function inicio(){callar();
        :`<div class="hoy"><span class="flor">🏆</span><div class="txt"><b>¡Has terminado todo el jardín!</b><span>Repite los retos 🔥 para ganar más estrellas.</span></div></div>`}
   <h2 class="titulo-sec">📝 Deberes de Matemáticas <small>10 ejercicios nuevos cada día</small></h2>
   ${tarjetaDeberes()}
+  <h2 class="titulo-sec">🎁 Mis regalos <small>${hechas()} de ${total()} abiertos · cada lección terminada abre uno</small></h2>
+  <div class="regalos">${MATERIAS.flatMap(m=>m.unis.map((u,i)=>`<button class="regalo-it" onclick="leccion('${m.id}',${i})" title="${escH(m.nom)}: ${escH(u.t)}">
+    ${miniCaja(m.id+'-'+i+'-ej',listo(m.id,i))}<span>${escH(u.t)}</span></button>`)).join('')}</div>
   <h2 class="titulo-sec">Mis libros <small>toca un libro para ver sus lecciones</small></h2>
   <div class="estante">${MATERIAS.map(m=>{const h=m.unis.filter((u,i)=>listo(m.id,i)).length;
     return `<button class="libro" onclick="materia('${m.id}')"><div class="tapa">${PORT[m.id]}</div>
@@ -664,7 +679,7 @@ function tarjetaDeberes(){
   return `<div class="hoy"><span class="flor">${d.nota?'✅':'📝'}</span><div class="txt">
     <b>${d.nota?`Deberes hechos: ${d.nota}`:'Deberes de hoy sin hacer'}</b><span style="text-transform:capitalize">${fecha}</span>
     ${hist.length?`<div class="mandos" style="margin-top:6px">${hist.map(([f,n])=>`<span class="chip" title="${f}">${f.slice(8)}/${f.slice(5,7)} · ${n}</span>`).join('')}</div>`:''}</div>
-    <button class="btn" onclick="hacerDeberes()">${d.nota?'Repasar':'Hacer los deberes'}</button></div>`;
+    ${miniCaja('deb-'+HOY,!!d.nota)}<button class="btn" onclick="hacerDeberes()">${d.nota?'Repasar':'Hacer los deberes'}</button></div>`;
 }
 function hacerDeberes(){const d=deberesHoy();L={id:'deb',i:0,modo:'deb',lista:d.lista,k:0,res:[],hecha:false};pregunta();}
 
@@ -677,7 +692,7 @@ function materia(id){callar();
   ${[1,2,3].map(t=>{const us=m.unis.map((u,i)=>({u,i})).filter(x=>x.u.tri===t);if(!us.length)return '';
     return `<h3 class="tri">${t}.º trimestre</h3><div class="unis">${us.map(({u,i})=>`
       <button class="uni ${listo(id,i)?'lista':''}" onclick="leccion('${id}',${i})"><span class="num">${listo(id,i)?'✓':i+1}</span>
-      <span class="t">${escH(u.t)}<br><span class="e">${E.retos[id+'-'+i]?'🔥 Reto superado':listo(id,i)?'Lección terminada · falta el reto 🔥':'6 ejercicios + reto'}</span></span><span>›</span></button>`).join('')}</div>`;}).join('')}`;
+      <span class="t">${escH(u.t)}<br><span class="e">${E.retos[id+'-'+i]?'🔥 Reto superado':listo(id,i)?'Lección terminada · falta el reto 🔥':'Termina los 6 ejercicios y abre tu regalo 🎁'}</span></span>${miniCaja(id+'-'+i+'-ej',listo(id,i))}</button>`).join('')}</div>`;}).join('')}`;
   scrollTo(0,0);
 }
 
@@ -686,7 +701,8 @@ let L=null;
 function leccion(id,i){callar();
   const m=MATERIAS.find(x=>x.id===id),u=m.unis[i];
   $('#vista').innerHTML=`<button class="volver" onclick="materia('${id}')"><span class="flecha" aria-hidden="true">←</span>${escH(m.nom)}</button>
-  <div class="leccion"><h1 style="font-size:28px;margin-bottom:10px">${escH(u.t)}</h1>
+  <div class="leccion"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px"><h1 style="font-size:28px">${escH(u.t)}</h1>
+   <span class="aviso-regalo">${miniCaja(id+'-'+i+'-ej',listo(id,i))}${listo(id,i)?'¡Regalo abierto!':'Haz los ejercicios y ábrelo'}</span></div>
    <div class="explica">${u.exp}</div><div class="ejemplo">✏️ ${escH(u.ejemplo)}</div>
    <div class="mandos"><button class="btn" onclick="empezar('${id}',${i},'ej')">Hacer los ejercicios</button>
    <button class="btn sec" onclick="empezar('${id}',${i},'reto')">🔥 Reto</button>
@@ -705,7 +721,8 @@ function pregunta(){callar();
   L.hecha=false;
   $('#vista').innerHTML=`<button class="volver" onclick="${deb?'inicio()':`leccion('${L.id}',${L.i})`}"><span class="flecha" aria-hidden="true">←</span>${escH(titulo)}</button>
   <div class="leccion">${deb?'<h1 style="font-size:24px;margin-bottom:8px">📝 Deberes de Matemáticas</h1>':''}<div style="display:flex;align-items:center;gap:14px;margin-bottom:6px"><div class="estrella-prog" id="eprog" style="--p:${L.k/L.lista.length}" title="Tu estrella se enciende con cada ejercicio">${estrellaSola()}</div>
-   <div class="pasos" style="margin:0">${L.lista.map((x,j)=>`<i class="${L.res[j]===true?'si':L.res[j]===false?'no':j===L.k?'ya':''}"></i>`).join('')}</div></div>
+   <div class="pasos" style="margin:0;flex:1">${L.lista.map((x,j)=>`<i class="${L.res[j]===true?'si':L.res[j]===false?'no':j===L.k?'ya':''}"></i>`).join('')}</div>
+   ${L.modo==='gen'?'':miniCaja(deb?'deb-'+HOY:L.id+'-'+L.i+'-'+L.modo,false)}</div>
    <p class="nota">${L.modo==='reto'?'🔥 Reto':L.modo==='gen'?'♾️ Práctica sin fin':deb?'Deber':'Ejercicio'} ${L.k+1} de ${L.lista.length}</p>
    <div class="preg" style="display:flex;gap:10px;align-items:flex-start"><button class="icono" onclick="leerPregunta()" aria-label="Leer la pregunta en voz alta" title="Escuchar">🔊</button><span>${escH(q.q)}</span></div>
    ${q.t==='op'?`<div class="ops">${q.o.map((o,j)=>`<button class="op" data-j="${j}" onclick="responder(${j})">${escH(o)}</button>`).join('')}</div>`
@@ -769,6 +786,8 @@ function cajaSVG(t){return `<svg viewBox="0 0 200 190" aria-hidden="true">
   <rect x="22" y="78" width="156" height="14" fill="rgba(0,0,0,.08)"/>
   <g class="tapa-c"><rect x="12" y="52" width="176" height="32" rx="8" fill="${t.c}"/><rect x="88" y="52" width="24" height="32" fill="${t.l}"/>
    <path d="M100 52c-18-30-52-26-44-6 5 12 30 8 44 6zM100 52c18-30 52-26 44-6-5 12-30 8-44 6z" fill="${t.l}"/><circle cx="100" cy="50" r="9" fill="${t.l}"/></g></svg>`;}
+function miniCaja(key,abierta){const t=tema(key);
+  return `<span class="mini-caja ${abierta?'abierta':'cerrada'}" title="${abierta?'Regalo abierto':'Termina la lección para abrirlo'}">${cajaSVG(t)}${abierta?`<span class="asoma">${t.p[0]}</span>`:'<span class="candado">🔒</span>'}</span>`;}
 function regalo(key){
   const t=tema(key),quieto=matchMedia('(prefers-reduced-motion: reduce)').matches;
   const r=document.createElement('div');r.className='regalo';r.setAttribute('role','dialog');r.setAttribute('aria-label','Caja de regalo');
