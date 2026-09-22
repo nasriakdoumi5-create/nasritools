@@ -160,6 +160,19 @@ table.glosa{width:100%;border-collapse:collapse;font-size:15px}
 .estrella-fin svg{width:100%;height:100%}
 .estrella-fin.apagada{filter:grayscale(.6);opacity:.6;animation:none}
 @keyframes gira{0%,100%{transform:scale(1) rotate(-6deg)}50%{transform:scale(1.12) rotate(6deg)}}
+/* Caja de regalo al terminar un ejercicio */
+.regalo{position:fixed;inset:0;z-index:70;display:grid;place-items:center;background:rgba(28,20,38,.55);overflow:hidden}
+.regalo .caja{width:min(220px,55vw);transition:transform .4s}
+.regalo .caja svg{width:100%;height:auto;overflow:visible}
+.regalo .tapa-c{transform-box:fill-box;transform-origin:50% 100%;transition:transform .7s cubic-bezier(.3,1.6,.5,1)}
+.regalo.abierta .tapa-c{transform:translate(18%,-120%) rotate(28deg)}
+.regalo .caja.tiembla{animation:tiembla .5s ease-in-out 2}
+@keyframes tiembla{0%,100%{transform:rotate(0)}25%{transform:rotate(-6deg)}75%{transform:rotate(6deg)}}
+.regalo .p{position:fixed;left:0;top:0;pointer-events:none;will-change:transform;line-height:1}
+.regalo .msj{position:absolute;bottom:12%;left:50%;transform:translateX(-50%);background:var(--lienzo);color:var(--tinta);
+  border-radius:20px;padding:16px 22px;text-align:center;box-shadow:var(--sombra);width:min(360px,90vw);opacity:0;transition:opacity .5s}
+.regalo .msj.ver{opacity:1}
+.regalo .msj b{font-family:var(--f-tit);font-size:22px;display:block;margin-bottom:10px}
 .parar{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:60;background:var(--tinta);color:var(--papel);box-shadow:var(--sombra)}
 .nota{font-size:13px;color:var(--tinta-2)}
 </style>
@@ -724,6 +737,7 @@ function final(){
     $('#vista').innerHTML=`<div class="leccion fin"><div class="estrella-fin ${aprobado?'':'apagada'}">${estrellaSola()}</div>
      <h1>Deberes: ${ok} de ${n}</h1><p>${ok===n?'¡Todos bien! Mañana tendrás deberes nuevos.':aprobado?'¡Deberes hechos! Mañana, más.':'Repasa las lecciones de Matemáticas y vuelve a intentarlo.'}</p>
      <div class="mandos" style="justify-content:center"><button class="btn" onclick="hacerDeberes()">Repasar</button><button class="btn sec" onclick="inicio()">Inicio</button></div></div>`;
+    if(aprobado)regalo('deb-'+HOY);
     return;}
   if(aprobado&&L.modo==='ej'&&!E.hechas[key]){E.hechas[key]=HOY;sumar(30);}
   if(aprobado&&L.modo==='reto'&&!E.retos[key]){E.retos[key]=HOY;sumar(50);}
@@ -731,6 +745,48 @@ function final(){
    <h1>${ok} de ${n}</h1><p>${ok===n?'¡Todo perfecto!':aprobado?'¡Lección superada! Tu jardín ha crecido.':'Casi lo tienes. Lee otra vez la explicación y vuelve a intentarlo.'}</p>
    <div class="mandos" style="justify-content:center"><button class="btn" onclick="empezar('${L.id}',${L.i},'${L.modo}')">Otra vez</button>
    <button class="btn sec" onclick="materia('${L.id}')">Volver al libro</button><button class="btn sec" onclick="inicio()">Inicio</button></div></div>`;
+  if(aprobado)regalo(key+'-'+L.modo);
+}
+
+/* ============ CAJA DE REGALO ============ */
+/* Solo se abre al superar un ejercicio. Cada lección tiene su propia caja (color, lazo y sorpresa). */
+const TEMAS=[
+ {c:'#F48FB1',l:'#C2185B',p:['🌸','🌷','💗'],m:'¡Un ramo de flores para ti!'},
+ {c:'#B39DDB',l:'#6A4FB5',p:['🦋','💜','✨'],m:'¡Mariposas mágicas!'},
+ {c:'#80CBC4',l:'#00897B',p:['🌼','🍀','🌸'],m:'¡Un jardín entero!'},
+ {c:'#FF8A80',l:'#D32F2F',p:['🌹','❤️','💖'],m:'¡Rosas para una campeona!'},
+ {c:'#FFD54F',l:'#F57F17',p:['⭐','🌟','✨'],m:'¡Una lluvia de estrellas!'},
+ {c:'#90CAF9',l:'#1E88E5',p:['🌈','☁️','💙'],m:'¡Un arcoíris para ti!'},
+ {c:'#FFCC80',l:'#EF6C00',p:['🍓','🍒','🎀'],m:'¡Qué dulce trabajo!'},
+ {c:'#CE93D8',l:'#8E24AA',p:['🦄','💫','💜'],m:'¡Un unicornio te felicita!'},
+ {c:'#F8BBD0',l:'#AD1457',p:['🐱','🐾','💕'],m:'¡Los gatitos están orgullosos!'},
+ {c:'#EF9A9A',l:'#C62828',p:['🎈','🎉','💝'],m:'¡Fiesta por tu esfuerzo!'},
+ {c:'#80DEEA',l:'#00838F',p:['🐚','🐠','💎'],m:'¡Tesoros del mar!'},
+ {c:'#F48FB1',l:'#F9A825',p:['👑','💖','✨'],m:'¡Eres una reina del estudio!'}];
+function tema(key){let h=0;for(const ch of key)h=(h*31+ch.charCodeAt(0))>>>0;return TEMAS[h%TEMAS.length];}
+function cajaSVG(t){return `<svg viewBox="0 0 200 190" aria-hidden="true">
+  <rect x="22" y="78" width="156" height="108" rx="10" fill="${t.c}"/><rect x="88" y="78" width="24" height="108" fill="${t.l}"/>
+  <rect x="22" y="78" width="156" height="14" fill="rgba(0,0,0,.08)"/>
+  <g class="tapa-c"><rect x="12" y="52" width="176" height="32" rx="8" fill="${t.c}"/><rect x="88" y="52" width="24" height="32" fill="${t.l}"/>
+   <path d="M100 52c-18-30-52-26-44-6 5 12 30 8 44 6zM100 52c18-30 52-26 44-6-5 12-30 8-44 6z" fill="${t.l}"/><circle cx="100" cy="50" r="9" fill="${t.l}"/></g></svg>`;}
+function regalo(key){
+  const t=tema(key),quieto=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const r=document.createElement('div');r.className='regalo';r.setAttribute('role','dialog');r.setAttribute('aria-label','Caja de regalo');
+  r.innerHTML=`<div class="caja tiembla">${cajaSVG(t)}</div><div class="msj"><b>${t.m}</b><button class="btn">¡Gracias!</button></div>`;
+  document.body.appendChild(r);
+  const cerrarR=()=>{r.remove();};r.querySelector('.msj .btn').onclick=cerrarR;
+  setTimeout(()=>{r.classList.add('abierta');hablar(t.m.replace(/[¡!]/g,''));if(!quieto)lluvia(r,t);},1000);
+  setTimeout(()=>r.querySelector('.msj').classList.add('ver'),quieto?1200:2600);
+}
+function lluvia(r,t){
+  const caja=r.querySelector('.caja').getBoundingClientRect(),x0=caja.left+caja.width/2,y0=caja.top+caja.height*.35;
+  const ps=Array.from({length:90},()=>{const e=document.createElement('span');e.className='p';e.textContent=t.p[az(0,t.p.length-1)];
+    e.style.fontSize=az(22,44)+'px';r.appendChild(e);const a=(-Math.PI/2)+(Math.random()-.5)*2.2,v=7+Math.random()*9;
+    return {e,x:x0,y:y0,vx:Math.cos(a)*v,vy:Math.sin(a)*v,g:.18+Math.random()*.1,rot:Math.random()*360,vr:(Math.random()-.5)*8};});
+  const H=innerHeight+80;let vivos=ps.length;
+  (function paso(){vivos=0;for(const p of ps){if(p.y>H)continue;vivos++;p.vy+=p.g;p.vx*=.992;p.x+=p.vx;p.y+=p.vy;p.rot+=p.vr;
+    p.e.style.transform=`translate(${p.x}px,${p.y}px) rotate(${p.rot}deg)`;}
+    if(vivos&&r.isConnected)requestAnimationFrame(paso);})();
 }
 
 /* ============ LIBRO DIGITAL: Santillana dentro de una ventana ============ */
