@@ -1,0 +1,2399 @@
+<!doctype html>
+<html lang="es"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1B7F87">
+<meta name="author" content="NasriTools">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>[hidden]{display:none!important}body{margin:0}img{max-width:100%}</style>
+<title>Faro de Estudio · NasriTools</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Andika:ital,wght@0,400;0,700;1,400&family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --papel:#F4F7F6; --lienzo:#FFFFFF; --hueco:#E8EEEC;
+  --tinta:#0D333D; --tinta-2:#4A6B72; --granito:#93A3A6;
+  --mar:#1B7F87; --mar-claro:#DCEDEC; --mar-hondo:#0F5A61;
+  --faro:#F5A524; --faro-claro:#FDF0D8;
+  --acerto:#3F8B51; --acerto-claro:#E2F1E4;
+  --fallo:#C24A3F; --fallo-claro:#FAE5E2;
+  --borde:#D6E2DF; --sombra:0 1px 2px rgba(13,51,61,.06), 0 6px 18px rgba(13,51,61,.07);
+  --r:14px; --r-g:22px;
+  --f-display:'Fredoka','Trebuchet MS',sans-serif;
+  --f-lectura:'Andika','Comic Sans MS',sans-serif;
+  --f-ui:'Nunito','Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --papel:#0A1E24; --lienzo:#102C34; --hueco:#16383F;
+    --tinta:#E4EFEE; --tinta-2:#A9C2C4; --granito:#7A9296;
+    --mar:#3FAEB4; --mar-claro:#123E44; --mar-hondo:#8FD6D9;
+    --faro:#FFB53D; --faro-claro:#3A2E14;
+    --acerto:#63BE76; --acerto-claro:#173222;
+    --fallo:#E8776A; --fallo-claro:#3A1E1A;
+    --borde:#204750; --sombra:0 1px 2px rgba(0,0,0,.3), 0 8px 22px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --papel:#0A1E24; --lienzo:#102C34; --hueco:#16383F;
+  --tinta:#E4EFEE; --tinta-2:#A9C2C4; --granito:#7A9296;
+  --mar:#3FAEB4; --mar-claro:#123E44; --mar-hondo:#8FD6D9;
+  --faro:#FFB53D; --faro-claro:#3A2E14;
+  --acerto:#63BE76; --acerto-claro:#173222;
+  --fallo:#E8776A; --fallo-claro:#3A1E1A;
+  --borde:#204750; --sombra:0 1px 2px rgba(0,0,0,.3), 0 8px 22px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+body{background:var(--papel);color:var(--tinta);font-family:var(--f-ui);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:var(--f-display);font-weight:600;margin:0;text-wrap:balance;line-height:1.2}
+button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer;border:0;background:none}
+:focus-visible{outline:3px solid var(--faro);outline-offset:2px;border-radius:6px}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+
+/* ============ BARRA ============ */
+.barra{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:12px;
+  padding:10px clamp(12px,3vw,26px);background:var(--lienzo);border-bottom:1px solid var(--borde)}
+.marca{display:flex;align-items:center;gap:9px;font-family:var(--f-display);font-weight:600;font-size:17px;letter-spacing:-.2px}
+.marca svg{flex:0 0 auto}
+.barra .sep{flex:1}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;
+  background:var(--hueco);font-weight:700;font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.chip.oro{background:var(--faro-claro);color:var(--tinta)}
+.chip b{color:var(--mar-hondo)}
+.btn-icono{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:var(--hueco);font-size:17px}
+.btn-icono:hover{background:var(--mar-claro)}
+
+/* ============ ESTRUCTURA ============ */
+.envoltura{max-width:1120px;margin:0 auto;padding:clamp(16px,3vw,30px) clamp(12px,3vw,26px) 110px}
+.tira{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.eyebrow{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--granito)}
+.volver{display:inline-flex;align-items:center;gap:7px;font-weight:700;color:var(--mar-hondo);padding:6px 12px;border-radius:999px;background:var(--mar-claro)}
+.volver:hover{filter:brightness(.97)}
+
+/* ============ PORTADA / FARO ============ */
+.portada{display:grid;grid-template-columns:1fr 190px;gap:22px;align-items:center;
+  background:linear-gradient(150deg,var(--mar-hondo),var(--mar));color:#fff;
+  border-radius:var(--r-g);padding:clamp(18px,3vw,28px);margin-bottom:26px;overflow:hidden;position:relative}
+.portada h1{font-size:clamp(24px,4.2vw,34px);color:#fff;margin-bottom:6px}
+.portada p{margin:0;color:#DFF2F1;max-width:52ch;font-size:15px}
+.portada .datos{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.portada .datos span{background:rgba(255,255,255,.16);padding:5px 11px;border-radius:999px;font-size:13px;font-weight:700}
+.faro-caja{position:relative;height:170px;display:grid;place-items:end center}
+.faro-caja svg{width:100%;height:100%;overflow:visible}
+@keyframes barrido{0%{transform:rotate(-26deg);opacity:0}20%{opacity:.85}80%{opacity:.85}100%{transform:rotate(26deg);opacity:0}}
+.haz{transform-origin:96px 44px;opacity:0}
+.haz.gira{animation:barrido 1.5s ease-in-out}
+@media(max-width:700px){.portada{grid-template-columns:1fr}.faro-caja{height:130px;order:-1;justify-items:center}}
+
+/* ============ TARJETAS ============ */
+.rejilla{display:grid;gap:14px}
+.r3{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.r4{grid-template-columns:repeat(auto-fill,minmax(168px,1fr))}
+.tarjeta{background:var(--lienzo);border:1px solid var(--borde);border-radius:var(--r);padding:16px}
+
+/* Misión de hoy */
+.mision{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:12px;margin-bottom:30px}
+.mis{display:flex;flex-direction:column;gap:8px;text-align:left;background:var(--lienzo);
+  border:1px solid var(--borde);border-left:5px solid var(--mar);border-radius:var(--r);padding:14px 15px;transition:transform .15s}
+.mis:hover{transform:translateY(-2px)}
+.mis .k{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--granito)}
+.mis .t{font-family:var(--f-display);font-size:17px;font-weight:600}
+.mis .d{font-size:13px;color:var(--tinta-2)}
+.mis.hecha{border-left-color:var(--acerto);background:var(--acerto-claro)}
+.mis.hecha .t::after{content:" ✔";color:var(--acerto)}
+
+/* ============ LIBROS ============ */
+.libro{display:flex;flex-direction:column;text-align:left;border-radius:var(--r);overflow:hidden;
+  border:1px solid var(--borde);background:var(--lienzo);box-shadow:var(--sombra);transition:transform .16s}
+.libro:hover{transform:translateY(-3px)}
+.libro{perspective:1100px}
+.tapa{aspect-ratio:300/390;position:relative;overflow:hidden;background:#fff;
+  transform-origin:left center;backface-visibility:hidden;
+  transition:transform .52s cubic-bezier(.45,.05,.3,1),box-shadow .52s}
+.tapa svg{display:block;width:100%;height:100%}
+.libro.abriendo .tapa{transform:rotateY(-122deg);box-shadow:22px 0 34px rgba(13,51,61,.3)}
+.tapa-mini{width:118px;border-radius:7px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,.28);background:#fff}
+.tapa-mini svg{display:block;width:100%;height:auto}
+
+/* ---- pasar página ---- */
+.hojas{position:relative;perspective:2000px}
+.hoja-vieja{position:absolute;top:0;left:0;transform-origin:left center;z-index:6;
+  background:var(--lienzo);border-radius:var(--r);box-shadow:0 0 34px rgba(13,51,61,.22);
+  overflow:hidden;pointer-events:none;backface-visibility:hidden}
+@keyframes pasar{
+  0%{transform:rotateY(0deg);filter:brightness(1)}
+  100%{transform:rotateY(-166deg);filter:brightness(.62)}}
+.folio{margin-top:16px;text-align:center;font-size:12px;font-weight:700;color:var(--granito);
+  letter-spacing:.14em;font-variant-numeric:tabular-nums}
+.libro .pie{padding:10px 13px 12px;display:flex;flex-direction:column;gap:7px}
+.libro .pie .lang{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--granito);display:block;min-height:2.5em;line-height:1.25}
+.barrita{height:7px;border-radius:99px;background:var(--hueco);overflow:hidden}
+.barrita i{display:block;height:100%;background:var(--mar);border-radius:99px;transition:width .4s}
+.libro .pct{font-size:12px;font-weight:700;color:var(--tinta-2);font-variant-numeric:tabular-nums}
+.falta{border-style:dashed;border-width:2px;border-color:var(--granito);background:transparent;box-shadow:none}
+.falta .tapa{background:var(--hueco);color:var(--tinta-2);align-items:center;justify-content:center;text-align:center}
+.falta .tapa .tit{max-width:100%;font-size:14px;text-shadow:none}
+.falta .tapa .aviso{font-size:26px;margin-bottom:6px}
+
+/* ============ UNIDADES ============ */
+.uni{display:flex;gap:13px;align-items:flex-start;text-align:left;width:100%;padding:14px 15px;
+  background:var(--lienzo);border:1px solid var(--borde);border-radius:var(--r);transition:border-color .15s}
+.uni:hover{border-color:var(--mar)}
+.uni .n{flex:0 0 34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--mar-claro);
+  color:var(--mar-hondo);font-family:var(--f-display);font-weight:700;font-size:16px}
+.uni.lista .n{background:var(--acerto-claro);color:var(--acerto)}
+.uni h4{font-size:16px;margin-bottom:2px}
+.uni p{margin:0;font-size:13px;color:var(--tinta-2)}
+.uni .tri{font-size:11px;font-weight:800;color:var(--granito);letter-spacing:.06em;text-transform:uppercase;margin-top:5px}
+
+/* ============ LECCIÓN ============ */
+.leccion{display:grid;grid-template-columns:1fr;gap:18px;max-width:760px;margin:0 auto}
+.pizarra{background:var(--lienzo);border:1px solid var(--borde);border-left:5px solid var(--faro);
+  border-radius:var(--r);padding:18px 20px;font-family:var(--f-lectura);font-size:17px;line-height:1.7}
+.pizarra h3{font-family:var(--f-display);font-size:19px;margin-bottom:10px}
+.pizarra p{margin:0 0 11px}
+.pizarra ul{margin:0 0 11px;padding-left:20px}
+.pizarra li{margin-bottom:5px}
+.pizarra b{color:var(--mar-hondo)}
+.ejemplo{background:var(--mar-claro);border-radius:11px;padding:12px 14px;margin:12px 0 4px;
+  font-family:var(--f-ui);font-size:15px;font-weight:600}
+.ejemplo .et{display:block;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--mar-hondo);margin-bottom:4px}
+
+.preg{background:var(--lienzo);border:1px solid var(--borde);border-radius:var(--r);padding:18px 20px}
+.preg .cnt{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--granito);margin-bottom:8px}
+.preg .q{font-family:var(--f-lectura);font-size:20px;line-height:1.45;margin-bottom:15px;display:block}
+.ops{display:grid;gap:9px}
+.op{text-align:left;padding:13px 15px;border-radius:12px;background:var(--hueco);border:2px solid transparent;
+  font-family:var(--f-lectura);font-size:17px;transition:.12s}
+.op:hover:not(:disabled){border-color:var(--mar)}
+.op:disabled{cursor:default}
+.op.ok{background:var(--acerto-claro);border-color:var(--acerto);font-weight:700}
+.op.no{background:var(--fallo-claro);border-color:var(--fallo)}
+.escribe{display:flex;gap:9px;flex-wrap:wrap}
+.escribe input{flex:1;min-width:170px;padding:13px 15px;border-radius:12px;border:2px solid var(--borde);
+  background:var(--papel);color:var(--tinta);font-family:var(--f-lectura);font-size:19px}
+.escribe input:focus{border-color:var(--mar);outline:none}
+.btn{padding:12px 20px;border-radius:12px;background:var(--mar);color:#fff;font-weight:800;font-size:15px}
+.btn:hover{background:var(--mar-hondo)}
+.btn.sec{background:var(--hueco);color:var(--tinta)}
+.btn.oro{background:var(--faro);color:#3A2A05}
+.btn:disabled{opacity:.45;cursor:default}
+.veredicto{margin-top:14px;padding:12px 15px;border-radius:12px;font-weight:700;font-family:var(--f-lectura);font-size:16px;display:none}
+.veredicto.si{display:block;background:var(--acerto-claro);color:var(--acerto)}
+.veredicto.nn{display:block;background:var(--fallo-claro);color:var(--fallo)}
+.pista{margin-top:9px;font-size:14px;color:var(--tinta-2);font-family:var(--f-lectura)}
+.progreso-preg{display:flex;gap:5px;margin-bottom:14px}
+.progreso-preg i{flex:1;height:6px;border-radius:99px;background:var(--hueco)}
+.progreso-preg i.on{background:var(--acerto)}
+.progreso-preg i.act{background:var(--mar)}
+.pares{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.pares .op{font-size:16px;padding:11px 13px}
+.pares .op.sel{border-color:var(--faro);background:var(--faro-claro)}
+
+/* ============ PANEL / HERRAMIENTAS ============ */
+.fab{position:fixed;right:clamp(12px,3vw,26px);bottom:clamp(12px,3vw,22px);z-index:50;
+  display:flex;align-items:center;gap:9px;padding:13px 20px;border-radius:999px;background:var(--faro);color:#3A2A05;
+  font-family:var(--f-display);font-weight:600;font-size:16px;box-shadow:0 6px 20px rgba(13,51,61,.22)}
+.fab:hover{filter:brightness(1.06)}
+.velo{position:fixed;inset:0;z-index:60;background:rgba(10,30,36,.5);display:none;padding:16px;overflow-y:auto}
+.velo.abierto{display:block}
+.modal{max-width:640px;margin:22px auto;background:var(--papel);border-radius:var(--r-g);padding:22px;box-shadow:var(--sombra)}
+.modal h2{font-size:22px;margin-bottom:6px}
+.modal .cerrar{position:sticky;top:0;float:right;width:34px;height:34px;border-radius:50%;background:var(--hueco);font-size:18px}
+.herr-lista{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:16px}
+.herr{display:flex;flex-direction:column;gap:4px;align-items:flex-start;text-align:left;padding:13px;border-radius:var(--r);
+  background:var(--lienzo);border:1px solid var(--borde)}
+.herr:hover{border-color:var(--mar)}
+.herr .ic{font-size:24px}
+.herr .nm{font-family:var(--f-display);font-weight:600;font-size:15px}
+.herr .ds{font-size:12px;color:var(--tinta-2);line-height:1.35}
+
+/* Reloj */
+.reloj-caja{display:grid;place-items:center;gap:14px}
+.reloj{width:min(260px,72vw);height:min(260px,72vw)}
+.mandos{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+
+/* Monedas */
+.monedas{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0}
+.moneda{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:13px;
+  border:3px solid #B9A05E;background:radial-gradient(circle at 32% 28%,#F7E4A8,#D9BE71);color:#5A4712;font-variant-numeric:tabular-nums}
+.moneda.cobre{border-color:#B07A4E;background:radial-gradient(circle at 32% 28%,#E7B58C,#C98A5C);color:#4E2A10}
+.moneda.bi{border-color:#9AA3A8;background:radial-gradient(circle at 32% 28%,#F2E7C0 42%,#C7CDD1 44%);color:#43301A}
+.billete{width:92px;height:52px;border-radius:7px;display:grid;place-items:center;font-weight:800;
+  background:linear-gradient(120deg,#C9D9E8,#9FBBD6);color:#123049;border:2px solid #7E9FBD}
+.marcador{font-family:var(--f-display);font-size:28px;font-weight:700;text-align:center;font-variant-numeric:tabular-nums}
+
+/* Tabla 100 */
+.t100{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;margin-top:12px}
+.t100 span{aspect-ratio:1;display:grid;place-items:center;border-radius:6px;background:var(--lienzo);
+  border:1px solid var(--borde);font-size:clamp(9px,2.1vw,13px);font-weight:700;font-variant-numeric:tabular-nums}
+.t100 span.mk{background:var(--faro);color:#3A2A05;border-color:var(--faro)}
+
+/* Tablas de multiplicar */
+.tabla-mult{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:7px;margin-top:12px}
+.tabla-mult div{background:var(--lienzo);border:1px solid var(--borde);border-radius:9px;padding:8px 6px;
+  text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
+
+/* Glosario */
+.glosa{width:100%;border-collapse:collapse;margin-top:12px;font-size:15px}
+.glosa th{text-align:left;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--granito);padding:6px 8px;border-bottom:2px solid var(--borde)}
+.glosa td{padding:8px;border-bottom:1px solid var(--borde)}
+.glosa td:first-child{font-weight:700;color:var(--mar-hondo)}
+.buscador{width:100%;padding:11px 14px;border-radius:11px;border:2px solid var(--borde);background:var(--lienzo);color:var(--tinta);font-size:16px;font-family:inherit}
+
+/* Libros que faltan */
+.pendiente{display:flex;gap:12px;align-items:flex-start;padding:14px;background:var(--lienzo);
+  border:1px solid var(--borde);border-radius:var(--r);border-left:5px solid var(--faro)}
+.pendiente .ic{font-size:22px}
+.pendiente h4{font-size:16px}
+.pendiente p{margin:3px 0 0;font-size:13.5px;color:var(--tinta-2)}
+.pendiente .meta{font-size:12px;color:var(--granito);font-weight:700;margin-top:5px;display:block}
+.nota{background:var(--faro-claro);border-radius:var(--r);padding:14px 16px;font-size:14.5px;line-height:1.55}
+.nota h4{margin-bottom:6px;font-size:16px}
+.rtl{direction:rtl;text-align:right;font-family:'Segoe UI',Tahoma,sans-serif;line-height:1.9}
+
+a.btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none}
+.abrir-libro{display:flex;flex-direction:column;gap:5px;padding:20px 18px;border-radius:var(--r-g);
+  color:#fff;text-decoration:none;box-shadow:var(--sombra);transition:transform .15s,filter .15s}
+.abrir-libro:hover{transform:translateY(-3px);filter:brightness(1.08)}
+.abrir-libro .ab-ic{font-size:30px;line-height:1}
+.abrir-libro .ab-n{font-family:var(--f-display);font-weight:600;font-size:18px;line-height:1.2}
+.abrir-libro .ab-p{font-size:12.5px;font-weight:700;opacity:.85;letter-spacing:.03em}
+.clase{display:flex;gap:9px;align-items:center;flex-wrap:wrap;background:var(--lienzo);
+  border:1px solid var(--borde);border-radius:var(--r);padding:12px 15px}
+.clase>span{font-weight:700;font-size:14.5px}
+.btn.sec.on{background:var(--acerto-claro);color:var(--acerto);box-shadow:inset 0 0 0 2px var(--acerto)}
+.btn.sec.esp{background:var(--faro-claro);color:#8A6414;box-shadow:inset 0 0 0 2px var(--faro)}
+.regla{display:flex;gap:10px;align-items:flex-start;margin-top:14px;padding:12px 14px;border-radius:11px;
+  background:var(--mar-claro);font-size:14px;line-height:1.5;font-family:var(--f-ui)}
+.regla b{color:var(--mar-hondo)}
+.adelanto{background:var(--faro-claro);border-radius:11px;padding:12px 14px;font-size:14.5px;margin-top:10px}
+.paso .esperando{font-size:11px;font-weight:800;color:#8A6414;background:var(--faro-claro);
+  padding:2px 8px;border-radius:99px;margin-left:6px}
+.url-fila{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin:10px 0 4px}
+.url{font-family:ui-monospace,Consolas,"Courier New",monospace;background:var(--hueco);color:var(--mar-hondo);
+  padding:10px 14px;border-radius:10px;font-size:15px;font-weight:700;user-select:all;
+  border:2px dashed var(--borde);max-width:100%;overflow-x:auto;white-space:nowrap}
+.digi{display:flex;gap:14px;align-items:flex-start;background:var(--lienzo);border:1px solid var(--borde);
+  border-left:5px solid var(--mar);border-radius:var(--r);padding:16px 18px;margin-bottom:14px}
+.digi .ic{font-size:26px;line-height:1}
+.digi h4{font-size:17px;margin-bottom:3px}
+.digi p{margin:0 0 10px;font-size:14px;color:var(--tinta-2)}
+.pasos{counter-reset:p;list-style:none;margin:0 0 12px;padding:0;display:grid;gap:8px}
+.pasos li{counter-increment:p;position:relative;padding-left:34px;font-size:14.5px;line-height:1.5}
+.pasos li::before{content:counter(p);position:absolute;left:0;top:1px;width:23px;height:23px;border-radius:50%;
+  background:var(--mar-claro);color:var(--mar-hondo);font-weight:800;font-size:13px;display:grid;place-items:center}
+.aviso-cod{background:var(--faro-claro);border-radius:10px;padding:9px 12px;font-size:13.5px;margin-top:10px}
+.medallas{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px}
+.med{display:flex;align-items:center;gap:7px;padding:8px 13px;border-radius:999px;background:var(--hueco);font-weight:700;font-size:13px;opacity:.4}
+.med.g{opacity:1;background:var(--faro-claro)}
+/* ============ RUTA DEL CURSO ============ */
+.grupo{background:var(--lienzo);border:1px solid var(--borde);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
+.grupo>summary{list-style:none;cursor:pointer;padding:13px 16px;display:flex;align-items:center;gap:10px;
+  font-family:var(--f-display);font-weight:600;font-size:16px}
+.grupo>summary::-webkit-details-marker{display:none}
+.grupo>summary::after{content:"▾";margin-left:auto;color:var(--granito);transition:transform .2s}
+.grupo[open]>summary::after{transform:rotate(180deg)}
+.grupo>summary:hover{background:var(--hueco)}
+.grupo .fecha{font-family:var(--f-ui);font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--granito)}
+.grupo .cnt2{font-family:var(--f-ui);font-size:12px;font-weight:700;color:var(--mar-hondo);
+  background:var(--mar-claro);padding:3px 10px;border-radius:99px;font-variant-numeric:tabular-nums}
+.ruta{padding:2px 14px 14px}
+.paso{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;padding:9px 8px;border-radius:11px;position:relative}
+.paso:hover{background:var(--hueco)}
+.paso::before{content:"";position:absolute;left:21px;top:34px;bottom:-9px;width:2px;background:var(--borde)}
+.paso:last-child::before{display:none}
+.paso .pt{flex:0 0 28px;height:28px;border-radius:50%;display:grid;place-items:center;
+  font-size:12px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums}
+.paso .info h5{margin:0;font-family:var(--f-display);font-weight:600;font-size:15px;line-height:1.25}
+.paso .info em{font-style:normal;display:block;font-size:12.5px;color:var(--tinta-2)}
+.paso.ok .info h5{color:var(--tinta-2)}
+.paso.aqui{background:var(--faro-claro);box-shadow:inset 0 0 0 2px var(--faro)}
+.paso.aqui .info em{color:var(--tinta);font-weight:700}
+.vacio{text-align:center;color:var(--tinta-2);padding:26px;font-family:var(--f-lectura)}
+.confeti{position:fixed;inset:0;pointer-events:none;z-index:70}
+</style>
+</head><body>
+
+<header class="barra">
+  <span class="marca">
+    <svg width="22" height="24" viewBox="0 0 22 24" aria-hidden="true"><path d="M7 22h8l-1.4-12H8.4L7 22z" fill="#F5A524"/><rect x="8.2" y="4" width="5.6" height="5" rx="1.4" fill="#1B7F87"/><circle cx="11" cy="6.4" r="1.5" fill="#FFF3D6"/><path d="M11 1.4 13 3.6H9L11 1.4z" fill="#1B7F87"/><rect x="5.6" y="22" width="10.8" height="2" rx="1" fill="#1B7F87"/></svg>
+    Faro
+  </span>
+  <span class="sep"></span>
+  <span class="chip oro" id="chip-puntos" title="Faros encendidos">🔆 <b id="pts">0</b></span>
+  <span class="chip" id="chip-racha" title="Días seguidos">🔥 <b id="racha">0</b></span>
+  <button class="btn-icono" id="btn-tema" title="Cambiar modo claro / oscuro" aria-label="Cambiar tema">◐</button>
+</header>
+
+<main class="envoltura" id="vista"></main>
+
+<button class="fab" id="btn-caja">🧰 Herramientas</button>
+<div class="velo" id="velo"><div class="modal" id="modal"></div></div>
+<canvas class="confeti" id="confeti"></canvas>
+
+<script>
+/* ===================== DATOS ===================== */
+const MOTIVOS={
+ mat:'<circle cx="28" cy="72" r="21"/><rect x="56" y="54" width="38" height="9" rx="4"/><rect x="70" y="40" width="9" height="38" rx="4"/>',
+ len:'<rect x="14" y="44" width="72" height="9" rx="4"/><rect x="14" y="63" width="50" height="9" rx="4"/><circle cx="82" cy="86" r="8"/>',
+ nat:'<path d="M18 92c0-32 24-54 56-58-4 32-26 54-56 58z"/><circle cx="86" cy="34" r="6"/>',
+ soc:'<path d="M0 98c20-28 34-8 52-32s36 4 58-16v50H0z"/>',
+ eng:'<circle cx="26" cy="74" r="15"/><circle cx="62" cy="60" r="11"/><circle cx="90" cy="82" r="7"/>',
+ gal:'<path d="M0 66c14-11 24 11 38 0s24 11 38 0 24 11 38 0v44H0z"/>'
+};
+
+/* --- Portadas: mismo formato que los libros de verdad (dibujo propio) --- */
+const FD='Fredoka, Trebuchet MS, sans-serif', FN='Nunito, Segoe UI, sans-serif';
+function espiral(c){return Array.from({length:11},(_,i)=>
+  `<ellipse cx="17" cy="${30+i*32}" rx="14" ry="6.5" fill="none" stroke="${c}" stroke-width="7"/>`).join('');}
+function sello(x,y,g){return `<text x="${x}" y="${y}" font-family="${FD}" font-size="19" font-weight="600" fill="#1B1B1B">MiRA</text>
+  <rect x="${x-4}" y="${y+8}" width="94" height="26" rx="3" fill="#1B1B1B"/>
+  <text x="${x+6}" y="${y+27}" font-family="${FN}" font-size="16" font-weight="800" fill="#fff" letter-spacing="1.4">ANAYA</text>
+  <text x="272" y="${y+27}" text-anchor="end" font-family="${FN}" font-size="14" font-weight="800" fill="#1B1B1B">${g}</text>`;}
+function franjaSantillana(){return `<rect x="0" y="302" width="300" height="88" fill="#FBF9F6"/>
+  <circle cx="30" cy="330" r="4.5" fill="#6E3F9E"/><circle cx="41" cy="323" r="3.2" fill="#8E63BC"/>
+  <circle cx="41" cy="338" r="3.2" fill="#8E63BC"/><circle cx="21" cy="322" r="2.6" fill="#B49AD6"/>
+  <circle cx="21" cy="339" r="2.6" fill="#B49AD6"/>
+  <text x="54" y="326" font-family="${FN}" font-size="8.5" font-weight="800" fill="#6E3F9E" letter-spacing="1.6">PROYECTO</text>
+  <text x="54" y="342" font-family="${FD}" font-size="15" font-weight="600" fill="#3B2C55">construyendo</text>
+  <text x="54" y="357" font-family="${FD}" font-size="15" font-weight="600" fill="#3B2C55">mundos</text>
+  <text x="278" y="374" text-anchor="end" font-family="${FD}" font-size="17" font-weight="600" fill="#111">Santillana</text>`;}
+
+const PORTADAS={
+nat:()=>`<svg viewBox="0 0 300 390" role="img" aria-label="Portada de Ciencias da Natureza 2">
+ <rect width="300" height="390" fill="#F7F1F0"/>${espiral('#6DBE45')}
+ <text x="52" y="52" font-family="${FD}" font-size="21" font-weight="500" fill="#2B2B2B">Primaria</text>
+ <rect x="48" y="62" width="168" height="32" rx="16" fill="#4E9C3F"/>
+ <text x="60" y="85" font-family="${FD}" font-size="19" font-weight="600" fill="#fff">CIENCIAS DA</text>
+ <rect x="48" y="100" width="150" height="32" rx="16" fill="#4E9C3F"/>
+ <text x="60" y="123" font-family="${FD}" font-size="19" font-weight="600" fill="#fff">NATUREZA</text>
+ <text x="272" y="118" text-anchor="end" font-family="${FD}" font-size="98" font-weight="700" fill="#6DBE45">2</text>
+ <ellipse cx="160" cy="244" rx="88" ry="52" fill="#2F7D2C"/><circle cx="104" cy="192" r="41" fill="#2F7D2C"/>
+ <polygon points="64,190 28,200 64,211" fill="#F5A524"/><polygon points="240,214 276,199 250,248" fill="#2F7D2C"/>
+ <circle cx="118" cy="183" r="5" fill="#F7F1F0"/>
+ <circle cx="142" cy="250" r="18" fill="#8CCB6E"/><circle cx="142" cy="250" r="7" fill="#2F7D2C"/>
+ <circle cx="190" cy="236" r="14" fill="#F5A524"/><rect x="206" y="250" width="28" height="21" rx="5" fill="#8CCB6E"/>
+ <polygon points="112,268 120,282 104,282" fill="#E86A8A"/>
+ ${sello(46,326,'GALICIA')}</svg>`,
+
+soc:()=>`<svg viewBox="0 0 300 390" role="img" aria-label="Portada de A Xanela de Galicia 2">
+ <rect width="300" height="390" fill="#FDF9F4"/><rect width="300" height="80" fill="#E8562A"/>
+ <text x="150" y="52" text-anchor="middle" font-family="${FD}" font-size="35" font-weight="700" fill="#fff">A XANELA</text>
+ <rect x="76" y="68" width="148" height="30" rx="15" fill="#4E9C3F"/>
+ <text x="150" y="88" text-anchor="middle" font-family="${FN}" font-size="14" font-weight="800" fill="#fff" letter-spacing="1">DE GALICIA</text>
+ <circle cx="150" cy="212" r="88" fill="#E8562A"/>
+ <g fill="#F4B79B"><circle cx="46" cy="150" r="9"/><rect x="238" y="140" width="18" height="18" rx="4"/>
+  <circle cx="60" cy="286" r="7"/><rect x="242" y="278" width="16" height="16" rx="8"/>
+  <polygon points="270,206 278,222 262,222"/><rect x="30" y="212" width="16" height="10" rx="5"/></g>
+ <g fill="#F5B7A0" opacity=".85"><circle cx="112" cy="168" r="7"/><circle cx="196" cy="256" r="6"/></g>
+ <text x="150" y="252" text-anchor="middle" font-family="${FD}" font-size="112" font-weight="700" fill="#fff">2</text>
+ ${sello(46,320,'')}
+ <text x="272" y="336" text-anchor="end" font-family="${FN}" font-size="14" font-weight="800" fill="#1B1B1B">CIENCIAS</text>
+ <text x="272" y="354" text-anchor="end" font-family="${FN}" font-size="14" font-weight="800" fill="#1B1B1B">SOCIAIS</text>
+ <text x="272" y="374" text-anchor="end" font-family="${FN}" font-size="11" font-weight="800" fill="#8A7A70">GALICIA</text></svg>`,
+
+eng:()=>`<svg viewBox="0 0 300 390" role="img" aria-label="Portada de Open Minds 2 Activity Book">
+ <rect width="300" height="390" fill="#1E7FC4"/>
+ <path d="M0 246 C74 208 156 274 300 226 L300 390 L0 390Z" fill="#FCFDFE"/>
+ <g stroke="#8FC9EC" stroke-width="4" fill="none" opacity=".8">
+  <circle cx="42" cy="196" r="15"/><path d="M244 176 l10 10 -10 10 -10-10z"/>
+  <path d="M60 60 l7 14 15 2 -11 11 3 15 -14-7 -14 7 3-15 -11-11 15-2z" stroke-width="3"/></g>
+ <text x="30" y="122" font-family="${FD}" font-size="54" font-weight="600" fill="#fff">open</text>
+ <circle cx="196" cy="98" r="21" fill="none" stroke="#fff" stroke-width="6"/>
+ <rect x="188" y="118" width="16" height="9" rx="3" fill="#fff"/>
+ <text x="60" y="176" font-family="${FD}" font-size="54" font-weight="600" fill="#fff">minds</text>
+ <text x="270" y="62" text-anchor="end" font-family="${FD}" font-size="58" font-weight="700" fill="#fff">2</text>
+ <text x="30" y="216" font-family="${FD}" font-size="25" font-weight="600" fill="#fff">Activity Book</text>
+ <g fill="#1E7FC4" opacity=".22"><circle cx="86" cy="308" r="26"/><circle cx="150" cy="330" r="18"/><circle cx="196" cy="300" r="12"/></g>
+ <rect x="172" y="330" width="30" height="30" rx="4" fill="#E03127"/>
+ <text x="187" y="352" text-anchor="middle" font-family="${FD}" font-size="19" font-weight="700" fill="#fff">R</text>
+ <text x="276" y="352" text-anchor="end" font-family="${FN}" font-size="15" font-weight="800" fill="#153A56">Richmond</text></svg>`,
+
+len:()=>`<svg viewBox="0 0 300 390" role="img" aria-label="Portada de Lengua Castellana 2">
+ <rect width="300" height="390" fill="#C8103F"/>
+ <text x="22" y="60" font-family="${FD}" font-size="26" font-weight="600" fill="#fff">Lengua Castellana</text>
+ <text x="22" y="86" font-family="${FN}" font-size="15" font-weight="700" fill="#F6C3CF">1.&#170; trimestre</text>
+ <text x="278" y="64" text-anchor="end" font-family="${FD}" font-size="46" font-weight="700" fill="#fff">2</text>
+ <text x="286" y="106" font-family="${FN}" font-size="10" font-weight="800" fill="#F6C3CF" letter-spacing="2.4" transform="rotate(90 286 106)">PRIMARIA</text>
+ <rect x="56" y="254" width="192" height="22" rx="4" fill="#DFA05C"/>
+ <rect x="62" y="196" width="44" height="58" rx="5" fill="#F3E6D6"/>
+ <circle cx="84" cy="214" r="9" fill="#C8103F"/><circle cx="84" cy="238" r="12" fill="#C8103F"/>
+ <rect x="118" y="216" width="52" height="20" rx="3" fill="#6E4B9E"/>
+ <ellipse cx="144" cy="238" rx="26" ry="11" fill="#8E63BC"/>
+ <rect x="192" y="188" width="7" height="46" fill="#8A5A2B"/>
+ <ellipse cx="196" cy="240" rx="19" ry="22" fill="#E8A33D"/><circle cx="196" cy="238" r="6" fill="#C8103F"/>
+ <rect x="228" y="200" width="4" height="54" fill="#33313A"/>
+ <rect x="214" y="192" width="32" height="8" rx="3" fill="#33313A"/>
+ ${franjaSantillana()}</svg>`,
+
+mat:()=>`<svg viewBox="0 0 300 390" role="img" aria-label="Portada de Matemáticas 2">
+ <rect width="300" height="390" fill="#BBD9EC"/>
+ <text x="22" y="60" font-family="${FD}" font-size="28" font-weight="600" fill="#123049">Matem&#225;ticas</text>
+ <text x="22" y="86" font-family="${FN}" font-size="15" font-weight="700" fill="#3D6A8C">1.&#170; trimestre</text>
+ <text x="278" y="64" text-anchor="end" font-family="${FD}" font-size="46" font-weight="700" fill="#123049">2</text>
+ <text x="286" y="106" font-family="${FN}" font-size="10" font-weight="800" fill="#3D6A8C" letter-spacing="2.4" transform="rotate(90 286 106)">PRIMARIA</text>
+ <rect x="0" y="278" width="300" height="24" fill="#8CC63F"/>
+ <rect x="90" y="150" width="120" height="36" rx="5" fill="#E86A9E"/>
+ <rect x="62" y="190" width="176" height="36" rx="5" fill="#E86A9E"/>
+ <rect x="90" y="230" width="120" height="36" rx="5" fill="#E86A9E"/>
+ <g><rect x="98" y="156" width="13" height="24" fill="#F5C24A"/><rect x="114" y="159" width="11" height="21" fill="#5BB3A6"/>
+  <rect x="128" y="155" width="14" height="25" fill="#E8562A"/><rect x="176" y="157" width="12" height="23" fill="#6E4B9E"/>
+  <rect x="70" y="196" width="13" height="24" fill="#5BB3A6"/><rect x="86" y="199" width="11" height="21" fill="#F5C24A"/>
+  <rect x="200" y="196" width="14" height="24" fill="#E8562A"/><rect x="217" y="198" width="12" height="22" fill="#8CC63F"/>
+  <rect x="98" y="236" width="12" height="24" fill="#6E4B9E"/><rect x="113" y="238" width="13" height="22" fill="#F5C24A"/>
+  <rect x="180" y="236" width="12" height="24" fill="#5BB3A6"/></g>
+ <rect x="212" y="240" width="52" height="34" rx="5" fill="#F5C24A"/>
+ <rect x="221" y="228" width="10" height="14" fill="#F5C24A"/><rect x="236" y="226" width="10" height="16" fill="#E8562A"/>
+ <line x1="264" y1="244" x2="276" y2="228" stroke="#F5C24A" stroke-width="5" stroke-linecap="round"/>
+ <circle cx="224" cy="282" r="8" fill="#33313A"/><circle cx="254" cy="282" r="8" fill="#33313A"/>
+ ${franjaSantillana()}</svg>`,
+
+gal:()=>`<svg viewBox="0 0 300 390" role="img" aria-label="Portada de Lingua Galega 2, libro pendiente">
+ <rect width="300" height="390" fill="#F3EEF9"/>${espiral('#9B7ACB')}
+ <text x="52" y="52" font-family="${FD}" font-size="21" font-weight="500" fill="#2B2B2B">Primaria</text>
+ <rect x="48" y="62" width="140" height="32" rx="16" fill="#6B4E9E"/>
+ <text x="60" y="85" font-family="${FD}" font-size="19" font-weight="600" fill="#fff">LINGUA</text>
+ <rect x="48" y="100" width="142" height="32" rx="16" fill="#6B4E9E"/>
+ <text x="60" y="123" font-family="${FD}" font-size="19" font-weight="600" fill="#fff">GALEGA</text>
+ <text x="272" y="118" text-anchor="end" font-family="${FD}" font-size="98" font-weight="700" fill="#9B7ACB">2</text>
+ <path d="M52 262 L146 244 L146 300 L52 314Z" fill="#fff" stroke="#6B4E9E" stroke-width="4"/>
+ <path d="M248 262 L154 244 L154 300 L248 314Z" fill="#fff" stroke="#6B4E9E" stroke-width="4"/>
+ <line x1="150" y1="246" x2="150" y2="300" stroke="#6B4E9E" stroke-width="5"/>
+ <g stroke="#C3AEE0" stroke-width="4" stroke-linecap="round">
+  <line x1="68" y1="272" x2="132" y2="262"/><line x1="68" y1="286" x2="120" y2="277"/>
+  <line x1="232" y1="272" x2="168" y2="262"/><line x1="232" y1="286" x2="180" y2="277"/></g>
+ <text x="150" y="212" text-anchor="middle" font-family="${FD}" font-size="30" font-weight="600" fill="#6B4E9E">x &#183; ll &#183; &#241;</text>
+ ${sello(46,326,'GALICIA')}</svg>`
+};
+
+const MATERIAS=[
+{id:'mat',nom:'Matemáticas',libro:'Matemáticas 2 · Construyendo Mundos',edi:'Santillana',lang:'Castellano',c1:'#2E6DA4',c2:'#6BA3D6',tengo:true,
+ unis:[
+ {t:'Números hasta el 999',tri:1,exp:`<p>Los números tienen <b>casas</b>: unidades, decenas y centenas. En el número <b>356</b> hay 3 centenas, 5 decenas y 6 unidades.</p><ul><li>Para comparar, mira primero la <b>centena</b>: 482 es mayor que 428.</li><li>Los números <b>pares</b> acaban en 0, 2, 4, 6 u 8. Los <b>impares</b>, en 1, 3, 5, 7 o 9.</li></ul>`,ejemplo:'356 = 300 + 50 + 6',
+  ej:[{t:'op',q:'¿Cuántas decenas tiene el número 47?',o:['7 decenas','4 decenas','47 decenas'],r:1,p:'La decena es la cifra de la izquierda: 4.'},
+      {t:'esc',q:'300 + 50 + 6 = ',r:['356'],p:'Junta centenas, decenas y unidades.'},
+      {t:'op',q:'¿Qué número es MAYOR?',o:['428','482','248'],r:1,p:'Los dos empiezan por 4: mira las decenas.'},
+      {t:'esc',q:'El número anterior a 200 es...',r:['199'],p:'Uno menos que 200.'},
+      {t:'op',q:'¿Cuál de estos números es PAR?',o:['35','48','61'],r:1,p:'Acaba en 8, así que es par.'},
+      {t:'esc',q:'Escribe con cifras: doscientos siete',r:['207'],p:'2 centenas, 0 decenas y 7 unidades.'}]},
+ {t:'Sumar y restar llevando',tri:1,exp:`<p>Cuando al sumar una columna te pasas de 9, <b>te llevas 1</b> a la columna de al lado.</p><ul><li>Coloca siempre unidades debajo de unidades.</li><li>En la resta, si arriba hay menos que abajo, pides prestada una decena.</li></ul>`,ejemplo:'28 + 15 → 8+5=13, escribo 3 y me llevo 1 → 43',
+  ej:[{t:'esc',q:'28 + 15 = ',r:['43']},{t:'esc',q:'46 + 37 = ',r:['83']},{t:'esc',q:'52 − 18 = ',r:['34'],p:'Pide prestada una decena.'},
+      {t:'esc',q:'90 − 45 = ',r:['45']},
+      {t:'op',q:'Ana tiene 34 cromos y le regalan 19. ¿Cuántos tiene ahora?',o:['43 cromos','53 cromos','15 cromos'],r:1,p:'Le dan más, así que sumas.'},
+      {t:'esc',q:'125 + 68 = ',r:['193']}]},
+ {t:'Las tablas de multiplicar',tri:2,exp:`<p>Multiplicar es <b>sumar muchas veces lo mismo</b>. En vez de 4+4+4 escribimos 3 × 4.</p><ul><li>El <b>doble</b> es multiplicar por 2. La <b>mitad</b> es repartir en 2 partes iguales.</li><li>Cualquier número por 10 se escribe igual con un 0 detrás.</li></ul>`,ejemplo:'4 + 4 + 4 = 3 × 4 = 12',
+  ej:[{t:'op',q:'4 + 4 + 4 es lo mismo que...',o:['4 × 4','3 × 4','4 + 3'],r:1},
+      {t:'esc',q:'3 × 5 = ',r:['15']},{t:'esc',q:'4 × 7 = ',r:['28']},
+      {t:'esc',q:'El doble de 8 es...',r:['16']},{t:'esc',q:'La mitad de 14 es...',r:['7']},
+      {t:'esc',q:'5 cajas con 6 lápices cada una. ¿Cuántos lápices hay?',r:['30'],p:'5 × 6'}]},
+ {t:'Medir: largo, peso y capacidad',tri:2,exp:`<p>Para medir usamos <b>unidades</b>:</p><ul><li>Lo <b>largo</b>: centímetros (cm) y metros (m).</li><li>Lo que <b>pesa</b>: gramos (g) y kilos (kg).</li><li>Lo que <b>cabe</b>: litros (l).</li></ul>`,ejemplo:'1 metro = 100 cm · 1 kilo = 1000 g · medio litro = 500 ml',
+  ej:[{t:'op',q:'¿En qué medimos lo que pesa una sandía?',o:['En litros','En kilos','En metros'],r:1},
+      {t:'esc',q:'1 metro tiene ... centímetros',r:['100']},
+      {t:'op',q:'Una botella de leche grande tiene un...',o:['litro','kilo','metro'],r:0},
+      {t:'vf',q:'Un kilo pesa más que un gramo.',r:true},
+      {t:'op',q:'¿Qué es más largo?',o:['50 cm','1 metro','20 cm'],r:1,p:'1 metro son 100 cm.'},
+      {t:'esc',q:'Medio kilo son ... gramos',r:['500']}]},
+ {t:'El reloj, el calendario y el dinero',tri:2,exp:`<p>La aguja <b>corta</b> marca las horas y la <b>larga</b> los minutos.</p><ul><li>Minutero en el 12 → <b>en punto</b>. En el 6 → <b>y media</b>. En el 3 → <b>y cuarto</b>.</li><li>1 euro = 100 céntimos.</li></ul>`,ejemplo:'Las 4 y media = las 4:30',
+  ej:[{t:'op',q:'Cuando el minutero está en el 6, decimos que es...',o:['en punto','y media','y cuarto'],r:1},
+      {t:'esc',q:'¿Cuántos meses tiene el año?',r:['12','doce']},
+      {t:'esc',q:'1 euro tiene ... céntimos',r:['100']},
+      {t:'op',q:'Tengo una moneda de 50 céntimos y otra de 20. ¿Cuánto tengo?',o:['52 céntimos','70 céntimos','25 céntimos'],r:1},
+      {t:'esc',q:'Si son las 4 en punto, dentro de 2 horas serán las...',r:['6','seis']},
+      {t:'op',q:'¿Qué mes viene después de marzo?',o:['febrero','abril','mayo'],r:1}]},
+ {t:'Figuras, cuerpos y gráficos',tri:3,exp:`<p>Los <b>polígonos</b> son figuras planas cerradas con lados rectos. Se cuentan por sus <b>lados</b> y sus <b>vértices</b> (las esquinas).</p><ul><li>3 lados: triángulo · 4: cuadrilátero · 5: pentágono · 6: hexágono.</li><li>Los <b>cuerpos</b> ocupan espacio: cubo, esfera, cilindro, pirámide.</li></ul>`,ejemplo:'Un dado es un cubo · una pelota es una esfera',
+  ej:[{t:'op',q:'Un polígono de 3 lados es un...',o:['cuadrado','triángulo','pentágono'],r:1},
+      {t:'esc',q:'¿Cuántos lados tiene un pentágono?',r:['5','cinco']},
+      {t:'op',q:'La pelota tiene forma de...',o:['cubo','esfera','cilindro'],r:1},
+      {t:'vf',q:'El cuadrado tiene los 4 lados iguales.',r:true},
+      {t:'op',q:'Un dado tiene forma de...',o:['cubo','pirámide','esfera'],r:0},
+      {t:'esc',q:'¿Cuántos vértices tiene un rectángulo?',r:['4','cuatro']}]}
+]},
+
+{id:'len',nom:'Lengua Castellana',libro:'Lengua Castellana 2 · Construyendo Mundos',edi:'Santillana',lang:'Castellano',c1:'#B8324E',c2:'#E0687F',tengo:true,
+ unis:[
+ {t:'El abecedario y las sílabas',tri:1,exp:`<p>El abecedario español tiene <b>27 letras</b>. Cinco son vocales: <b>a, e, i, o, u</b>. Las demás son consonantes.</p><ul><li>Las palabras se separan en <b>sílabas</b>: ca-ra-me-lo tiene 4.</li><li>Cada sílaba lleva al menos una vocal.</li></ul>`,ejemplo:'ma-ri-po-sa → 4 sílabas',
+  ej:[{t:'esc',q:'¿Cuántas letras tiene el abecedario español?',r:['27','veintisiete']},
+      {t:'op',q:'¿Cuántas sílabas tiene "mariposa"?',o:['3','4','5'],r:1},
+      {t:'op',q:'¿Cuál NO es una vocal?',o:['e','m','u'],r:1},
+      {t:'esc',q:'¿Cuántas sílabas tiene "ca-ra-me-lo"?',r:['4','cuatro']},
+      {t:'op',q:'¿Qué palabra es la más larga?',o:['sol','bicicleta','mesa'],r:1},
+      {t:'par',q:'Une cada palabra con su número de sílabas',pares:[['pan','1 sílaba'],['casa','2 sílabas'],['pelota','3 sílabas'],['mariposa','4 sílabas']]}]},
+ {t:'Ortografía: ca-que-qui · za-ce-ci · ga-gue-gui',tri:1,exp:`<p>El sonido fuerte de la <b>k</b> se escribe <b>ca, que, qui, co, cu</b>.</p><ul><li>El sonido de la <b>z</b> se escribe <b>za, ce, ci, zo, zu</b>.</li><li>Para que la <b>g</b> suene suave delante de e, i ponemos una <b>u</b> muda: gue, gui.</li></ul>`,ejemplo:'queso · cebra · guitarra',
+  ej:[{t:'op',q:'¿Cuál está bien escrito?',o:['keso','queso','ceso'],r:1},
+      {t:'op',q:'El animal con rayas blancas y negras se escribe...',o:['zebra','cebra','sebra'],r:1},
+      {t:'op',q:'¿Cuál está bien escrito?',o:['gitarra','guitarra','güitarra'],r:1},
+      {t:'op',q:'Lo que te pones en los pies:',o:['zapato','capato','sapato'],r:0},
+      {t:'esc',q:'Escribe la palabra: ci + ne',r:['cine']},
+      {t:'op',q:'¿Cuál lleva "qu"?',o:['eskina','esquina','escina'],r:1}]},
+ {t:'Ortografía: mp y mb · r y rr · el punto',tri:2,exp:`<p>Antes de <b>p</b> y de <b>b</b> siempre se escribe <b>m</b>, nunca n: ca<b>mp</b>o, bo<b>mb</b>ero.</p><ul><li>Entre dos vocales, el sonido fuerte se escribe <b>rr</b>: pe<b>rr</b>o.</li><li>Después del <b>punto</b> se escribe con mayúscula.</li></ul>`,ejemplo:'campo · bombero · perro / pero',
+  ej:[{t:'op',q:'¿Cuál está bien escrito?',o:['canpo','campo','cambo'],r:1},
+      {t:'op',q:'La persona que apaga fuegos es el...',o:['bonbero','bombero','bonvero'],r:1},
+      {t:'op',q:'"El ___ ladra en el jardín."',o:['pero','perro'],r:1},
+      {t:'vf',q:'Los nombres de las personas se escriben con mayúscula.',r:true},
+      {t:'op',q:'Después de un punto escribimos con...',o:['minúscula','mayúscula'],r:1},
+      {t:'esc',q:'Antes de p y b siempre se escribe la letra...',r:['m','eme']}]},
+ {t:'El nombre, el adjetivo y el verbo',tri:2,exp:`<p>El <b>nombre</b> dice cómo se llaman las cosas (mesa, Leo). El <b>adjetivo</b> dice cómo son (verde, alto). El <b>verbo</b> dice lo que hacen (correr, comer).</p><ul><li>Los nombres <b>propios</b> (Leo, Ponteareas) llevan mayúscula.</li><li>Plural: casa → casas · lápiz → lápices.</li></ul>`,ejemplo:'La mesa (nombre) verde (adjetivo) se rompe (verbo).',
+  ej:[{t:'op',q:'"mesa" es un...',o:['nombre','adjetivo','verbo'],r:0},
+      {t:'op',q:'"verde" es un...',o:['nombre','adjetivo','verbo'],r:1},
+      {t:'op',q:'"correr" es un...',o:['nombre','adjetivo','verbo'],r:2},
+      {t:'esc',q:'El plural de "lápiz" es...',r:['lapices']},
+      {t:'op',q:'"Ponteareas" es un nombre...',o:['común','propio'],r:1},
+      {t:'esc',q:'El femenino de "profesor" es...',r:['profesora']}]},
+ {t:'Leo y comprendo: las alfombras de flores',tri:3,exp:`<p style="font-family:var(--f-lectura)">El domingo de Corpus, en Ponteareas, las calles se llenan de flores. Muchas familias se levantan muy temprano para hacer <b>alfombras</b> con pétalos de colores.</p><p style="font-family:var(--f-lectura)">Leo y su abuela recogen hortensias azules en el huerto. Después, con mucho cuidado, dibujan una estrella enorme en el suelo.</p><p style="font-family:var(--f-lectura)">Cuando pasa la procesión, la alfombra se deshace. Pero todos sonríen: el año que viene volverán a hacerla.</p>`,ejemplo:'Lee el texto dos veces antes de contestar. ¡No hay prisa!',
+  ej:[{t:'op',q:'¿Dónde ocurre la historia?',o:['En Vigo','En Ponteareas','En Santiago'],r:1},
+      {t:'op',q:'¿Con qué hacen las alfombras?',o:['Con pétalos de flores','Con papel','Con arena'],r:0},
+      {t:'op',q:'¿Quién recoge las flores con Leo?',o:['Su hermano','Su abuela','Su maestra'],r:1},
+      {t:'esc',q:'¿De qué color son las hortensias del cuento?',r:['azules','azul']},
+      {t:'vf',q:'Leo se pone triste porque la alfombra se deshace.',r:false,p:'Vuelve a leer el final: todos sonríen.'},
+      {t:'op',q:'¿Qué dibujan en el suelo?',o:['Una estrella','Un barco','Una casa'],r:0}]},
+ {t:'Escribo: la nota, la descripción y el cuento',tri:3,exp:`<p>Un <b>cuento</b> tiene tres partes: principio, nudo y final.</p><ul><li>Una <b>nota</b> es un mensaje corto para avisar de algo.</li><li>Para <b>describir</b> usamos adjetivos: alto, alegre, pequeño.</li><li>Las preguntas van entre <b>¿ ?</b> y llevamos cuidado con el punto final.</li></ul>`,ejemplo:'Principio: Érase una vez… · Nudo: un día… · Final: y colorín colorado.',
+  ej:[{t:'op',q:'Un cuento tiene...',o:['solo un final','principio, nudo y final','solo dibujos'],r:1},
+      {t:'op',q:'En una nota escribimos...',o:['un mensaje corto','un libro entero','una tabla'],r:0},
+      {t:'esc',q:'Las palabras que dicen cómo es alguien se llaman...',r:['adjetivos','adjetivo']},
+      {t:'op',q:'¿Qué signo cierra una pregunta?',o:['.','?','!'],r:1},
+      {t:'vf',q:'Al empezar a escribir un cuento ponemos mayúscula.',r:true},
+      {t:'op',q:'"Érase una vez..." es el...',o:['principio','nudo','final'],r:0}]}
+]},
+
+{id:'nat',nom:'Ciencias da Natureza',libro:'Ciencias da Natureza 2 · MIRA',edi:'Anaya',lang:'Galego',c1:'#3F8A34',c2:'#7BBF63',tengo:true,
+ unis:[
+ {t:'Os seres vivos',tri:1,exp:`<p>Os <b>seres vivos</b> nacen, medran, reprodúcense e morren. As persoas, os animais e as plantas son seres vivos.</p><ul><li>Os <b>seres inertes</b> non teñen vida: unha pedra, a auga, unha cadeira.</li><li>Todos os seres vivos necesitan <b>aire</b>, <b>auga</b> e <b>alimento</b>.</li></ul><p style="font-size:14px;color:var(--tinta-2)">En castellano: los seres vivos nacen, crecen, se reproducen y mueren.</p>`,ejemplo:'medrar = crecer · auga = agua · alimento = comida',
+  ej:[{t:'op',q:'Os seres vivos nacen, medran, reprodúcense e...',o:['voan','morren','falan'],r:1},
+      {t:'op',q:'Cal destes é un ser inerte?',o:['unha pedra','un can','unha árbore'],r:0},
+      {t:'vf',q:'As plantas son seres vivos.',r:true},
+      {t:'esc',q:'Para respirar necesitamos... (5 letras)',r:['aire']},
+      {t:'op',q:'Un ser vivo necesita auga, aire e...',o:['alimento','xoguetes','luz eléctrica'],r:0}]},
+ {t:'Os animais',tri:1,exp:`<p>Os animais <b>vertebrados</b> teñen esqueleto por dentro. Os <b>invertebrados</b> non o teñen.</p><ul><li>Vertebrados: mamíferos, aves, peixes, réptiles e anfibios.</li><li>Segundo o que comen: <b>herbívoros</b> (plantas), <b>carnívoros</b> (carne) e <b>omnívoros</b> (todo).</li></ul>`,ejemplo:'A vaca é un mamífero herbívoro. A bolboreta é invertebrada.',
+  ej:[{t:'op',q:'Os animais que teñen esqueleto por dentro chámanse...',o:['invertebrados','vertebrados','mamíferos'],r:1},
+      {t:'op',q:'A vaca é un...',o:['réptil','mamífero','ave'],r:1},
+      {t:'op',q:'Os peixes respiran polas...',o:['branquias','pulmóns','patas'],r:0},
+      {t:'op',q:'O animal que come só plantas é...',o:['carnívoro','herbívoro','omnívoro'],r:1},
+      {t:'par',q:'Une cada animal co seu grupo',pares:[['aguia','ave'],['sapo','anfibio'],['lagarto','réptil'],['troita','peixe']]},
+      {t:'vf',q:'A bolboreta é un animal invertebrado.',r:true}]},
+ {t:'As plantas',tri:2,exp:`<p>As plantas teñen <b>raíz</b>, <b>tallo</b>, <b>follas</b>, <b>flores</b> e <b>froitos</b>.</p><ul><li>A raíz suxeita a planta e colle a auga da terra.</li><li>As plantas fabrican o seu propio alimento coa luz do <b>Sol</b>.</li><li>Hai árbores (o carballo), arbustos e herbas.</li></ul>`,ejemplo:'raíz = raíz · folla = hoja · froito = fruto',
+  ej:[{t:'op',q:'A parte que suxeita a planta e colle a auga é a...',o:['folla','raíz','flor'],r:1},
+      {t:'esc',q:'Das flores nacen os... (7 letras)',r:['froitos','froito']},
+      {t:'op',q:'As plantas fabrican o seu alimento coa luz do...',o:['Sol','vento','lume'],r:0},
+      {t:'op',q:'O carballo é unha...',o:['herba','árbore','flor'],r:1},
+      {t:'vf',q:'As plantas non necesitan auga para vivir.',r:false}]},
+ {t:'O corpo humano e os sentidos',tri:2,exp:`<p>Temos <b>cinco sentidos</b>: vista, oído, olfacto, gusto e tacto.</p><ul><li>Vemos cos <b>ollos</b>, oímos coas <b>orellas</b>, ulimos co <b>nariz</b>, saboreamos coa <b>lingua</b> e tocamos coa <b>pel</b>.</li><li>Para estar sans: comer froita e verdura, durmir e lavar os dentes.</li></ul>`,ejemplo:'ollo = ojo · orella = oreja · lingua = lengua · pel = piel',
+  ej:[{t:'esc',q:'Cantos sentidos temos?',r:['5','cinco']},
+      {t:'op',q:'Vemos cos...',o:['ollos','pés','dedos'],r:0},
+      {t:'op',q:'O sentido do gusto está na...',o:['man','lingua','orella'],r:1},
+      {t:'op',q:'Cal é un alimento máis saudable?',o:['froita','lambetadas','patacas fritidas'],r:0},
+      {t:'par',q:'Une cada parte co seu sentido',pares:[['ollos','vista'],['orellas','oído'],['nariz','olfacto'],['pel','tacto']]},
+      {t:'vf',q:'Hai que lavar os dentes despois de comer.',r:true}]},
+ {t:'A materia, as máquinas e o ordenador',tri:3,exp:`<p>Todo o que nos rodea é <b>materia</b> e pode estar en tres estados: <b>sólido</b>, <b>líquido</b> e <b>gas</b>.</p><ul><li>As <b>máquinas simples</b> teñen poucas pezas: a tesoira, a roda, a panca.</li><li>O ordenador ten pantalla, teclado e rato.</li></ul>`,ejemplo:'A auga: sólida (xeo), líquida (auga) e gas (vapor).',
+  ej:[{t:'op',q:'A auga do vaso é un...',o:['sólido','líquido','gas'],r:1},
+      {t:'op',q:'Unha pedra é un...',o:['sólido','líquido','gas'],r:0},
+      {t:'op',q:'O aire é un...',o:['sólido','líquido','gas'],r:2},
+      {t:'op',q:'A tesoira é unha máquina...',o:['simple','complicada','eléctrica'],r:0},
+      {t:'esc',q:'A parte do ordenador onde escribimos as letras é o...',r:['teclado']}]}
+]},
+
+{id:'soc',nom:'Ciencias Sociais',libro:'A Xanela de Galicia 2 · MIRA',edi:'Anaya',lang:'Galego',c1:'#D4622F',c2:'#F09A63',tengo:true,isbn:'978-84-14-36149-8',
+ unis:[
+ {t:'O tempo atmosférico',tri:1,exp:`<p>O <b>tempo atmosférico</b> é como está o ceo hoxe: sol, choiva, vento, néboa ou neve.</p><ul><li>Co <b>termómetro</b> medimos a temperatura.</li><li>O ano ten catro <b>estacións</b>: primavera, verán, outono e inverno.</li><li>En Galicia chove moito, sobre todo no inverno.</li></ul>`,ejemplo:'choiva = lluvia · néboa = niebla · outono = otoño',
+  ej:[{t:'op',q:'Co termómetro medimos a...',o:['choiva','temperatura','hora'],r:1},
+      {t:'op',q:'A auga que cae das nubes chámase...',o:['néboa','choiva','vento'],r:1},
+      {t:'esc',q:'A estación máis fría do ano é o...',r:['inverno']},
+      {t:'esc',q:'Cantas estacións ten o ano?',r:['4','catro']},
+      {t:'vf',q:'Coa néboa vese moi lonxe.',r:false}]},
+ {t:'A paisaxe de Galicia',tri:1,exp:`<p>Galicia ten paisaxe de <b>montaña</b>, de <b>val</b> e de <b>costa</b>.</p><ul><li>As entradas do mar na terra chámanse <b>rías</b>. Son moi típicas de Galicia.</li><li>O río máis longo é o <b>Miño</b>. Ponteareas está á beira do río <b>Tea</b>.</li><li>Na ría de Vigo están as illas <b>Cíes</b>.</li></ul>`,ejemplo:'praia = playa · río = río · illa = isla',
+  ej:[{t:'op',q:'As entradas do mar na terra en Galicia chámanse...',o:['praias','rías','lagos'],r:1},
+      {t:'op',q:'O río máis longo de Galicia é o...',o:['Tea','Miño','Ulla'],r:1},
+      {t:'op',q:'Un terreo moi alto chámase...',o:['montaña','chaira','praia'],r:0},
+      {t:'esc',q:'As illas máis famosas da ría de Vigo son as illas...',r:['cies']},
+      {t:'vf',q:'Ponteareas está á beira do río Tea.',r:true}]},
+ {t:'A auga e o aire',tri:2,exp:`<p>A auga do mar é <b>salgada</b> e a dos ríos é <b>doce</b>.</p><ul><li>Co calor do Sol a auga evapórase e forma as <b>nubes</b>. Despois cae en forma de choiva: é o <b>ciclo da auga</b>.</li><li>Hai que coidala: pecha a billa mentres lavas os dentes.</li></ul>`,ejemplo:'salgada = salada · doce = dulce · billa = grifo',
+  ej:[{t:'op',q:'A auga do mar é...',o:['doce','salgada','quente'],r:1},
+      {t:'op',q:'Cando a auga quenta e sobe forma as...',o:['nubes','pedras','ondas'],r:0},
+      {t:'vf',q:'Debemos pechar a billa mentres lavamos os dentes.',r:true},
+      {t:'esc',q:'A auga que bebemos é auga... (5 letras)',r:['doce']},
+      {t:'op',q:'O aire que respiramos ten...',o:['osíxeno','area','auga salgada'],r:0}]},
+ {t:'O Sol, a Terra e a Lúa',tri:2,exp:`<p>A <b>Terra</b> dá voltas arredor do <b>Sol</b> e tarda un ano. Ao xirar sobre si mesma fai o <b>día</b> e a <b>noite</b>.</p><ul><li>A <b>Lúa</b> xira arredor da Terra e non ten luz propia: reflicte a do Sol.</li><li>Unha semana ten 7 días e un ano 12 meses.</li></ul>`,ejemplo:'Día = o noso lado mira ao Sol. Noite = o noso lado está ás escuras.',
+  ej:[{t:'op',q:'A Terra dá voltas arredor do...',o:['Sol','Lúa','mar'],r:0},
+      {t:'op',q:'A Lúa xira arredor da...',o:['Terra','Sol','estrela'],r:0},
+      {t:'esc',q:'Cantos días ten unha semana?',r:['7','sete']},
+      {t:'op',q:'Cando o noso lado da Terra non recibe luz do Sol é de...',o:['día','noite','tarde'],r:1},
+      {t:'vf',q:'A Lúa ten luz propia.',r:false}]},
+ {t:'Onde vivimos: aldea, vila e cidade',tri:3,exp:`<p>Podemos vivir nunha <b>aldea</b> (poucas casas), nunha <b>vila</b> (mediana, como Ponteareas) ou nunha <b>cidade</b> (moi grande, como Vigo).</p><ul><li>Galicia ten <b>7 cidades</b>: A Coruña, Lugo, Ourense, Pontevedra, Vigo, Santiago e Ferrol.</li><li>A capital de Galicia é <b>Santiago de Compostela</b>.</li><li>Ponteareas está na provincia de <b>Pontevedra</b>.</li></ul>`,ejemplo:'aldea = aldea · vila = pueblo grande · cidade = ciudad',
+  ej:[{t:'esc',q:'Cantas cidades ten Galicia?',r:['7','sete']},
+      {t:'op',q:'Ponteareas está na provincia de...',o:['Lugo','Pontevedra','Ourense'],r:1},
+      {t:'op',q:'A capital de Galicia é...',o:['Vigo','Santiago de Compostela','A Coruña'],r:1},
+      {t:'op',q:'Un lugar pequeno con poucas casas é unha...',o:['cidade','aldea','vila'],r:1},
+      {t:'par',q:'Une cada traballo co que fai',pares:[['panadeiro','fai pan'],['médica','coida enfermos'],['mestra','ensina na escola'],['labrego','traballa no campo']]},
+      {t:'op',q:'Para ir de Vigo a Madrid podemos ir en...',o:['tren','bicicleta','barco'],r:0}]},
+ {t:'O tempo pasa',tri:3,exp:`<p><b>Onte</b> é o día que xa pasou, <b>hoxe</b> é o día de agora e <b>mañá</b> é o que vén.</p><ul><li>Un ano ten 12 meses. Cen anos son un <b>século</b>.</li><li>Os pais dos teus pais son os teus <b>avós</b>.</li><li>Antes non había móbiles nin ordenadores: as cousas cambian co tempo.</li></ul>`,ejemplo:'onte = ayer · hoxe = hoy · mañá = mañana',
+  ej:[{t:'op',q:'O día que xa pasou é...',o:['hoxe','onte','mañá'],r:1},
+      {t:'esc',q:'Cantos meses ten un ano?',r:['12','doce']},
+      {t:'op',q:'Os pais do teu pai son os teus...',o:['irmáns','avós','curmáns'],r:1},
+      {t:'vf',q:'Hai cen anos xa había teléfonos móbiles.',r:false},
+      {t:'op',q:'Un século son...',o:['10 anos','100 anos','1000 anos'],r:1}]}
+]},
+
+{id:'eng',nom:'English',libro:'Open Minds 2 · Activity Book',edi:'Richmond',lang:'Inglés',c1:'#1970B8',c2:'#5CADE5',tengo:true,
+ unis:[
+ {t:'En clase: objetos y números',tri:1,exp:`<p>En clase usamos: <b>pencil</b> (lápiz), <b>book</b> (libro), <b>chair</b> (silla), <b>table</b> (mesa), <b>bag</b> (mochila), <b>rubber</b> (goma).</p><ul><li>Números: one, two, three, four, five, six, seven, eight, nine, ten.</li><li>Saludo: <b>Hello! My name is Leo. I'm seven.</b></li></ul>`,ejemplo:'Toca el botón 🔊 para escuchar cada palabra en inglés.',
+  ej:[{t:'op',q:'"pencil" en español es...',o:['libro','lápiz','silla'],r:1},
+      {t:'esc',q:'Escribe el número 3 en inglés',r:['three']},
+      {t:'par',q:'Une la palabra con su traducción',pares:[['book','libro'],['chair','silla'],['table','mesa'],['bag','mochila']]},
+      {t:'op',q:'"Hello! My name ___ Leo."',o:['is','are','am'],r:0},
+      {t:'esc',q:'Escribe el número 10 en inglés',r:['ten']}]},
+ {t:'Mi familia: family',tri:1,exp:`<p>La familia: <b>mother</b> (madre), <b>father</b> (padre), <b>sister</b> (hermana), <b>brother</b> (hermano), <b>grandmother</b> (abuela), <b>grandfather</b> (abuelo), <b>baby</b> (bebé).</p><ul><li><b>I am</b> = yo soy · <b>He is</b> = él es · <b>She is</b> = ella es.</li></ul>`,ejemplo:'This is my sister. She is five.',
+  ej:[{t:'op',q:'"mother" es...',o:['madre','hermana','abuela'],r:0},
+      {t:'esc',q:'"brother" en español es...',r:['hermano']},
+      {t:'op',q:'El padre en inglés es...',o:['mother','father','brother'],r:1},
+      {t:'par',q:'Une la palabra con su traducción',pares:[['sister','hermana'],['grandmother','abuela'],['baby','bebé'],['cousin','primo']]},
+      {t:'op',q:'"I ___ seven years old."',o:['am','is','are'],r:0}]},
+ {t:'Mi cuerpo: body and face',tri:2,exp:`<p>El cuerpo: <b>head</b> (cabeza), <b>arm</b> (brazo), <b>leg</b> (pierna), <b>hand</b> (mano), <b>foot</b> (pie).</p><ul><li>La cara: <b>eyes</b> (ojos), <b>nose</b> (nariz), <b>mouth</b> (boca), <b>ears</b> (orejas), <b>hair</b> (pelo).</li></ul>`,ejemplo:'I have two eyes and one nose.',
+  ej:[{t:'op',q:'"head" es...',o:['mano','cabeza','pie'],r:1},
+      {t:'esc',q:'"hand" en español es...',r:['mano']},
+      {t:'par',q:'Une la palabra con su traducción',pares:[['eyes','ojos'],['nose','nariz'],['mouth','boca'],['ears','orejas']]},
+      {t:'op',q:'"I have two ___" (piernas)',o:['arms','legs','hands'],r:1},
+      {t:'esc',q:'"hair" en español es...',r:['pelo','cabello']}]},
+ {t:'Los animales: animals',tri:2,exp:`<p>Animales: <b>cat</b> (gato), <b>dog</b> (perro), <b>bird</b> (pájaro), <b>fish</b> (pez), <b>cow</b> (vaca), <b>horse</b> (caballo), <b>rabbit</b> (conejo).</p><ul><li>Describir: <b>big</b> (grande), <b>small</b> (pequeño), <b>fast</b> (rápido).</li></ul>`,ejemplo:'The elephant is very big. The rabbit is small.',
+  ej:[{t:'op',q:'"cat" es...',o:['perro','gato','pájaro'],r:1},
+      {t:'esc',q:'"dog" en español es...',r:['perro']},
+      {t:'par',q:'Une la palabra con su traducción',pares:[['bird','pájaro'],['fish','pez'],['cow','vaca'],['horse','caballo']]},
+      {t:'op',q:'"The elephant is very ___."',o:['small','big','short'],r:1},
+      {t:'esc',q:'"rabbit" en español es...',r:['conejo']}]},
+ {t:'La comida: food',tri:3,exp:`<p>Comida: <b>milk</b> (leche), <b>bread</b> (pan), <b>apple</b> (manzana), <b>water</b> (agua), <b>cheese</b> (queso), <b>egg</b> (huevo), <b>orange</b> (naranja).</p><ul><li>Gustos: <b>I like</b> = me gusta · <b>I don't like</b> = no me gusta.</li></ul>`,ejemplo:"I like apples. I don't like fish.",
+  ej:[{t:'op',q:'"milk" es...',o:['pan','leche','agua'],r:1},
+      {t:'esc',q:'"bread" en español es...',r:['pan']},
+      {t:'par',q:'Une la palabra con su traducción',pares:[['apple','manzana'],['water','agua'],['cheese','queso'],['egg','huevo']]},
+      {t:'op',q:'"I ___ like fish." (no me gusta)',o:["don't",'do','am'],r:0},
+      {t:'esc',q:'"orange" en español es...',r:['naranja']}]},
+ {t:'Mi casa y el tiempo: house & weather',tri:3,exp:`<p>La casa: <b>kitchen</b> (cocina), <b>bedroom</b> (dormitorio), <b>bathroom</b> (baño), <b>door</b> (puerta), <b>window</b> (ventana).</p><ul><li>El tiempo: <b>sunny</b> (soleado), <b>rainy</b> (lluvioso), <b>windy</b> (ventoso), <b>cloudy</b> (nublado).</li></ul>`,ejemplo:"It's rainy today. — ¡Muy típico en Galicia!",
+  ej:[{t:'op',q:'"kitchen" es...',o:['baño','cocina','dormitorio'],r:1},
+      {t:'esc',q:'"bedroom" en español es...',r:['dormitorio','habitacion','cuarto']},
+      {t:'par',q:'Une la palabra con su traducción',pares:[['sunny','soleado'],['rainy','lluvioso'],['windy','ventoso'],['cloudy','nublado']]},
+      {t:'op',q:'"It\'s ___ today." (llueve)',o:['sunny','raining','windy'],r:1},
+      {t:'esc',q:'"window" en español es...',r:['ventana']}]}
+]},
+
+{id:'gal',nom:'Lingua Galega',libro:'Lingua Galega 2 (pendiente de comprar)',edi:'Anaya · MIRA',lang:'Galego',c1:'#6B4E9E',c2:'#A28BCB',tengo:false,
+ unis:[
+ {t:'O abecedario galego',tri:1,exp:`<p>O galego escríbese case coma o castelán, pero hai letras que cambian.</p><ul><li>O son do <b>j</b> castelán escríbese con <b>x</b>: gente → <b>xente</b>.</li><li>O <b>ll</b> aparece moito: hoja → <b>folla</b>, mujer → <b>muller</b>.</li><li>Hai 5 vogais: a, e, i, o, u.</li></ul>`,ejemplo:'xogar (jugar) · xoves (jueves) · caixa (caja)',
+  ej:[{t:'op',q:'O son do "j" castelán escríbese en galego con...',o:['g','x','ll'],r:1},
+      {t:'op',q:'"gente" en galego é...',o:['gente','xente','jente'],r:1},
+      {t:'esc',q:'"hoja" en galego é...',r:['folla']},
+      {t:'esc',q:'Cantas vogais ten o galego?',r:['5','cinco']},
+      {t:'vf',q:'En galego escríbese "muller", non "mujer".',r:true}]},
+ {t:'O artigo e o substantivo',tri:1,exp:`<p>Os <b>artigos</b> galegos son: <b>o, a, os, as</b> (el, la, los, las).</p><ul><li>o neno / a nena / os nenos / as nenas.</li><li>Plural: can → <b>cans</b> · animal → <b>animais</b>.</li></ul>`,ejemplo:'o libro · a mesa · os amigos · as casas',
+  ej:[{t:'op',q:'O artigo que acompaña a "casa" é...',o:['o','a','os'],r:1},
+      {t:'esc',q:'O plural de "can" é...',r:['cans']},
+      {t:'op',q:'"os nenos" está en...',o:['singular','plural'],r:1},
+      {t:'par',q:'Une cada grupo co seu tipo',pares:[['o neno','masculino singular'],['a nena','feminino singular'],['os nenos','masculino plural'],['as nenas','feminino plural']]},
+      {t:'esc',q:'O artigo masculino singular en galego é...',r:['o']}]},
+ {t:'O adxectivo e o verbo',tri:2,exp:`<p>O <b>adxectivo</b> di como é algo: grande, pequeno, bonito.</p><ul><li>O <b>verbo</b> di o que se fai: falar, comer, xogar.</li><li>Tempos: onte (pasado), hoxe (presente), mañá (futuro).</li></ul>`,ejemplo:'Eu falo · onte falei · mañá falarei',
+  ej:[{t:'op',q:'"grande" é un...',o:['substantivo','adxectivo','verbo'],r:1},
+      {t:'op',q:'"comer" é un...',o:['substantivo','adxectivo','verbo'],r:2},
+      {t:'esc',q:'"Eu ___ galego na escola." (falar, presente)',r:['falo']},
+      {t:'op',q:'"Onte cantei" está en...',o:['presente','pasado','futuro'],r:1},
+      {t:'vf',q:'"Mañá xogaremos" está en futuro.',r:true}]},
+ {t:'Vocabulario da escola e da casa',tri:2,exp:`<p>Palabras que vas usar todos os días na escola:</p><ul><li><b>lapis</b> (lápiz), <b>caderno</b> (cuaderno), <b>xanela</b> (ventana), <b>reloxo</b> (reloj), <b>mestra</b> (maestra).</li><li>Na casa: <b>culler</b> (cuchara), <b>leite</b> (leche), <b>almorzo</b> (desayuno), <b>xantar</b> (comida).</li></ul>`,ejemplo:'Abre a xanela e colle o lapis.',
+  ej:[{t:'op',q:'"cuchara" en galego é...',o:['culler','coitelo','garfo'],r:0},
+      {t:'esc',q:'"leche" en galego é...',r:['leite']},
+      {t:'par',q:'Une a palabra galega co castelán',pares:[['xanela','ventana'],['lapis','lápiz'],['caderno','cuaderno'],['reloxo','reloj']]},
+      {t:'op',q:'"el desayuno" en galego é...',o:['o xantar','o almorzo','a cea'],r:1},
+      {t:'esc',q:'"el niño" en galego é... (2 palabras)',r:['o neno','neno']}]},
+ {t:'Maiúsculas e signos',tri:3,exp:`<p>As <b>maiúsculas</b> van ao empezar a escribir, despois do punto e nos nomes propios (Leo, Ponteareas, Galicia).</p><ul><li>A <b>coma</b> (,) separa as palabras dunha lista.</li><li>As preguntas rematan con <b>?</b> e as exclamacións con <b>!</b>.</li></ul>`,ejemplo:'Merquei mazás, peras e uvas. Como te chamas?',
+  ej:[{t:'op',q:'Ao final dunha pregunta poñemos...',o:['.','?','!'],r:1},
+      {t:'vf',q:'Os nomes propios escríbense con maiúscula.',r:true},
+      {t:'op',q:'Despois do punto escribimos con...',o:['minúscula','maiúscula'],r:1},
+      {t:'esc',q:'O signo que separa palabras nunha lista é a...',r:['coma']},
+      {t:'op',q:'"galicia" está mal escrito porque falta a...',o:['coma','maiúscula','til'],r:1}]}
+]}
+];
+
+/* --- Temas que completan el curso (currículo oficial de 2.º, Galicia) --- */
+const EXTRA={
+mat:[
+ /* VIDA REAL - matemáticas de todos los días */
+ {t:'La compra: pagar y contar el cambio',tri:1,exp:`<p>En la tienda hay que hacer dos cuentas: <b>cuánto suma todo</b> y <b>cuánto te devuelven</b>.</p><ul><li>Primero sumas lo que llevas en la cesta.</li><li>El <b>cambio</b> es el dinero que pagas menos lo que cuesta.</li><li>1 euro = 100 céntimos. Los billetes son de 5, 10, 20 y 50 euros.</li></ul>`,ejemplo:'Pan 1 € + leche 2 € = 3 €. Pago con 5 € y me devuelven 2 €.',
+  ej:[{t:'esc',q:'Pan 1 €, leche 2 € y huevos 3 €. En total son ... €',r:['6']},
+      {t:'esc',q:'La compra cuesta 7 € y pago con un billete de 10 €. Me devuelven ... €',r:['3']},
+      {t:'op',q:'Un yogur cuesta 60 céntimos. ¿Cuánto cuestan 2 yogures?',o:['1,20 €','1,60 €','60 céntimos'],r:0,p:'60 + 60 = 120 céntimos.'},
+      {t:'esc',q:'Tengo 8 € y me gasto 5 €. Me quedan ... €',r:['3']},
+      {t:'op',q:'¿Con qué monedas pagas justo 1,50 €?',o:['una de 1 € y una de 50 céntimos','tres de 20 céntimos','una de 2 €'],r:0},
+      {t:'esc',q:'4 barras de pan a 1 € cada una son ... €',r:['4']},
+      {t:'esc',q:'🔥 Compro 3 zumos de 2 € y pago con 10 €. Me devuelven ... €',r:['4'],p:'3 × 2 = 6, y 10 − 6 = 4.'},
+      {t:'op',q:'🔥 Una bolsa de manzanas cuesta 2,40 € y otra 1,80 €. Las dos juntas cuestan...',o:['4,20 €','3,20 €','4,80 €'],r:0}]},
+ {t:'El súper: ofertas, peso y precio',tri:2,exp:`<p>En el súper el precio va muchas veces por <b>kilo</b> o por <b>litro</b>.</p><ul><li>Si medio kilo cuesta 2 €, el kilo entero cuesta 4 €.</li><li><b>2 x 1</b> quiere decir que te llevas dos y pagas uno.</li><li>Comparar precios es mirar cuál sale más barato por la misma cantidad.</li></ul>`,ejemplo:'Medio kilo de tomates 2 € → un kilo 4 €.',
+  ej:[{t:'esc',q:'Si medio kilo de tomates cuesta 2 €, el kilo cuesta ... €',r:['4']},
+      {t:'op',q:'Oferta 2 x 1 en zumos de 3 €. Me llevo 2 y pago...',o:['3 €','6 €','1,50 €'],r:0},
+      {t:'esc',q:'Compro 3 kilos de patatas a 1 € el kilo. Pago ... €',r:['3']},
+      {t:'op',q:'¿Qué sale más barato?',o:['1 litro por 2 €','2 litros por 3 €','medio litro por 1,50 €'],r:1,p:'Con 2 litros por 3 €, cada litro sale a 1,50 €.'},
+      {t:'esc',q:'Una caja de 6 yogures cuesta 3 €. Cada yogur sale a ... céntimos',r:['50'],p:'300 : 6.'},
+      {t:'vf',q:'Un paquete de 1 kilo de arroz pesa más que uno de 500 gramos.',r:true},
+      {t:'esc',q:'🔥 Llevo 2 kilos de naranjas a 1,50 € el kilo. Son ... €',r:['3']},
+      {t:'op',q:'🔥 Tengo 10 €. ¿Cuántos paquetes de 3 € puedo comprar?',o:['3 paquetes','4 paquetes','2 paquetes'],r:0,p:'3 × 3 = 9, y sobra 1 €.'}]},
+ {t:'En la cocina: recetas y cantidades',tri:2,exp:`<p>Una receta dice cuánto hay que poner. Si cocinas para <b>más personas</b>, todo se multiplica.</p><ul><li>Para el doble de personas, el doble de todo.</li><li>Medio litro son 500 ml. Un cuarto de kilo son 250 g.</li><li>El horno y el reloj van juntos: hay que saber cuándo sacarlo.</li></ul>`,ejemplo:'Receta para 2: 200 g de harina. Para 4: 400 g.',
+  ej:[{t:'esc',q:'La receta para 2 personas lleva 200 g de harina. Para 4 personas hacen falta ... g',r:['400']},
+      {t:'esc',q:'Medio litro de leche son ... ml',r:['500']},
+      {t:'op',q:'Meto la pizza a las 13:00 y tarda 20 minutos. La saco a las...',o:['13:20','13:40','14:00'],r:0},
+      {t:'esc',q:'Un cuarto de kilo de azúcar son ... gramos',r:['250']},
+      {t:'esc',q:'Tengo una docena de huevos y uso 5. Me quedan ...',r:['7'],p:'Una docena son 12.'},
+      {t:'op',q:'Reparto una tarta en 8 trozos iguales y me como 2. Quedan...',o:['6 trozos','4 trozos','10 trozos'],r:0},
+      {t:'esc',q:'🔥 La receta para 3 personas lleva 6 huevos. Para 6 personas hacen falta ... huevos',r:['12']},
+      {t:'esc',q:'🔥 Pongo el arroz a las 14:35 y tarda 18 minutos. Está listo a las 14 : ...',r:['53']}]},
+ {t:'Salimos: autobús, coche y distancias',tri:3,exp:`<p>Para ir de un sitio a otro hay que contar <b>tiempo</b> y <b>distancia</b>.</p><ul><li>1 kilómetro (km) son 1000 metros.</li><li>La hora de llegada es la de salida más lo que dura el viaje.</li><li>Ida y vuelta es el doble del camino.</li></ul>`,ejemplo:'Salgo a las 9:00 y el viaje dura 30 minutos: llego a las 9:30.',
+  ej:[{t:'esc',q:'1 kilómetro son ... metros',r:['1000']},
+      {t:'op',q:'El bus sale a las 9:00 y tarda 45 minutos. Llega a las...',o:['9:45','10:00','9:30'],r:0},
+      {t:'esc',q:'De casa al cole hay 600 metros. Ida y vuelta son ... metros',r:['1200']},
+      {t:'op',q:'Ponteareas está a 30 km de Vigo. Ir y volver son...',o:['30 km','60 km','15 km'],r:1},
+      {t:'esc',q:'El billete cuesta 2 € y somos 4. Pagamos ... €',r:['8']},
+      {t:'esc',q:'Salgo a las 10:15 y tardo 1 hora. Llego a las ... y 15',r:['11','11:15','once']},
+      {t:'op',q:'🔥 El tren sale a las 8:50 y tarda 1 hora y 20 minutos. Llega a las...',o:['10:10','9:10','10:20'],r:0},
+      {t:'esc',q:'🔥 Ando 800 metros por la mañana y 800 por la tarde. En total ... metros',r:['1600']}]},
+ {t:'Mi día: horarios y calendario',tri:3,exp:`<p>El día tiene <b>24 horas</b>. Saber cuánto falta para algo es restar horas y minutos.</p><ul><li>Una hora son 60 minutos. Media hora, 30.</li><li>De la mañana a la tarde: las 3 de la tarde son las 15:00.</li><li>El mes tiene 4 semanas y unos días más.</li></ul>`,ejemplo:'Empiezo a las 9:00 y acabo a las 14:00: son 5 horas.',
+  ej:[{t:'esc',q:'Entro al cole a las 9:00 y salgo a las 14:00. Estoy ... horas',r:['5','cinco']},
+      {t:'op',q:'Las 4 de la tarde en el reloj de 24 horas son las...',o:['16:00','14:00','04:00'],r:0},
+      {t:'esc',q:'Media hora son ... minutos',r:['30','treinta']},
+      {t:'op',q:'Duermo de las 22:00 a las 7:00. Duermo...',o:['9 horas','8 horas','10 horas'],r:0},
+      {t:'esc',q:'Hoy es día 10. Dentro de una semana será día ...',r:['17']},
+      {t:'vf',q:'Un mes tiene siempre 30 días.',r:false,p:'Unos tienen 30, otros 31 y febrero 28.'},
+      {t:'esc',q:'🔥 La peli empieza a las 17:40 y dura 1 hora y 30 minutos. Acaba a las 19 : ...',r:['10']},
+      {t:'op',q:'🔥 El recreo es de 11:15 a 11:45. Dura...',o:['30 minutos','45 minutos','15 minutos'],r:0}]},
+ {t:'En casa: medir, repartir y ahorrar',tri:3,exp:`<p>En casa también hay matemáticas: medir un mueble, repartir entre hermanos o guardar dinero.</p><ul><li>Repartir en partes iguales es dividir.</li><li>Ahorrar es sumar un poco cada semana.</li><li>Para saber si algo cabe, se mide con el metro.</li></ul>`,ejemplo:'Ahorro 2 € por semana: en 4 semanas tengo 8 €.',
+  ej:[{t:'esc',q:'Ahorro 2 € cada semana. En 4 semanas tengo ... €',r:['8']},
+      {t:'esc',q:'12 galletas para 3 hermanos, a partes iguales. Cada uno come ...',r:['4']},
+      {t:'op',q:'La mesa mide 120 cm y el hueco 1 metro. ¿Cabe?',o:['no cabe','sí cabe','cabe justo'],r:0,p:'1 metro son 100 cm, y la mesa mide más.'},
+      {t:'esc',q:'Una botella de 2 litros se reparte en 4 vasos iguales. Cada vaso lleva ... ml',r:['500']},
+      {t:'esc',q:'Quiero un juguete de 20 € y tengo 12 €. Me faltan ... €',r:['8']},
+      {t:'op',q:'Somos 5 en casa y hay 20 mandarinas a partes iguales. A cada uno le tocan...',o:['4 mandarinas','5 mandarinas','3 mandarinas'],r:0},
+      {t:'esc',q:'🔥 Ahorro 3 € por semana. Para juntar 21 € necesito ... semanas',r:['7']},
+      {t:'op',q:'🔥 Una estantería de 90 cm y otra de 70 cm en una pared de 1 metro y medio. ¿Caben las dos?',o:['no, pasan 10 cm','sí, sobran 10 cm','caben justas'],r:0,p:'90 + 70 = 160 cm, y la pared mide 150 cm.'}]},
+ {t:'Números ordinales y series',tri:1,exp:`<p>Los <b>ordinales</b> dicen el lugar que ocupa algo: 1.º primero, 2.º segundo, 3.º tercero, 4.º cuarto, 5.º quinto… hasta 10.º décimo.</p><ul><li>Una <b>serie</b> es una fila de números que sigue una regla: 2, 4, 6, 8… (de 2 en 2).</li></ul>`,ejemplo:'5, 10, 15, 20… la regla es «de 5 en 5».',
+  ej:[{t:'op',q:'Si llegas detrás del segundo, ¿en qué puesto quedas?',o:['primero','tercero','cuarto'],r:1},
+      {t:'esc',q:'Sigue la serie: 2, 4, 6, 8, ...',r:['10','diez']},
+      {t:'esc',q:'Sigue la serie: 5, 10, 15, ...',r:['20','veinte']},
+      {t:'op',q:'El número 10.º se lee...',o:['décimo','noveno','doceavo'],r:0},
+      {t:'esc',q:'Cuenta hacia atrás: 30, 27, 24, ...',r:['21'],p:'Va restando 3 cada vez.'}]},
+ {t:'Sumar y restar de tres cifras',tri:2,exp:`<p>Con números de tres cifras se coloca igual: unidades bajo unidades, decenas bajo decenas y centenas bajo centenas.</p><ul><li>Se empieza siempre por la <b>derecha</b>.</li><li>Si te pasas de 9, te llevas 1 a la columna siguiente.</li></ul>`,ejemplo:'245 + 137 → 5+7=12 (escribo 2, llevo 1) → 382',
+  ej:[{t:'esc',q:'245 + 137 = ',r:['382']},{t:'esc',q:'408 + 256 = ',r:['664']},
+      {t:'esc',q:'365 − 142 = ',r:['223']},{t:'esc',q:'500 − 245 = ',r:['255'],p:'Pide prestado dos veces.'},
+      {t:'op',q:'En el cole hay 234 niños y 118 son niñas. ¿Cuántos niños hay?',o:['116','126','352'],r:0}]},
+ {t:'Las tablas del 6, 7, 8 y 9',tri:2,exp:`<p style="background:var(--faro-claro);border-radius:10px;padding:10px 13px;font-size:14px;margin:0 0 11px"><b>⚠️ Aviso:</b> según el colegio, este tema se da a final de 2.º o ya en 3.º. Si aún no lo habéis visto en clase, tómalo como adelanto, no como deberes.</p><p>Ya sabes las fáciles. Estas se aprenden con trucos:</p><ul><li>La del <b>9</b>: las decenas suben 1 y las unidades bajan 1 → 9, 18, 27, 36…</li><li>La del <b>6</b> es el doble de la del 3.</li><li>3 × 8 es lo mismo que 8 × 3: se puede dar la vuelta.</li></ul>`,ejemplo:'9 × 4 = 36 · 9 × 5 = 45 · 9 × 6 = 54',
+  ej:[{t:'esc',q:'6 × 4 = ',r:['24']},{t:'esc',q:'7 × 3 = ',r:['21']},
+      {t:'esc',q:'8 × 5 = ',r:['40']},{t:'esc',q:'9 × 7 = ',r:['63']},
+      {t:'op',q:'¿Cuál da el mismo resultado que 8 × 3?',o:['3 × 8','8 + 3','8 − 3'],r:0},
+      {t:'esc',q:'6 cajas de 7 huevos son ... huevos',r:['42']}]},
+ {t:'Cálculo mental y redondeo',tri:2,exp:`<p>No hace falta escribirlo todo: hay cuentas que salen de cabeza.</p><ul><li>Sumar 10 es subir una decena: 34 + 10 = 44.</li><li>Sumar 9 es sumar 10 y quitar 1.</li><li><b>Redondear</b> a la decena: 38 está más cerca de 40 que de 30.</li></ul>`,ejemplo:'47 + 9 → 47 + 10 = 57 → 57 − 1 = 56',
+  ej:[{t:'esc',q:'34 + 10 = ',r:['44']},{t:'esc',q:'56 + 9 = ',r:['65'],p:'Suma 10 y quita 1.'},
+      {t:'op',q:'Redondea 38 a la decena más cercana:',o:['30','40'],r:1},
+      {t:'op',q:'Redondea 62 a la decena más cercana:',o:['60','70'],r:0},
+      {t:'esc',q:'70 − 20 = ',r:['50']}]},
+ {t:'Repartir: empezamos a dividir',tri:3,exp:`<p style="background:var(--faro-claro);border-radius:10px;padding:10px 13px;font-size:14px;margin:0 0 11px"><b>⚠️ Aviso:</b> según el colegio, este tema se da a final de 2.º o ya en 3.º. Si aún no lo habéis visto en clase, tómalo como adelanto, no como deberes.</p><p><b>Dividir</b> es repartir en partes iguales.</p><ul><li>12 caramelos entre 3 niños → a 4 cada uno: 12 : 3 = 4.</li><li>Dividir es lo contrario de multiplicar: si 3 × 4 = 12, entonces 12 : 3 = 4.</li></ul>`,ejemplo:'12 : 3 = 4 porque 3 × 4 = 12',
+  ej:[{t:'esc',q:'10 : 2 = ',r:['5','cinco']},{t:'esc',q:'15 : 3 = ',r:['5','cinco']},
+      {t:'esc',q:'20 : 4 = ',r:['5','cinco']},
+      {t:'op',q:'18 galletas entre 2 platos. ¿Cuántas en cada plato?',o:['8','9','16'],r:1},
+      {t:'op',q:'Dividir es lo contrario de...',o:['sumar','multiplicar','restar'],r:1}]},
+ {t:'Problemas de dos pasos',tri:3,exp:`<p>Algunos problemas piden <b>dos cuentas</b>. Hazlo por orden:</p><ul><li>1) Lee y subraya los números.</li><li>2) Piensa qué te preguntan.</li><li>3) Haz la primera cuenta, y con su resultado haz la segunda.</li></ul>`,ejemplo:'Tengo 20 €, compro 2 libros de 6 € → 2×6=12 → 20−12=8 € me quedan.',
+  ej:[{t:'op',q:'Tengo 20 €. Compro 2 libros de 6 € cada uno. ¿Cuánto me queda?',o:['8 €','14 €','12 €'],r:0},
+      {t:'esc',q:'Hay 3 mesas con 4 sillas cada una. Se rompen 2 sillas. ¿Cuántas quedan?',r:['10','diez']},
+      {t:'esc',q:'Leo 15 páginas por la mañana y 12 por la tarde. Si el libro tiene 40, ¿cuántas me faltan?',r:['13','trece']},
+      {t:'op',q:'En una caja hay 24 lápices. Reparto la mitad. ¿Cuántos doy?',o:['6','12','24'],r:1},
+      {t:'esc',q:'5 bolsas de 5 manzanas. Me como 3. ¿Cuántas quedan?',r:['22']}]}
+],
+len:[
+ {t:'El género y el número',tri:1,exp:`<p>Las palabras tienen <b>género</b>: masculino (el niño) o femenino (la niña).</p><ul><li>Y tienen <b>número</b>: singular (una cosa) o plural (muchas).</li><li>Plural: se añade <b>-s</b> (casa → casas) o <b>-es</b> (papel → papeles).</li></ul>`,ejemplo:'el gato / la gata · un árbol / unos árboles',
+  ej:[{t:'op',q:'"la mesa" es...',o:['masculino','femenino'],r:1},
+      {t:'esc',q:'El plural de "papel" es...',r:['papeles']},
+      {t:'esc',q:'El femenino de "león" es...',r:['leona']},
+      {t:'op',q:'"los niños" está en...',o:['singular','plural'],r:1},
+      {t:'esc',q:'El plural de "flor" es...',r:['flores']}]},
+ {t:'Los artículos y los determinantes',tri:2,exp:`<p>Los <b>artículos</b> van delante del nombre: <b>el, la, los, las</b> (los conoces) y <b>un, una, unos, unas</b>.</p><ul><li>Los <b>demostrativos</b> dicen si algo está cerca o lejos: este, ese, aquel.</li><li>Los <b>posesivos</b> dicen de quién es: mi, tu, su, nuestro.</li></ul>`,ejemplo:'El perro · un perro · este perro · mi perro',
+  ej:[{t:'op',q:'¿Qué artículo va con "coche"?',o:['la','el','las'],r:1},
+      {t:'esc',q:'Completa: ___ casas son grandes. (artículo)',r:['las']},
+      {t:'op',q:'"mi mochila" — la palabra "mi" es un...',o:['artículo','posesivo','verbo'],r:1},
+      {t:'op',q:'Para algo que está muy lejos decimos...',o:['este','ese','aquel'],r:2},
+      {t:'esc',q:'Completa: ___ elefante es enorme. (artículo)',r:['el']}]},
+ {t:'Sinónimos, antónimos y familias',tri:2,exp:`<p>Los <b>sinónimos</b> significan casi lo mismo: bonito = hermoso.</p><ul><li>Los <b>antónimos</b> significan lo contrario: alto ↔ bajo.</li><li>Una <b>familia de palabras</b> viene de la misma raíz: pan, panadero, panadería.</li></ul>`,ejemplo:'contento = alegre · contento ↔ triste',
+  ej:[{t:'op',q:'Un sinónimo de "contento" es...',o:['triste','alegre','rápido'],r:1},
+      {t:'esc',q:'El antónimo de "alto" es...',r:['bajo']},
+      {t:'esc',q:'El antónimo de "día" es...',r:['noche']},
+      {t:'par',q:'Une cada palabra con su contrario',pares:[['grande','pequeño'],['frío','caliente'],['dentro','fuera'],['abrir','cerrar']]},
+      {t:'op',q:'¿Cuál NO es de la familia de "pan"?',o:['panadero','panadería','pantalón'],r:2}]},
+ {t:'La oración: quién hace y qué hace',tri:3,exp:`<p>Una <b>oración</b> tiene sentido completo y empieza con mayúscula y acaba en punto.</p><ul><li>El <b>sujeto</b> dice <b>quién</b> hace la acción.</li><li>El <b>predicado</b> dice <b>qué hace</b>. Dentro está el verbo.</li></ul>`,ejemplo:'Leo (sujeto) come una manzana (predicado).',
+  ej:[{t:'op',q:'En "Mi hermana canta", el sujeto es...',o:['canta','Mi hermana'],r:1},
+      {t:'op',q:'En "El perro corre por el parque", el verbo es...',o:['perro','corre','parque'],r:1},
+      {t:'op',q:'¿Cuál es una oración completa?',o:['La casa azul','Los niños juegan en el patio','Corriendo mucho'],r:1},
+      {t:'vf',q:'Todas las oraciones acaban en punto.',r:true},
+      {t:'esc',q:'La parte que dice QUIÉN hace la acción se llama...',r:['sujeto']}]},
+ {t:'Diminutivos y aumentativos',tri:3,exp:`<p>Cambiando el final de una palabra decimos si algo es pequeño o grande.</p><ul><li><b>Diminutivos</b>: -ito, -illo → casa → cas<b>ita</b>.</li><li><b>Aumentativos</b>: -ón, -azo → casa → cas<b>ona</b>.</li></ul>`,ejemplo:'perro → perrito (pequeño) → perrazo (grande)',
+  ej:[{t:'esc',q:'El diminutivo de "casa" es...',r:['casita']},
+      {t:'esc',q:'El diminutivo de "gato" es...',r:['gatito']},
+      {t:'op',q:'"cucharón" es un...',o:['diminutivo','aumentativo'],r:1},
+      {t:'esc',q:'El diminutivo de "flor" es...',r:['florecita','florcita']},
+      {t:'op',q:'¿Cuál es más pequeño?',o:['librito','librote'],r:0}]},
+ {t:'El diálogo y los signos ¿? ¡!',tri:2,exp:`<p>Cuando dos personajes hablan es un <b>diálogo</b>. Cada vez que habla uno, se pone una <b>raya</b> (—) y se cambia de línea.</p><ul><li>Las preguntas van entre <b>¿ ?</b> y las exclamaciones entre <b>¡ !</b>.</li><li>En español se abren <b>y</b> se cierran.</li></ul>`,ejemplo:'— ¿Vienes al parque?\\n— ¡Claro que sí!',
+  ej:[{t:'op',q:'¿Cómo se escribe bien?',o:['Cómo te llamas?','¿Cómo te llamas?'],r:1},
+      {t:'op',q:'Cuando un personaje habla en un cuento ponemos...',o:['una raya —','un punto','una coma'],r:0},
+      {t:'op',q:'"¡Qué alegría!" es una...',o:['pregunta','exclamación'],r:1},
+      {t:'vf',q:'En español la pregunta se abre con ¿ y se cierra con ?',r:true},
+      {t:'esc',q:'Escribe el signo que abre una pregunta',r:['¿','?']}]}
+],
+gal:[
+ {t:'Os pronomes persoais',tri:1,exp:`<p>Os <b>pronomes</b> substitúen o nome: <b>eu, ti, el/ela, nós, vós, eles/elas</b>.</p><ul><li>En galego dise <b>eu</b> (yo) e <b>ti</b> (tú).</li><li>«Nós imos á escola» = nosotros vamos a la escuela.</li></ul>`,ejemplo:'eu = yo · ti = tú · nós = nosotros',
+  ej:[{t:'esc',q:'"yo" en galego é...',r:['eu']},
+      {t:'op',q:'"nosotros" en galego é...',o:['nós','vós','eles'],r:0},
+      {t:'esc',q:'"tú" en galego é...',r:['ti']},
+      {t:'par',q:'Une o pronome co castelán',pares:[['eu','yo'],['ti','tú'],['el','él'],['nós','nosotros']]},
+      {t:'op',q:'"___ imos á praia." (nosotros)',o:['Eu','Nós','Ti'],r:1}]},
+ {t:'O xénero e o número',tri:1,exp:`<p>As palabras galegas tamén son masculinas ou femininas, singulares ou plurais.</p><ul><li>Plural: engádese <b>-s</b> (casa → casas) ou <b>-es</b> (flor → flores).</li><li>As acabadas en <b>-l</b> fan o plural en <b>-is</b>: animal → animais.</li></ul>`,ejemplo:'o neno / a nena · animal → animais',
+  ej:[{t:'esc',q:'O plural de "animal" é...',r:['animais']},
+      {t:'esc',q:'O plural de "flor" é...',r:['flores']},
+      {t:'op',q:'"a mesa" é...',o:['masculino','feminino'],r:1},
+      {t:'esc',q:'O feminino de "neno" é...',r:['nena']},
+      {t:'op',q:'"os cans" está en...',o:['singular','plural'],r:1}]},
+ {t:'Sinónimos e antónimos',tri:2,exp:`<p>Os <b>sinónimos</b> significan case o mesmo: bonito = fermoso.</p><ul><li>Os <b>antónimos</b> son o contrario: grande ↔ pequeno.</li></ul>`,ejemplo:'ledo = contento · ledo ↔ triste',
+  ej:[{t:'op',q:'Un sinónimo de "bonito" en galego é...',o:['fermoso','feo','pequeno'],r:0},
+      {t:'esc',q:'O contrario de "grande" é...',r:['pequeno']},
+      {t:'esc',q:'O contrario de "día" é...',r:['noite']},
+      {t:'par',q:'Une cada palabra co seu contrario',pares:[['alto','baixo'],['quente','frío'],['novo','vello'],['dentro','fóra']]},
+      {t:'op',q:'"ledo" significa...',o:['triste','contento','cansado'],r:1}]},
+ {t:'A oración: suxeito e predicado',tri:3,exp:`<p>A <b>oración</b> ten sentido completo. O <b>suxeito</b> di quen fai a acción e o <b>predicado</b> di que fai.</p><ul><li>Empeza con maiúscula e remata en punto.</li></ul>`,ejemplo:'O meu irmán (suxeito) xoga no parque (predicado).',
+  ej:[{t:'op',q:'En "A nena le un libro", o suxeito é...',o:['le','A nena','un libro'],r:1},
+      {t:'op',q:'En "O can ladra", o verbo é...',o:['O can','ladra'],r:1},
+      {t:'vf',q:'Unha oración empeza con maiúscula.',r:true},
+      {t:'esc',q:'A parte que di QUEN fai a acción chámase...',r:['suxeito']},
+      {t:'op',q:'Cal é unha oración completa?',o:['A casa vella','Os nenos cantan na clase'],r:1}]},
+ {t:'Contos, cantigas e refráns',tri:3,exp:`<p>Galicia ten moitos <b>contos</b> e <b>cantigas</b> que pasan de avós a netos.</p><ul><li>Un <b>refrán</b> é unha frase curta que ensina algo: «Ao mal tempo, boa cara».</li><li>As <b>adiviñas</b> fan pensar cunha pregunta.</li></ul>`,ejemplo:'«Ao mal tempo, boa cara» = aunque las cosas vayan mal, sonríe.',
+  ej:[{t:'op',q:'Un refrán é...',o:['unha frase curta que ensina','un conto longo','unha canción'],r:0},
+      {t:'op',q:'«Ao mal tempo, ___ cara»',o:['boa','mala'],r:0},
+      {t:'vf',q:'As cantigas cántanse.',r:true},
+      {t:'op',q:'Unha adiviña serve para...',o:['pensar e acertar','durmir'],r:0},
+      {t:'esc',q:'Os contos que contan os avós chámanse contos p___ (populares)',r:['populares','popular']}]}
+],
+nat:[
+ {t:'Os hábitats: onde viven os animais',tri:2,exp:`<p>Cada animal vive no lugar que lle convén: é o seu <b>hábitat</b>.</p><ul><li>No <b>mar</b>: peixes, polbos, golfiños.</li><li>No <b>bosque</b>: xabarís, esquíos, corzos.</li><li>Na <b>granxa</b>: vacas, galiñas, ovellas.</li></ul>`,ejemplo:'O polbo vive no mar. O esquío vive no bosque.',
+  ej:[{t:'op',q:'O lugar onde vive un animal chámase...',o:['hábitat','rabaño','niño'],r:0},
+      {t:'op',q:'O polbo vive...',o:['no bosque','no mar','na montaña'],r:1},
+      {t:'par',q:'Une cada animal co seu hábitat',pares:[['peixe','o mar'],['xabaril','o bosque'],['vaca','a granxa'],['camelo','o deserto']]},
+      {t:'vf',q:'As galiñas viven no fondo do mar.',r:false},
+      {t:'esc',q:'Os paxaros fan o seu n___ nas árbores',r:['nino','niño']}]},
+ {t:'Coidamos o planeta: as tres erres',tri:3,exp:`<p>Para coidar a Terra hai tres palabras que empezan por <b>R</b>:</p><ul><li><b>Reducir</b>: usar menos cousas.</li><li><b>Reutilizar</b>: darlles outra vida.</li><li><b>Reciclar</b>: separar o lixo en contedores de cores.</li></ul>`,ejemplo:'Azul = papel · Amarelo = plásticos · Verde = vidro',
+  ej:[{t:'esc',q:'Cantas erres hai para coidar o planeta?',r:['3','tres']},
+      {t:'op',q:'O contedor azul é para...',o:['papel e cartón','vidro','plástico'],r:0},
+      {t:'op',q:'O contedor amarelo é para...',o:['vidro','envases e plásticos','papel'],r:1},
+      {t:'vf',q:'Reutilizar é tirar as cousas ao lixo.',r:false},
+      {t:'op',q:'Apagar a luz ao saír serve para...',o:['aforrar enerxía','gastar máis'],r:0}]}
+],
+soc:[
+ {t:'Os transportes e a seguridade viaria',tri:2,exp:`<p>Os <b>transportes</b> lévannos dun sitio a outro.</p><ul><li>Por <b>terra</b>: coche, autobús, tren, bicicleta.</li><li>Pola <b>auga</b>: barco. Polo <b>aire</b>: avión.</li><li>Cruza sempre polo <b>paso de peóns</b> e co semáforo en verde.</li></ul>`,ejemplo:'En Galicia hai moitos barcos: somos terra de mar.',
+  ej:[{t:'op',q:'O avión é un transporte...',o:['terrestre','aéreo','marítimo'],r:1},
+      {t:'op',q:'Para cruzar a rúa hai que esperar ao semáforo en...',o:['vermello','verde'],r:1},
+      {t:'par',q:'Une cada transporte co seu medio',pares:[['barco','auga'],['tren','terra'],['avión','aire'],['bicicleta','terra']]},
+      {t:'vf',q:'No coche hai que ir sempre co cinto posto.',r:true},
+      {t:'op',q:'A liña branca no chan para cruzar chámase...',o:['paso de peóns','beirarrúa'],r:0}]},
+ {t:'Festas e tradicións de Galicia',tri:3,exp:`<p>Galicia ten festas propias en todo o ano.</p><ul><li>O <b>Entroido</b> (carnaval), coas súas máscaras.</li><li>O <b>Corpus de Ponteareas</b>, coas alfombras de flores nas rúas.</li><li>O <b>Magosto</b> no outono: castañas asadas.</li><li>A música tradicional toca coa <b>gaita</b>.</li></ul>`,ejemplo:'No Magosto cómense castañas. No Corpus fanse alfombras de flores.',
+  ej:[{t:'op',q:'No Magosto cómense...',o:['castañas','laranxas','patacas'],r:0},
+      {t:'op',q:'O instrumento máis típico de Galicia é a...',o:['guitarra','gaita','frauta'],r:1},
+      {t:'op',q:'As alfombras de flores de Ponteareas fanse no...',o:['Entroido','Corpus','Nadal'],r:1},
+      {t:'vf',q:'O Entroido é a festa das máscaras e os disfraces.',r:true},
+      {t:'esc',q:'A festa do outono coas castañas chámase o M___',r:['magosto']}]}
+],
+eng:[
+ {t:'Números y colores: numbers & colours',tri:1,exp:`<p>Numbers 11–20: <b>eleven, twelve, thirteen, fourteen, fifteen, sixteen, seventeen, eighteen, nineteen, twenty</b>.</p><ul><li>Colours: <b>red</b> (rojo), <b>blue</b> (azul), <b>green</b> (verde), <b>yellow</b> (amarillo), <b>black</b> (negro), <b>white</b> (blanco).</li></ul>`,ejemplo:'I have twelve blue pencils.',
+  ej:[{t:'esc',q:'Escribe el número 12 en inglés',r:['twelve']},
+      {t:'esc',q:'"yellow" en español es...',r:['amarillo']},
+      {t:'par',q:'Une el color con su traducción',pares:[['red','rojo'],['green','verde'],['black','negro'],['white','blanco']]},
+      {t:'op',q:'El número 20 en inglés es...',o:['twelve','twenty','two'],r:1},
+      {t:'esc',q:'"blue" en español es...',r:['azul']}]},
+ {t:'Los juguetes: toys',tri:2,exp:`<p>Toys: <b>ball</b> (pelota), <b>doll</b> (muñeca), <b>car</b> (coche), <b>kite</b> (cometa), <b>teddy bear</b> (osito), <b>bike</b> (bici).</p><ul><li><b>I've got a ball.</b> = Tengo una pelota.</li><li><b>Let's play!</b> = ¡Vamos a jugar!</li></ul>`,ejemplo:"I've got a red bike. Let's play!",
+  ej:[{t:'op',q:'"ball" es...',o:['muñeca','pelota','coche'],r:1},
+      {t:'esc',q:'"doll" en español es...',r:['muneca','muñeca']},
+      {t:'par',q:'Une el juguete con su traducción',pares:[['car','coche'],['kite','cometa'],['bike','bici'],['teddy bear','osito']]},
+      {t:'op',q:'"I’ve got a ball" significa...',o:['Tengo una pelota','Quiero una pelota'],r:0},
+      {t:'esc',q:'"Let’s play" en español es "vamos a ___"',r:['jugar']}]},
+ {t:'Los días de la semana: days',tri:3,exp:`<p>Days: <b>Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday</b>.</p><ul><li>In English the days always start with a <b>capital letter</b>.</li><li><b>Today is Monday.</b> · <b>I go to school.</b></li></ul>`,ejemplo:'Today is Friday. Tomorrow is Saturday!',
+  ej:[{t:'esc',q:'"Monday" en español es...',r:['lunes']},
+      {t:'op',q:'El sábado en inglés es...',o:['Sunday','Saturday','Friday'],r:1},
+      {t:'par',q:'Une el día con su traducción',pares:[['Tuesday','martes'],['Thursday','jueves'],['Sunday','domingo'],['Friday','viernes']]},
+      {t:'vf',q:'En inglés los días se escriben con mayúscula.',r:true},
+      {t:'esc',q:'"Wednesday" en español es...',r:['miercoles','miércoles']}]}
+]
+};
+
+/* --- Las áreas que no llevan libro: se dan en clase --- */
+function cuaderno(l1,l2,bg,ac,motivo){
+  return `<svg viewBox="0 0 300 390" role="img" aria-label="Cuaderno de ${l1} ${l2}">
+   <rect width="300" height="390" fill="${bg}"/>
+   ${Array.from({length:11},(_,i)=>`<rect x="8" y="${24+i*32}" width="26" height="9" rx="4.5" fill="#FFFFFF" opacity=".55"/>`).join('')}
+   <rect x="52" y="44" width="216" height="106" rx="10" fill="#FDFCF8"/>
+   <text x="160" y="86" text-anchor="middle" font-family="${FD}" font-size="25" font-weight="600" fill="${ac}">${l1}</text>
+   <text x="160" y="118" text-anchor="middle" font-family="${FD}" font-size="25" font-weight="600" fill="${ac}">${l2}</text>
+   <text x="160" y="140" text-anchor="middle" font-family="${FN}" font-size="12" font-weight="800" fill="#9AA3A6" letter-spacing="1.4">2.º PRIMARIA</text>
+   ${motivo}
+   <rect x="52" y="336" width="216" height="30" rx="15" fill="#FFFFFF" opacity=".8"/>
+   <text x="160" y="356" text-anchor="middle" font-family="${FN}" font-size="13" font-weight="800" fill="${ac}">SEN LIBRO · NA CLASE</text></svg>`;
+}
+PORTADAS.art=()=>cuaderno('Educación','Artística','#E8A33D','#8A4B12',
+ `<circle cx="104" cy="228" r="34" fill="#D8483C"/><circle cx="152" cy="252" r="34" fill="#2E6DA4" opacity=".9"/>
+  <circle cx="200" cy="228" r="34" fill="#4E9C3F" opacity=".9"/>
+  <circle cx="228" cy="292" r="9" fill="#3A2A05"/><rect x="234" y="248" width="6" height="46" fill="#3A2A05"/>
+  <circle cx="88" cy="300" r="9" fill="#3A2A05"/><rect x="94" y="256" width="6" height="46" fill="#3A2A05"/>
+  <rect x="94" y="250" width="146" height="7" rx="3" fill="#3A2A05"/>`);
+PORTADAS.efi=()=>cuaderno('Educación','Física','#3F8A34','#12420C',
+ `<circle cx="150" cy="252" r="46" fill="#FDFCF8"/><path d="M104 252h92M150 206v92" stroke="#12420C" stroke-width="5"/>
+  <path d="M118 220c20 18 44 18 64 0M118 284c20-18 44-18 64 0" stroke="#12420C" stroke-width="5" fill="none"/>
+  <circle cx="70" cy="300" r="14" fill="#F5C24A"/><circle cx="234" cy="300" r="14" fill="#F5C24A"/>`);
+PORTADAS.val=()=>cuaderno('Valores','Cívicos','#1B7F87','#08383D',
+ `<circle cx="118" cy="226" r="24" fill="#FDFCF8"/><path d="M86 296c0-20 14-34 32-34s32 14 32 34z" fill="#FDFCF8"/>
+  <circle cx="192" cy="226" r="24" fill="#F5C24A"/><path d="M160 296c0-20 14-34 32-34s32 14 32 34z" fill="#F5C24A"/>
+  <path d="M155 318c-14-12-26-20-26-32 0-8 6-13 13-13 5 0 10 3 13 8 3-5 8-8 13-8 7 0 13 5 13 13 0 12-12 20-26 32z" fill="#D8483C"/>`);
+
+MATERIAS.push(
+{id:'art',nom:'Educación Artística',libro:'Plástica e Música · sen libro de texto',edi:'Na clase',lang:'Galego',c1:'#C77F1E',c2:'#EDB65B',tengo:true,
+ unis:[
+ {t:'As cores primarias e secundarias',tri:1,exp:`<p>As <b>cores primarias</b> son tres e non se poden fabricar: <b>amarelo</b>, <b>azul</b> e <b>vermello</b>.</p><ul><li>Mesturándoas saen as <b>secundarias</b>: azul + amarelo = <b>verde</b>; vermello + amarelo = <b>laranxa</b>; azul + vermello = <b>violeta</b>.</li><li>Cores <b>cálidas</b>: vermello, laranxa, amarelo. Cores <b>frías</b>: azul, verde, violeta.</li></ul>`,ejemplo:'azul + amarelo = verde · vermello = cálida · azul = fría',
+  ej:[{t:'op',q:'Cales son as tres cores primarias?',o:['amarelo, azul e vermello','verde, laranxa e violeta','branco, negro e gris'],r:0},
+      {t:'esc',q:'Azul + amarelo = ',r:['verde']},
+      {t:'esc',q:'Vermello + amarelo = ',r:['laranxa']},
+      {t:'op',q:'O violeta sae de mesturar...',o:['azul e vermello','verde e amarelo'],r:0},
+      {t:'op',q:'Cal é unha cor cálida?',o:['vermello','azul','verde'],r:0}]},
+ {t:'Liñas, formas e texturas',tri:1,exp:`<p>As <b>liñas</b> poden ser rectas, curvas, quebradas ou onduladas.</p><ul><li>As <b>formas xeométricas</b> son o círculo, o cadrado ou o triángulo. As <b>orgánicas</b> son as da natureza: unha folla, unha nube.</li><li>A <b>textura</b> é como se sente algo ao tocalo: suave, rugoso, brando.</li></ul>`,ejemplo:'A pedra é rugosa. A la é suave.',
+  ej:[{t:'op',q:'Unha liña que dá voltas é unha liña...',o:['recta','curva','quebrada'],r:1},
+      {t:'op',q:'A textura dunha pedra é...',o:['suave','rugosa'],r:1},
+      {t:'vf',q:'O círculo é unha forma xeométrica.',r:true},
+      {t:'op',q:'A forma dunha folla de árbore é...',o:['xeométrica','orgánica'],r:1},
+      {t:'esc',q:'Unha liña que non se torce chámase liña r___',r:['recta']}]},
+ {t:'Os sons: fortes, suaves, longos e curtos',tri:1,exp:`<p>Os sons teñen <b>intensidade</b> (forte ou suave), <b>duración</b> (longo ou curto) e <b>altura</b> (agudo ou grave).</p><ul><li>O <b>silencio</b> tamén forma parte da música.</li></ul>`,ejemplo:'O trono é forte e grave. O paxaro é suave e agudo.',
+  ej:[{t:'op',q:'O son dun trono é...',o:['forte','suave'],r:0},
+      {t:'op',q:'A voz dun paxaro é...',o:['aguda','grave'],r:0},
+      {t:'vf',q:'O silencio tamén forma parte da música.',r:true},
+      {t:'par',q:'Une cada palabra co seu significado',pares:[['forte','moito son'],['suave','pouco son'],['longo','dura moito'],['curto','dura pouco']]},
+      {t:'op',q:'Un tambor grande fai un son...',o:['agudo','grave'],r:1}]},
+ {t:'O retrato e a paisaxe',tri:2,exp:`<p>Un <b>retrato</b> é o debuxo dunha persoa. Se te debuxas a ti mesmo é un <b>autorretrato</b>.</p><ul><li>Nunha <b>paisaxe</b>, o que está preto é o <b>primeiro plano</b> e o que está lonxe é o <b>fondo</b>.</li></ul>`,ejemplo:'Debuxo o meu can diante (primeiro plano) e o monte detrás (fondo).',
+  ej:[{t:'op',q:'Un debuxo de ti mesmo é un...',o:['retrato','autorretrato','paisaxe'],r:1},
+      {t:'op',q:'Nunha paisaxe, o que está máis preto chámase...',o:['primeiro plano','fondo'],r:0},
+      {t:'vf',q:'Un retrato debuxa unha persoa.',r:true},
+      {t:'op',q:'Se debuxas o monte e as árbores fas unha...',o:['paisaxe','retrato'],r:0},
+      {t:'esc',q:'O que está máis lonxe nun debuxo chámase o f___',r:['fondo']}]},
+ {t:'As figuras musicais e o pulso',tri:2,exp:`<p>O <b>pulso</b> é o latexo da música: sempre igual, coma o corazón.</p><ul><li>A <b>negra</b> dura 1 tempo.</li><li>A <b>branca</b> dura 2 tempos.</li><li>A <b>redonda</b> dura 4 tempos.</li></ul>`,ejemplo:'negra = 1 · branca = 2 · redonda = 4',
+  ej:[{t:'esc',q:'Cantos tempos dura unha branca?',r:['2','dous']},
+      {t:'esc',q:'Cantos tempos dura unha negra?',r:['1','un']},
+      {t:'op',q:'A redonda dura...',o:['1 tempo','2 tempos','4 tempos'],r:2},
+      {t:'op',q:'O latexo constante da música chámase...',o:['pulso','silencio'],r:0},
+      {t:'vf',q:'A negra dura menos que a branca.',r:true}]},
+ {t:'Os instrumentos e a gaita galega',tri:3,exp:`<p>Os instrumentos agrúpanse en tres familias:</p><ul><li><b>Vento</b>: sópranse (a frauta, a <b>gaita</b>).</li><li><b>Corda</b>: tócanse as cordas (o violín, a guitarra).</li><li><b>Percusión</b>: gólpeanse (o tambor, a pandeireta).</li></ul>`,ejemplo:'A gaita e a pandeireta son os sons de Galicia.',
+  ej:[{t:'op',q:'A gaita galega é un instrumento de...',o:['vento','corda','percusión'],r:0},
+      {t:'op',q:'A pandeireta é un instrumento de...',o:['percusión','corda'],r:0},
+      {t:'par',q:'Une cada instrumento coa súa familia',pares:[['violín','corda'],['tambor','percusión'],['frauta','vento'],['guitarra','corda']]},
+      {t:'vf',q:'A gaita é o instrumento máis típico de Galicia.',r:true},
+      {t:'op',q:'Para tocar a frauta hai que...',o:['soprar','golpear'],r:0}]}
+]},
+{id:'efi',nom:'Educación Física',libro:'Educación Física · sen libro de texto',edi:'No pavillón',lang:'Galego',c1:'#2F7D2C',c2:'#7BBF63',tengo:true,
+ unis:[
+ {t:'O quentamento e o meu corpo',tri:1,exp:`<p>Antes de xogar hai que <b>quentar</b>: mover o pescozo, os brazos, a cintura e as pernas pouquiño a pouco.</p><ul><li>Cando corremos, o <b>corazón</b> late máis rápido e respiramos máis forte.</li><li>Despois hai que beber <b>auga</b> e descansar.</li></ul>`,ejemplo:'Quentar evita facerse dano nos músculos.',
+  ej:[{t:'op',q:'Antes de facer deporte hai que...',o:['quentar','durmir'],r:0},
+      {t:'vf',q:'Cando corremos o corazón late máis rápido.',r:true},
+      {t:'op',q:'Despois de correr o mellor é beber...',o:['auga','refresco con gas'],r:0},
+      {t:'esc',q:'O órgano que bombea o sangue é o c___',r:['corazon','corazón']},
+      {t:'op',q:'Se me doe algo mentres xogo debo...',o:['dicirllo ao mestre','seguir sen dicir nada'],r:0}]},
+ {t:'Xogos populares galegos',tri:2,exp:`<p>En Galicia xóganse desde hai moitos anos: a <b>mariola</b> (saltar nun pé sobre cadros), a <b>corda</b>, o <b>escondite</b>, a <b>chave</b> e o <b>pano</b>.</p><ul><li>Xogar en equipo é axudarse, non gañar só.</li><li>Respectar as regras fai que o xogo sexa divertido para todos.</li></ul>`,ejemplo:'A mariola tamén se chama «rayuela» en castelán.',
+  ej:[{t:'op',q:'O xogo de saltar nun pé sobre cadros pintados no chan é...',o:['a mariola','o pano'],r:0},
+      {t:'op',q:'No escondite hai que...',o:['agocharse','correr moito'],r:0},
+      {t:'vf',q:'Na corda hai que saltar.',r:true},
+      {t:'par',q:'Une cada xogo co que se fai',pares:[['mariola','saltar nun pé'],['corda','saltar'],['escondite','agocharse'],['carreira','correr']]},
+      {t:'op',q:'Xogar en equipo significa...',o:['axudarse','gañar un só'],r:0}]},
+ {t:'Equilibrio, coordinación e lateralidade',tri:2,exp:`<p>O <b>equilibrio</b> é manterse sen caer: nun pé, sobre unha liña, nun banco.</p><ul><li>A <b>coordinación</b> é mover o corpo cando queremos e como queremos.</li><li>A <b>lateralidade</b> é saber cal é a túa dereita e a túa esquerda.</li></ul>`,ejemplo:'Para non caer nun pé, mira sempre a un punto fixo.',
+  ej:[{t:'op',q:'Andar sobre unha liña sen caer traballa o...',o:['equilibrio','oído'],r:0},
+      {t:'op',q:'Para manter o equilibrio nun pé axuda mirar...',o:['a un punto fixo','aos pés'],r:0},
+      {t:'vf',q:'A coordinación é mover ben o corpo.',r:true},
+      {t:'op',q:'A man coa que escribes é a túa man...',o:['dominante','débil'],r:0},
+      {t:'op',q:'Saltar á corda mellora...',o:['a coordinación','a vista'],r:0}]},
+ {t:'Hábitos saudables',tri:3,exp:`<p>Para estar san: <b>moverse todos os días</b>, comer froita e verdura, beber auga, durmir ben e lavarse.</p><ul><li>Un neno de 7 anos debe durmir entre <b>9 e 11 horas</b>.</li><li>Despois de xogar hai que lavar as mans.</li></ul>`,ejemplo:'Almorzar antes de ir á escola dá enerxía para toda a mañá.',
+  ej:[{t:'op',q:'Despois de xogar hai que lavar...',o:['as mans','os zapatos'],r:0},
+      {t:'op',q:'Cantas horas debe durmir un neno de 7 anos?',o:['entre 9 e 11','4 horas','15 horas'],r:0},
+      {t:'vf',q:'É bo almorzar antes de ir á escola.',r:true},
+      {t:'op',q:'Para estar san hai que moverse...',o:['todos os días','unha vez ao mes'],r:0},
+      {t:'op',q:'A bebida máis sa é...',o:['a auga','o refresco'],r:0}]}
+]},
+{id:'val',nom:'Valores Cívicos y Éticos',libro:'Valores Cívicos e Éticos · sen libro de texto',edi:'Na clase',lang:'Castellano',c1:'#166B72',c2:'#4FA9AF',tengo:true,
+ unis:[
+ {t:'Yo y los demás: respeto y empatía',tri:1,exp:`<p><b>Respetar</b> es tratar a los demás como te gustaría que te trataran a ti.</p><ul><li>Escuchar cuando otro habla es respeto.</li><li>La <b>empatía</b> es ponerse en el lugar del otro y notar cómo se siente.</li><li>Todos somos iguales aunque hablemos idiomas distintos o vengamos de otro país.</li></ul>`,ejemplo:'Si alguien está solo en el patio, invítale a jugar.',
+  ej:[{t:'op',q:'Escuchar cuando otro habla es una muestra de...',o:['respeto','prisa'],r:0},
+      {t:'vf',q:'Todos somos iguales aunque hablemos idiomas distintos.',r:true},
+      {t:'op',q:'Si un compañero está triste, puedo...',o:['preguntarle qué le pasa','reírme de él'],r:0},
+      {t:'esc',q:'Ponerse en el lugar del otro se llama e___',r:['empatia','empatía']},
+      {t:'op',q:'Si me equivoco con alguien, lo mejor es...',o:['pedir perdón','callarme'],r:0}]},
+ {t:'Las normas y la convivencia',tri:2,exp:`<p>Las <b>normas</b> no son castigos: sirven para que todos estemos mejor.</p><ul><li>Levantar la mano, respetar el turno, cuidar el material.</li><li>Cuando hay un problema se habla y se busca una solución; nunca se pega.</li></ul>`,ejemplo:'La clase funciona mejor cuando todos cumplen las mismas normas.',
+  ej:[{t:'op',q:'Las normas de clase sirven para...',o:['que todos estemos mejor','castigar a los niños'],r:0},
+      {t:'vf',q:'Levantar la mano para hablar es una norma de clase.',r:true},
+      {t:'op',q:'Si dos amigos discuten, lo mejor es...',o:['hablar y buscar una solución','pegarse'],r:0},
+      {t:'op',q:'Cuidar el material del cole es...',o:['cosa de todos','solo del conserje'],r:0},
+      {t:'esc',q:'Vivir bien juntos se llama c___',r:['convivencia']}]},
+ {t:'Los derechos de la infancia',tri:2,exp:`<p>Todos los niños y niñas del mundo tienen <b>derechos</b>, sin importar de dónde vengan.</p><ul><li>Derecho a tener un <b>nombre</b> y una <b>familia</b>.</li><li>Derecho a <b>ir a la escuela</b>, a <b>jugar</b> y a que le <b>cuiden</b>.</li><li>Ningún niño debe sufrir malos tratos ni trabajar.</li></ul>`,ejemplo:'Jugar no es un premio: es un derecho.',
+  ej:[{t:'op',q:'Todos los niños tienen derecho a...',o:['ir a la escuela','trabajar'],r:0},
+      {t:'vf',q:'Los niños tienen derecho a jugar.',r:true},
+      {t:'op',q:'También tienen derecho a...',o:['un nombre y una familia','un coche'],r:0},
+      {t:'vf',q:'Ningún niño debe sufrir malos tratos.',r:true},
+      {t:'op',q:'Los derechos de la infancia son para...',o:['todos los niños del mundo','solo algunos'],r:0}]},
+ {t:'Cuidar el planeta y a los animales',tri:3,exp:`<p>Cuidar lo que nos rodea también es un valor.</p><ul><li>Un animal de compañía necesita agua, comida, paseo y cariño: no es un juguete.</li><li>Cerrar el grifo, apagar la luz y separar la basura son gestos pequeños que suman.</li></ul>`,ejemplo:'Ir andando al cole ensucia menos el aire que ir en coche.',
+  ej:[{t:'op',q:'Un animal de compañía necesita...',o:['agua, comida y cariño','estar siempre solo'],r:0},
+      {t:'op',q:'Para ahorrar agua puedo...',o:['cerrar el grifo mientras me lavo','dejarlo abierto'],r:0},
+      {t:'vf',q:'Tirar basura al suelo daña la naturaleza.',r:true},
+      {t:'op',q:'Ir andando al cole en vez de en coche es...',o:['mejor para el aire','peor para el aire'],r:0},
+      {t:'esc',q:'Separar la basura para volver a usarla se llama r___',r:['reciclar']}]}
+]});
+
+/* Se juntan con los temas base y se ordenan por trimestre */
+MATERIAS.forEach(m=>{
+  if(EXTRA[m.id])m.unis=m.unis.concat(EXTRA[m.id]);
+  m.unis.sort((a,b)=>a.tri-b.tri);
+});
+
+/* MATEMÁTICAS = el libro de verdad (Santillana, Construyendo Mundos 2): sus 9 unidades, en su orden.
+   No se pierde ningún ejercicio: cada unidad del libro junta los temas del faro que le tocan
+   y añade lo que faltaba. OLD_MAT guarda el orden anterior para no perder el progreso de Youssef. */
+const OLD_MAT=MATERIAS.find(m=>m.id==='mat').unis.map(u=>u.t);
+const NUEVO_MAT={
+'Vamos de excursión':{exp:`<p>Los números hasta el <b>99</b> tienen <b>decenas</b> y <b>unidades</b>: en 47 hay 4 decenas y 7 unidades.</p><ul><li><b>&gt;</b> quiere decir «es mayor que» y <b>&lt;</b> «es menor que». La boca abierta mira siempre al número mayor: 52 &gt; 25.</li><li>Sumas y restas <b>sin llevar</b>: unidades con unidades, decenas con decenas.</li></ul>`,ejemplo:'52 > 25 · 34 + 12 = 46 · 68 está más cerca de 70',
+  ej:[{t:'op',q:'¿Qué signo va? 52 ... 25',o:['>','<','='],r:0,p:'52 es mayor: la boca abierta mira al 52.'},
+      {t:'op',q:'¿Qué signo va? 38 ... 83',o:['>','<','='],r:1},
+      {t:'esc',q:'¿Cuántas unidades tiene el 74?',r:['4','cuatro']},
+      {t:'esc',q:'34 + 12 = ',r:['46']},
+      {t:'esc',q:'87 − 25 = ',r:['62']},
+      {t:'esc',q:'El número que va justo después del 99 es...',r:['100','cien']}],
+  de:['Cálculo mental y redondeo']},
+'Una carrera ciclista':{exp:`<p>El <b>100</b> es una <b>centena</b>: 10 decenas. Después vienen los números del 100 al 199.</p><ul><li>La suma y la resta son <b>contrarias</b>: si 30 + 20 = 50, entonces 50 − 20 = 30.</li><li>Los ordinales dicen el puesto: 1.º, 2.º, 3.º… 10.º.</li></ul>`,ejemplo:'30 + 20 = 50 → 50 − 20 = 30',
+  ej:[{t:'esc',q:'Si 45 + 15 = 60, entonces 60 − 15 = ',r:['45']},
+      {t:'esc',q:'Una centena son ... decenas',r:['10','diez']},
+      {t:'esc',q:'El número que va después del 149 es...',r:['150']}],
+  de:['Sumar y restar llevando','Números ordinales y series']},
+'Una visita al acuario':{exp:`<p>Los números de tres cifras tienen <b>centenas, decenas y unidades</b>.</p><ul><li>Para medir usamos <b>instrumentos</b>: la regla, la báscula, la jarra medidora.</li><li>Lo que <b>cabe</b> en una pecera o una botella se mide en <b>litros</b>.</li></ul>`,ejemplo:'356 = 3 centenas + 5 decenas + 6 unidades',
+  ej:[{t:'op',q:'¿Con qué medimos cuánta agua cabe en una pecera?',o:['con una jarra de litros','con una regla','con un reloj'],r:0},
+      {t:'op',q:'¿Qué cabe más?',o:['una bañera','un vaso','una taza'],r:0}],
+  de:['Números hasta el 999','En la cocina: recetas y cantidades']},
+'La revisión médica':{exp:`<p>Los números del <b>200 al 399</b>.</p><ul><li><b>=</b> quiere decir «es igual a» y <b>≠</b> «no es igual a».</li><li>Lo que medimos de largo va en <b>centímetros</b> y <b>metros</b>: 1 m = 100 cm.</li><li>Los ordinales siguen: 11.º undécimo, 12.º duodécimo… 20.º vigésimo, 29.º vigésimo noveno.</li></ul>`,ejemplo:'200 + 50 = 250 · 1 m = 100 cm · 250 ≠ 205',
+  ej:[{t:'op',q:'¿Qué signo va? 200 + 30 ... 230',o:['=','≠'],r:0},
+      {t:'op',q:'¿Qué signo va? 305 ... 350',o:['=','≠'],r:1},
+      {t:'op',q:'El puesto 20.º se lee...',o:['vigésimo','duodécimo','décimo'],r:0},
+      {t:'esc',q:'Youssef mide 1 metro y 25 cm. Son ... cm',r:['125']},
+      {t:'esc',q:'El número anterior al 300 es...',r:['299']}],
+  de:['Medir: largo, peso y capacidad','Salimos: autobús, coche y distancias']},
+'En el mercado':{exp:`<p>Los números del <b>400 al 799</b>.</p><ul><li>Lo que <b>pesa</b> se mide en <b>kilogramos</b> (kg): la fruta, las patatas.</li><li>Sumas y restas de tres cifras sin llevar: centenas con centenas, decenas con decenas, unidades con unidades.</li></ul>`,ejemplo:'432 + 215 = 647 · 2 kg de naranjas',
+  ej:[{t:'esc',q:'432 + 215 = ',r:['647']},
+      {t:'esc',q:'768 − 325 = ',r:['443']},
+      {t:'op',q:'Las patatas se compran por...',o:['kilos','litros','metros'],r:0}],
+  de:['El súper: ofertas, peso y precio','Sumar y restar de tres cifras']},
+'Una tarde de juegos':{exp:`<p>Los números del <b>800 al 999</b> y las sumas llevando de tres cifras.</p><ul><li>Un <b>punto</b> es un sitio. Una <b>recta</b> no se acaba nunca. Un <b>segmento</b> es un trozo de recta con dos puntos al final.</li><li>Los <b>polígonos</b> tienen lados y vértices. La <b>circunferencia</b> es la línea redonda; el <b>círculo</b> es la línea y todo lo de dentro.</li></ul>`,ejemplo:'Una moneda es un círculo · su borde es una circunferencia',
+  ej:[{t:'op',q:'Un trozo de recta con dos puntos al final es un...',o:['segmento','círculo','vértice'],r:0},
+      {t:'op',q:'La línea redonda del borde de una rueda es una...',o:['circunferencia','recta','pirámide'],r:0},
+      {t:'vf',q:'Una recta se acaba en un punto.',r:false,p:'La recta no se acaba nunca.'},
+      {t:'esc',q:'856 + 137 = ',r:['993']}],
+  de:['Figuras, cuerpos y gráficos']},
+'Vamos de compras':{exp:`<p>Con el dinero usamos <b>monedas</b> (céntimos y euros) y <b>billetes</b> (5, 10, 20, 50 euros).</p><ul><li>Para pagar sumamos; para saber la vuelta restamos.</li><li>La <b>calculadora</b> sirve para comprobar: se teclea el número, el signo, el otro número y el <b>=</b>.</li></ul>`,ejemplo:'Pago 10 € por algo de 7 €: la vuelta son 3 €',
+  ej:[{t:'op',q:'En la calculadora, para hacer 25 + 17 pulsas...',o:['25 + 17 =','= 25 17','25 17 +'],r:0},
+      {t:'esc',q:'352 − 128 = ',r:['224']},
+      {t:'op',q:'¿Cuál es un billete?',o:['20 euros','2 euros','50 céntimos'],r:0,p:'Los billetes son de 5, 10, 20, 50… euros.'}],
+  de:['La compra: pagar y contar el cambio','En casa: medir, repartir y ahorrar']},
+'Nuestra clase':{exp:`<p>El tiempo se mide en <b>horas y minutos</b>.</p><ul><li>Una figura es <b>simétrica</b> cuando al doblarla por la mitad las dos partes son iguales, como una mariposa.</li><li>Los <b>cuerpos geométricos</b> ocupan espacio: cubo, esfera, cilindro, cono, pirámide.</li></ul>`,ejemplo:'Una mariposa es simétrica · un bote de lápices es un cilindro',
+  ej:[{t:'vf',q:'Una mariposa es simétrica.',r:true},
+      {t:'op',q:'¿Qué letra es simétrica?',o:['A','F','G'],r:0,p:'Si doblas la A por la mitad, los dos lados son iguales.'},
+      {t:'op',q:'Un bote de refresco tiene forma de...',o:['cilindro','cubo','pirámide'],r:0},
+      {t:'op',q:'Un cucurucho de helado tiene forma de...',o:['cono','esfera','cubo'],r:0}],
+  de:['El reloj, el calendario y el dinero','Mi día: horarios y calendario']},
+'¡Estamos en la playa!':{exp:`<p><b>Multiplicar</b> es sumar muchas veces lo mismo: 3 + 3 + 3 + 3 = 4 × 3.</p><ul><li>Repartir en <b>partes iguales</b> es dividir.</li><li>El <b>doble</b> es multiplicar por 2; la <b>mitad</b> es repartir en 2.</li><li>Algo puede ser <b>seguro</b>, <b>posible</b> o <b>imposible</b>.</li></ul>`,ejemplo:'Sacar una bola roja de una bolsa con solo bolas rojas es seguro',
+  ej:[{t:'op',q:'Mañana saldrá el sol. Es...',o:['seguro','posible','imposible'],r:0},
+      {t:'op',q:'Tirar un dado y sacar un 7 es...',o:['seguro','posible','imposible'],r:2,p:'El dado solo tiene del 1 al 6.'},
+      {t:'op',q:'Tirar un dado y sacar un 3 es...',o:['seguro','posible','imposible'],r:1},
+      {t:'esc',q:'4 + 4 + 4 + 4 + 4 = 5 × ... ',r:['4','cuatro']}],
+  de:['Las tablas de multiplicar','Las tablas del 6, 7, 8 y 9','Repartir: empezamos a dividir','Problemas de dos pasos']},
+};
+(function(){
+  const mat=MATERIAS.find(m=>m.id==='mat'), por={};
+  mat.unis.forEach(u=>por[u.t]=u);
+  const orden=Object.keys(NUEVO_MAT);
+  mat.unis=orden.map((t,i)=>{
+    const n=NUEVO_MAT[t], src=n.de.map(x=>por[x]).filter(Boolean);
+    return {t, tri:i<3?1:i<6?2:3, libro:true,
+      exp:n.exp+src.map(s=>`<h4 style="margin:14px 0 4px">${s.t}</h4>${s.exp}`).join(''),
+      ejemplo:n.ejemplo, ej:n.ej.concat(...src.map(s=>s.ej))};
+  });
+})();
+
+/* --- El libro digital oficial: el mismo que usa en clase --- */
+const PLAT_DE={mat:'santillana',len:'santillana',nat:'anaya',soc:'anaya',eng:'richmond',gal:'anaya'};
+const PLATAFORMAS={
+ santillana:{n:'Aula Virtual Santillana',u:'https://av.santillana.es/av/login/auth',ic:'🟣',col:'#6E3F9E',q:'Matemáticas y Lengua Castellana',
+  d:'Aquí están Matemáticas y Lengua Castellana, página por página, igual que en clase.',
+  p:['Se abre «Aula Virtual Santillana» y pide «Accede a tu cuenta».',
+     'Escribe el nombre de usuario y la contraseña que da el colegio.',
+     'Ya dentro aparecen los libros. Si tenéis un código de licencia, se añade desde el menú de la cuenta.'],
+  a:'El usuario y la contraseña de Santillana los da el colegio: no vienen impresos en el libro. Pedidlos en secretaría.'},
+ anaya:{n:'Anaya · Web del alumnado',u:'https://privatearea.grupoanaya.es/anaya/register-student',ic:'🟢',col:'#3E8A34',q:'Natureza, Sociais e Galega',
+  d:'Aquí están Ciencias da Natureza, A Xanela de Galicia y Lingua Galega, en galego, igual que en clase.',
+  p:['Se abre la web del alumnado de Anaya y pide Email y Contraseña.',
+     'La primera vez pulsa «REGÍSTRATE» y crea la cuenta con un correo de la familia.',
+     'Ya dentro, entra en «Introducir licencia» y escribe el código alfanumérico de la cubierta del libro.'],
+  a:'Si el código no aparece en la cubierta, lo da el colegio: pídelo en secretaría o a la tutora.'},
+ richmond:{n:'Richmond Learning Platform',u:'https://richmondlp.com',ic:'🔴',col:'#1E7FC4',q:'Open Minds 2 · English',
+  d:'Aquí está Open Minds 2, con los audios de verdad para escuchar cada unidad.',
+  p:['Se abre Richmond Learning Platform.',
+     'Pulsa el botón rosa «LOGIN / REGISTER», arriba a la derecha.',
+     'Elige «I am a Student» y escribe el Access Code del Activity Book.'],
+  a:'Cada código vale 12 meses desde la primera vez que se usa: no lo actives hasta que empiece a usarlo.'}
+};
+
+const FALTAN=[
+ {t:'Matemáticas 2 — 2.º trimestre',e:'Santillana · Proyecto Construyendo Mundos',n:'Tienes el 1.º y el 3.º. Falta justo el del medio: se usa a partir de enero.',c:'Enero'},
+ {t:'Lengua Castellana 2 — 2.º trimestre',e:'Santillana · Proyecto Construyendo Mundos',n:'Solo tienes el 1.º trimestre.',c:'Enero'},
+ {t:'Lengua Castellana 2 — 3.er trimestre',e:'Santillana · Proyecto Construyendo Mundos',n:'Se empieza después de Semana Santa.',c:'Abril'},
+ {t:'Lingua Galega 2',e:'Anaya · Proyecto MIRA (edición Galicia)',n:'Es obligatoria en Galicia y no aparece en las fotos. Confirma con la lista del colegio si la usan este curso.',c:'Septiembre'},
+ {t:'Open Minds 2 — Pupil\'s Book',e:'Richmond',n:'Tienes el Activity Book. Muchos coles piden también el libro del alumno; otros lo sustituyen por la versión digital. Pregunta antes de comprarlo.',c:'Comprobar'}
+];
+
+const GLOSA=[
+['escola','escuela','مدرسة'],['mestre / mestra','maestro / maestra','معلّم / معلّمة'],['neno / nena','niño / niña','طفل / طفلة'],
+['lapis','lápiz','قلم رصاص'],['caderno','cuaderno','دفتر'],['libro','libro','كتاب'],['xanela','ventana','نافذة'],['porta','puerta','باب'],
+['cadeira','silla','كرسي'],['reloxo','reloj','ساعة'],['mochila','mochila','حقيبة'],['deberes','deberes','واجبات'],['recreo','recreo','استراحة'],
+['auga','agua','ماء'],['leite','leche','حليب'],['pan','pan','خبز'],['mazá','manzana','تفاحة'],['ovo','huevo','بيضة'],['peixe','pescado','سمك'],
+['carne','carne','لحم'],['almorzo','desayuno','فطور'],['xantar','comida del mediodía','غداء'],['cea','cena','عشاء'],['culler','cuchara','ملعقة'],
+['casa','casa','بيت'],['rúa','calle','شارع'],['praia','playa','شاطئ'],['mar','mar','بحر'],['río','río','نهر'],['ponte','puente','جسر'],
+['chuvia','lluvia','مطر'],['vento','viento','ريح'],['néboa','niebla','ضباب'],['sol','sol','شمس'],['lúa','luna','قمر'],['ceo','cielo','سماء'],
+['árbore','árbol','شجرة'],['folla','hoja','ورقة شجر'],['flor','flor','زهرة'],['can','perro','كلب'],['gato','gato','قط'],['paxaro','pájaro','عصفور'],
+['cabalo','caballo','حصان'],['vaca','vaca','بقرة'],['ollo','ojo','عين'],['man','mano','يد'],['xeonllo','rodilla','ركبة'],['orella','oreja','أذن'],
+['hoxe','hoy','اليوم'],['onte','ayer','أمس'],['mañá','mañana','غداً'],['bo día','buenos días','صباح الخير'],['boa noite','buenas noches','تصبح على خير'],
+['grazas','gracias','شكراً'],['por favor','por favor','من فضلك'],['si / non','sí / no','نعم / لا'],['xogar','jugar','يلعب'],['ler','leer','يقرأ'],
+['escribir','escribir','يكتب'],['medrar','crecer','ينمو'],['moi ben','muy bien','أحسنت']
+];
+
+const DICTADO={
+ es:['casa','pelota','ventana','caramelo','bicicleta','mariposa','queso','cebra','guitarra','bombero','perro','campo','lápiz','escuela','abuela','estrella','zapato','esquina','jirafa','pájaro'],
+ gl:['xanela','leite','folla','muller','caderno','reloxo','praia','chuvia','árbore','peixe','culler','xogar','neno','escola','mazá'],
+ en:['book','table','water','apple','house','family','yellow','rabbit','window','bread','school','friend','green','mother','seven']
+};
+
+const MEDALLAS=[
+ {id:'p1',ic:'🌱',t:'Primer día',n:1},{id:'p2',ic:'⭐',t:'50 faros',n:50},{id:'p3',ic:'🏅',t:'150 faros',n:150},
+ {id:'p4',ic:'🚀',t:'300 faros',n:300},{id:'p5',ic:'👑',t:'600 faros',n:600}
+];
+const TRI=['','1.er trimestre','2.º trimestre','3.er trimestre'];
+/* ===================== ORDEN DEL CURSO ===================== */
+const ORDEN=['len','gal','mat','nat','soc','eng','art','efi','val'];
+MATERIAS.sort((a,b)=>ORDEN.indexOf(a.id)-ORDEN.indexOf(b.id));
+const URG={'Septiembre':0,'Enero':1,'Abril':2,'Comprobar':3};
+FALTAN.sort((a,b)=>URG[a.c]-URG[b.c]);
+const FECHAS=['','Septiembre → diciembre','Enero → marzo','Abril → junio'];
+function triActual(){const m=new Date().getMonth()+1;return m>=9?1:m<=3?2:3;}
+function ruta(){
+  const r=[];let n=0;
+  [1,2,3].forEach(t=>MATERIAS.forEach(m=>m.unis.forEach((u,i)=>{
+    if(u.tri===t)r.push({n:++n,mid:m.id,mnom:m.nom,ut:u.t,ui:i,tri:t,c:m.c1});})));
+  return r;
+}
+
+/* ===================== ESTADO ===================== */
+const HOY=new Date().toISOString().slice(0,10);
+let E={nombre:'',pts:0,racha:0,ultimo:'',hechas:{},retos:{},vistos:{},aciertos:0,fallos:0,tema:''};
+let DB=null, guardaTimer=null;
+
+function cargarLocal(){try{const s=localStorage.getItem('faro2');if(s)E=Object.assign(E,JSON.parse(s));}catch(e){}}
+function guardar(){
+  try{localStorage.setItem('faro2',JSON.stringify(E));}catch(e){}
+  if(DB){clearTimeout(guardaTimer);guardaTimer=setTimeout(()=>{DB.doc('progreso/alumno').set(JSON.parse(JSON.stringify(E))).catch(()=>{});},900);}
+}
+function totalUnis(){return MATERIAS.reduce((a,m)=>a+m.unis.length,0);}
+function tieneReto(mid,ui){const m=MATERIAS.find(x=>x.id===mid);return ((RETOS[m.unis[ui].t]||[]).length>0);}
+function listo(mid,ui){const k=mid+'-'+ui;return !!E.hechas[k]&&(!tieneReto(mid,ui)||!!E.retos[k]);}
+function hechasDe(mid){return MATERIAS.find(m=>m.id===mid).unis.filter((u,i)=>listo(mid,i)).length;}
+function totalHechas(){return MATERIAS.reduce((a,m)=>a+m.unis.filter((u,i)=>listo(m.id,i)).length,0);}
+
+function marcarDia(){
+  if(E.ultimo===HOY)return;
+  const ayer=new Date(Date.now()-864e5).toISOString().slice(0,10);
+  E.racha=(E.ultimo===ayer)?E.racha+1:1;
+  E.ultimo=HOY;guardar();
+}
+function sumarPuntos(n){E.pts+=n;guardar();pintarBarra();}
+function pintarBarra(){
+  document.getElementById('pts').textContent=E.pts;
+  document.getElementById('racha').textContent=E.racha;
+}
+
+/* ===================== UTILIDADES ===================== */
+const $=s=>document.querySelector(s);
+const vista=$('#vista');
+function norm(s){return String(s).toLowerCase().trim().replace(/[¿?¡!.,;:]/g,'').replace(/\s+/g,' ')
+  .normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function mezclar(a){const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+function hablar(txt,lang){
+  try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(txt);
+    u.lang=lang||'es-ES';u.rate=.82;speechSynthesis.speak(u);}catch(e){}
+}
+function tapaSVG(m){
+  return `<svg class="motivo" viewBox="0 0 110 100" preserveAspectRatio="none" aria-hidden="true" fill="currentColor" style="position:absolute;left:0;right:0;bottom:0;height:58%;width:100%;opacity:.45">${MOTIVOS[m.id]}</svg>`;
+}
+function barrerFaro(){const h=document.querySelector('.haz');if(!h)return;h.classList.remove('gira');void h.offsetWidth;h.classList.add('gira');}
+
+/* ===================== CONFETI ===================== */
+function confeti(){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const c=$('#confeti'),x=c.getContext('2d');c.width=innerWidth;c.height=innerHeight;
+  const col=['#F5A524','#1B7F87','#3F8B51','#C24A3F','#FFF'];
+  const p=Array.from({length:90},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height*.5,
+    v:2+Math.random()*4,s:5+Math.random()*7,r:Math.random()*6,c:col[Math.floor(Math.random()*5)]}));
+  let t=0;(function bucle(){t++;x.clearRect(0,0,c.width,c.height);
+    p.forEach(o=>{o.y+=o.v;o.r+=.1;x.save();x.translate(o.x,o.y);x.rotate(o.r);x.fillStyle=o.c;
+      x.fillRect(-o.s/2,-o.s/2,o.s,o.s*.6);x.restore();});
+    if(t<150)requestAnimationFrame(bucle);else x.clearRect(0,0,c.width,c.height);})();
+}
+
+/* ===================== VISTAS ===================== */
+function irA(v,a,b){R={v,a,b};window.scrollTo(0,0);render();}
+let R={v:'casa'};
+const sinMovim=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* abrir el libro: la tapa gira como una tapa de verdad */
+function abreLibro(el,mid){
+  if(sinMovim())return irA('materia',mid);
+  el.classList.add('abriendo');
+  setTimeout(()=>irA('materia',mid),440);
+}
+
+/* pasar página: la hoja actual se dobla hacia la izquierda */
+function conVuelta(pintar){
+  const z=$('#zona');
+  if(!z||sinMovim()){pintar();return;}
+  const r=z.getBoundingClientRect();
+  const clon=z.cloneNode(true);
+  clon.removeAttribute('id');clon.className='hoja-vieja';
+  clon.style.width=r.width+'px';clon.style.height=r.height+'px';
+  z.parentElement.appendChild(clon);
+  pintar();
+  requestAnimationFrame(()=>{clon.style.animation='pasar .6s ease-in forwards';});
+  setTimeout(()=>{clon.remove();},650);
+}
+
+function render(){
+  pintarBarra();
+  if(R.v==='casa')casa();
+  else if(R.v==='materia')materia(R.a);
+  else if(R.v==='unidad')unidad(R.a,R.b);
+  else if(R.v==='faltan')faltan();
+  else if(R.v==='familia')familia();
+  else if(R.v==='digital')digital();
+}
+
+/* ---------- LIBRO DIGITAL ---------- */
+function copiar(txt,b){
+  const orig=b.textContent, ok=()=>{b.textContent='✓ Copiado';setTimeout(()=>{b.textContent=orig;},1800);};
+  const aMano=()=>{const t=document.createElement('textarea');t.value=txt;
+    t.style.cssText='position:fixed;top:0;left:0;opacity:0';document.body.appendChild(t);
+    t.focus();t.select();try{document.execCommand('copy');ok();}catch(e){b.textContent='Selecciona y copia';}
+    t.remove();};
+  if(navigator.clipboard&&navigator.clipboard.writeText)
+    navigator.clipboard.writeText(txt).then(ok).catch(aMano);
+  else aMano();
+}
+function filaURL(u){
+  const corta=u.replace('https://','');
+  return `<div class="url-fila"><code class="url">${esc(corta)}</code>
+    <button class="btn sec" onclick="copiar('${u}',this)">📋 Copiar</button>
+    <a class="btn" href="${u}" target="_blank" rel="noopener">Abrir ↗</a></div>`;
+}
+
+function digital(){
+  const cual={santillana:[],anaya:[],richmond:[]};
+  MATERIAS.forEach(m=>{const k=PLAT_DE[m.id];if(cual[k])cual[k].push(m.libro);});
+  vista.innerHTML=`
+  <div class="tira"><button class="volver" onclick="irA('casa')">← Volver</button></div>
+  <h1 style="font-size:clamp(23px,4vw,30px);margin-bottom:6px">Mi libro digital</h1>
+  <p style="color:var(--tinta-2);max-width:64ch;margin:0 0 22px">Cada libro de papel que tenéis en casa trae un <b>código de licencia</b>. Con ese código se abre en el ordenador el mismo libro que usa en clase, con sus mismas páginas y sus mismos dibujos. Se hace una vez por libro y ya queda guardado.</p>
+  <div class="aviso-cod" style="margin-bottom:18px;display:flex;gap:11px;align-items:flex-start">
+    <span style="font-size:20px;line-height:1">🔗</span>
+    <span><b>Si el botón «Abrir» no hace nada:</b> pulsa 📋 <b>Copiar</b> y pega la dirección en la barra del navegador. Desde el icono <b>Mi Faro de Estudio</b> del escritorio los enlaces se abren solos.</span></div>
+  ${Object.keys(PLATAFORMAS).map(k=>{const P=PLATAFORMAS[k];
+    return `<div class="digi" style="flex-direction:column;gap:0">
+      <div style="display:flex;gap:12px;align-items:flex-start;width:100%">
+        <span class="ic">${P.ic}</span>
+        <div style="flex:1"><h4>${esc(P.n)}</h4><p>${esc(P.d)}</p></div></div>
+      <ol class="pasos">${P.p.map(x=>`<li>${esc(x)}</li>`).join('')}</ol>
+      ${filaURL(P.u)}
+      <span style="font-size:12.5px;color:var(--granito)">Libros: ${cual[k].map(x=>esc(x)).join(' · ')}</span>
+      <div class="aviso-cod">⚠️ ${esc(P.a)}</div></div>`;}).join('')}
+
+  <div class="rejilla r3" style="margin-top:20px">
+    <div class="nota" style="background:var(--mar-claro)"><h4>🔑 ¿Dónde está el código?</h4>
+      Mira dentro de la portada o en la contraportada de cada libro: es una tira de letras y números. En los libros de Santillana suele venir en la primera página; en los de Anaya, en la cubierta.</div>
+    <div class="nota"><h4>🏫 Si el colegio usa otra plataforma</h4>
+      Muchos centros de Galicia abren estos mismos libros desde <b>Blinklearning</b>. Si es vuestro caso, el colegio os dará el usuario. Preguntad a la tutora: «¿desde dónde entran los niños al libro digital?».</div>
+    <div class="nota" style="background:var(--hueco)"><h4>📕 De los libros que faltan</h4>
+      Un libro que aún no habéis comprado no tiene código. Mientras tanto, esos temas los tienes aquí en la ruta del curso, con explicación y ejercicios.</div>
+  </div>
+
+  <div class="digi" style="margin-top:16px;border-left-color:var(--faro)">
+    <span class="ic">💡</span><div>
+      <h4>Por qué el libro está allí y no aquí</h4>
+      <p style="margin:0">Las páginas de los libros son de las editoriales y no se pueden copiar. Por eso esta ventana hace dos cosas distintas: <b>el libro original</b> lo abres con tu código en la plataforma de su editorial, y <b>aquí practicas</b> los mismos temas del curso, en el mismo orden, con ejercicios que se corrigen solos.</p></div>
+  </div>`;
+}
+
+/* ---------- CASA ---------- */
+function casa(){
+  const hoy=misionDeHoy();
+  const pct=Math.round(totalHechas()/totalUnis()*100);
+  vista.innerHTML=`
+  <section class="portada">
+    <div>
+      <h1>¡Hola, ${esc(E.nombre||'campeón')}!</h1>
+      <p>Este es tu faro. Cada lección que terminas enciende un poco más su luz. Hoy tienes tres cosas cortas que hacer: en quince minutos las tienes.</p>
+      <div class="datos"><span>2.º de Primaria</span><span>Curso 2026 / 2027</span><span>Ponteareas · Galicia</span><span>Luz del faro: ${pct}%</span></div>
+    </div>
+    <div class="faro-caja">
+      <svg viewBox="0 0 192 170" role="img" aria-label="Faro que se enciende con tu progreso">
+        <g class="haz" opacity="0"><polygon points="96,44 192,2 192,86" fill="#FFE9B0"/><polygon points="96,44 0,2 0,86" fill="#FFE9B0"/></g>
+        <path d="M0 170 C34 148 62 160 96 152 C132 160 158 148 192 170Z" fill="#0B4B52"/>
+        <path d="M78 152 L84 58 H108 L114 152Z" fill="#F7F3EA"/>
+        <path d="M82.6 122 L109.4 122 L110.4 138 H81.6Z" fill="#D8483C"/>
+        <path d="M84.9 84 L107.1 84 L108 100 H84Z" fill="#D8483C"/>
+        <rect x="84" y="30" width="24" height="28" rx="3" fill="#0F5A61"/>
+        <circle cx="96" cy="44" r="7.5" fill="#FFE9B0" opacity="${.25+pct/100*.75}"/>
+        <path d="M81 30 L111 30 L96 15Z" fill="#D8483C"/>
+        <rect x="76" y="150" width="40" height="6" rx="3" fill="#0F5A61"/>
+      </svg>
+    </div>
+  </section>
+
+  <div class="regla" style="margin-bottom:18px">✋ <span>Manda el colegio, no el faro. Dentro de cada tema hay un botón <b>«¿Ya lo habéis dado en clase?»</b>: marca <b>⏳ Todavía no</b> y ese tema deja de aparecer en la misión de hoy hasta que lo veas con tu maestra.</span></div>
+  <div class="tira"><span class="eyebrow">Misión de hoy</span></div>
+  <div class="mision">
+    ${hoy.map(h=>{const done=listo(h.mid,h.ui);
+      return `<button class="mis ${done?'hecha':''}" onclick="irA('unidad','${h.mid}',${h.ui})">
+        <span class="k">Paso ${h.n} · ${esc(h.mnom)}</span><span class="t">${esc(h.ut)}</span>
+        <span class="d">${done?'Ya la has hecho. ¿Repasamos?':'5 preguntas · unos 5 minutos'}</span></button>`;}).join('')}
+  </div>
+
+  <div class="tira"><span class="eyebrow">Mis libros de clase</span>
+    <span style="font-size:13px;color:var(--tinta-2)">Toca el color de tu libro y se abre igual que en el cole</span></div>
+  <div class="rejilla" style="grid-template-columns:repeat(auto-fit,minmax(218px,1fr));margin-bottom:28px">
+    ${Object.keys(PLATAFORMAS).map(k=>{const P=PLATAFORMAS[k];
+      return `<a class="abrir-libro" style="background:${P.col}" href="${P.u}" target="_blank" rel="noopener">
+        <span class="ab-ic">📖</span><span class="ab-n">${esc(P.q)}</span>
+        <span class="ab-p">${esc(P.n)} ↗</span></a>`;}).join('')}
+  </div>
+
+  <div class="tira"><span class="eyebrow">La ruta del curso</span>
+    <span style="font-size:13px;color:var(--tinta-2)">Los ${totalUnis()} temas en el orden en que se dan en clase</span></div>
+  <div style="margin-bottom:26px">${gruposRuta()}</div>
+
+  <div class="tira"><span class="eyebrow">Mis libros</span><span style="font-size:13px;color:var(--tinta-2)">Toca uno para abrirlo</span></div>
+  <div class="rejilla r4" style="margin-bottom:26px">
+    ${MATERIAS.map(m=>{const h=hechasDe(m.id),tt=m.unis.length,p=Math.round(h/tt*100);
+      return `<button class="libro" onclick="abreLibro(this,'${m.id}')">
+        <div class="tapa">${PORTADAS[m.id]()}</div>
+        <div class="pie"><span class="lang">${m.lang}${m.tengo?'':' · falta el libro'}</span>
+          <div class="barrita"><i style="width:${p}%"></i></div>
+          <span class="pct">${h} de ${tt} temas</span></div></button>`;}).join('')}
+  </div>
+
+  <div class="rejilla r3">
+    <button class="tarjeta" style="text-align:left;border-left:5px solid var(--mar)" onclick="irA('digital')">
+      <h3 style="font-size:17px;margin-bottom:5px">📖 Mi libro digital</h3>
+      <p style="margin:0;font-size:14px;color:var(--tinta-2)">El libro de clase en la pantalla, con sus mismas páginas. Aquí te digo dónde está el código de cada uno.</p></button>
+    <button class="tarjeta" style="text-align:left" onclick="irA('faltan')">
+      <h3 style="font-size:17px;margin-bottom:5px">📚 Libros que faltan</h3>
+      <p style="margin:0;font-size:14px;color:var(--tinta-2)">Faltan ${FALTAN.length} libros del curso. Mira cuáles son, cuándo hacen falta y dónde conseguirlos.</p></button>
+    <button class="tarjeta" style="text-align:left" onclick="irA('familia')">
+      <h3 style="font-size:17px;margin-bottom:5px">👨‍👩‍👦 Guía para la familia</h3>
+      <p style="margin:0;font-size:14px;color:var(--tinta-2)">Cómo acompañarle 15 minutos al día. Con explicación en árabe.</p></button>
+    <div class="tarjeta">
+      <h3 style="font-size:17px;margin-bottom:5px">🏅 Mis medallas</h3>
+      <div class="medallas">${MEDALLAS.map(m=>`<span class="med ${E.pts>=m.n?'g':''}">${m.ic} ${m.t}</span>`).join('')}</div></div>
+  </div>`;
+}
+
+function misionDeHoy(){
+  const R2=ruta(), act=triActual();
+  const pend=R2.filter(x=>!listo(x.mid,x.ui));
+  const dados=pend.filter(x=>E.vistos[x.mid+'-'+x.ui]===true);
+  if(dados.length)return dados.slice(0,3);
+  const libres=pend.filter(x=>E.vistos[x.mid+'-'+x.ui]!==false);
+  const orden=libres.filter(x=>x.tri===act).concat(libres.filter(x=>x.tri!==act));
+  return (orden.length?orden:R2).slice(0,3);
+}
+
+function gruposRuta(){
+  const R2=ruta(), sig=R2.find(x=>!listo(x.mid,x.ui)&&E.vistos[x.mid+'-'+x.ui]!==false), act=triActual();
+  return [1,2,3].map(t=>{
+    const its=R2.filter(x=>x.tri===t), hs=its.filter(x=>listo(x.mid,x.ui)).length;
+    return `<details class="grupo"${t===act?' open':''}>
+      <summary>${TRI[t]} <span class="fecha">${FECHAS[t]}</span><span class="cnt2">${hs} / ${its.length}</span></summary>
+      <div class="ruta">${its.map(x=>{
+        const done=listo(x.mid,x.ui), aqui=sig&&sig.n===x.n, esp=E.vistos[x.mid+'-'+x.ui]===false;
+        return `<button class="paso ${done?'ok':''} ${aqui?'aqui':''}" onclick="irA('unidad','${x.mid}',${x.ui})">
+          <span class="pt" style="background:${done?'var(--acerto)':x.c}">${done?'✓':x.n}</span>
+          <span class="info"><h5>${esc(x.ut)}${esp?'<span class="esperando">aún no en clase</span>':''}</h5><em>${esc(x.mnom)}${aqui?' · Sigue por aquí 👉':''}</em></span></button>`;}).join('')}
+      </div></details>`;}).join('');
+}
+
+/* ---------- MATERIA ---------- */
+function materia(mid){
+  const m=MATERIAS.find(x=>x.id===mid);
+  vista.innerHTML=`
+  <div class="tira"><button class="volver" onclick="irA('casa')">← Mis libros</button></div>
+  <div class="portada" style="background:linear-gradient(150deg,${m.c1},${m.c2})">
+    <div><h1>${esc(m.nom)}</h1><p>${esc(m.libro)} · ${esc(m.edi)}</p>
+      <div class="datos"><span>${m.lang}</span><span>${m.unis.length} temas</span>
+      <span>${hechasDe(m.id)} terminados</span>${m.isbn?`<span>ISBN ${m.isbn}</span>`:''}
+      ${m.tengo?'':'<span>⚠️ Libro pendiente de comprar</span>'}</div></div>
+    <div class="faro-caja" style="height:auto;place-items:center"><div class="tapa-mini">${PORTADAS[m.id]()}</div></div>
+  </div>
+  ${m.tengo?'':`<div class="nota" style="margin-bottom:16px"><h4>Este libro todavía no lo tienes</h4>
+    Puedes estudiar igual: aquí tienes los temas con sus explicaciones y ejercicios. Cuando compréis el libro, todo te sonará ya.</div>`}
+  ${(()=>{const P=PLATAFORMAS[PLAT_DE[m.id]];
+    if(!P)return `<div class="digi" style="border-left-color:var(--granito)">
+      <span class="ic">✏️</span><div><h4>Esta área no lleva libro</h4>
+      <p style="margin:0">Se trabaja en clase, con las explicaciones de la maestra y lo que hace en el cuaderno. Aquí tienes los temas para repasar en casa.</p></div></div>`;
+    return `<div class="digi">
+    <span class="ic">📖</span><div style="flex:1">
+      <h4>Mi libro digital</h4>
+      <p>Las mismas páginas que tienes en clase, en <b>${esc(P.n)}</b>. El código se pone una sola vez; después entras directo.</p>
+      ${filaURL(P.u)}
+      <button class="btn sec" onclick="irA('digital')">¿Cómo se activa?</button>
+    </div></div>`;})()}
+  <div class="tira"><span class="eyebrow">Temas para practicar</span></div>
+  <div class="rejilla" style="grid-template-columns:repeat(auto-fill,minmax(290px,1fr))">
+    ${m.unis.map((u,i)=>{const done=listo(mid,i);
+      return `<button class="uni ${done?'lista':''}" onclick="irA('unidad','${mid}',${i})">
+        <span class="n">${done?'✓':i+1}</span>
+        <span><h4>${esc(u.t)}</h4><p>${u.ej.length+(RETOS[u.t]||[]).length} preguntas · explicación corta</p>
+        <span class="tri">${TRI[u.tri]}</span></span></button>`;}).join('')}
+  </div>`;
+}
+
+/* ---------- UNIDAD ---------- */
+/* RETOS: preguntas más difíciles que se añaden al final de cada tema (🔥). Matemáticas lleva el doble. */
+const RETOS={
+'Números hasta el 999':[
+ {t:'esc',q:'🔥 ¿Cuántas decenas hay en total en 340?',r:['34'],p:'340 son 34 decenas justas (34 × 10).'},
+ {t:'esc',q:'🔥 Escribe con cifras: setecientos cuatro',r:['704'],p:'7 centenas, 0 decenas y 4 unidades.'},
+ {t:'op',q:'🔥 ¿Qué número está entre 478 y 481?',o:['477','479','482'],r:1,p:'Tiene que ser mayor que 478 y menor que 481.'},
+ {t:'esc',q:'🔥 De estos tres, escribe el MAYOR: 507, 570, 75',r:['570'],p:'507 y 570 tienen 5 centenas: mira las decenas.'},
+ {t:'esc',q:'🔥 Cuenta de 10 en 10: 380, 390, ...',r:['400'],p:'Después de 390 vienen 400.'},
+ {t:'op',q:'🔥 En el número 469, el 6 vale...',o:['6 unidades','6 decenas','6 centenas'],r:1,p:'Está en el lugar de las decenas: vale 60.'}],
+'Sumar y restar llevando':[
+ {t:'esc',q:'🔥 247 + 189 = ',r:['436'],p:'7+9=16, me llevo 1.'},
+ {t:'esc',q:'🔥 503 − 268 = ',r:['235'],p:'Pide prestado dos veces.'},
+ {t:'esc',q:'🔥 Tengo 320 € y gasto 145 €. Me quedan ... €',r:['175'],p:'320 − 145.'},
+ {t:'esc',q:'🔥 ¿Qué número sumado a 68 da 100?',r:['32'],p:'100 − 68.'},
+ {t:'op',q:'🔥 En el autobús van 47 personas. Suben 18 y bajan 25. ¿Cuántas van ahora?',o:['40 personas','30 personas','54 personas'],r:0,p:'47 + 18 = 65, y 65 − 25 = 40.'},
+ {t:'esc',q:'🔥 99 + 99 = ',r:['198'],p:'100 + 100 = 200, y quitas 2.'}],
+'Las tablas de multiplicar':[
+ {t:'esc',q:'🔥 7 × 8 = ',r:['56']},
+ {t:'esc',q:'🔥 6 × 9 = ',r:['54']},
+ {t:'esc',q:'🔥 El doble de 24 es...',r:['48'],p:'24 + 24.'},
+ {t:'op',q:'🔥 4 × 6 es lo mismo que...',o:['6 × 4','4 + 6','6 − 4'],r:0,p:'Al multiplicar puedes cambiar el orden.'},
+ {t:'esc',q:'🔥 3 bolsas con 8 caramelos. Me como 5. Quedan ...',r:['19'],p:'3 × 8 = 24, y 24 − 5 = 19.'},
+ {t:'esc',q:'🔥 La mitad de 36 es...',r:['18'],p:'Reparte 36 en dos partes iguales.'}],
+'Medir: largo, peso y capacidad':[
+ {t:'esc',q:'🔥 2 metros y 35 cm son ... cm',r:['235'],p:'Cada metro son 100 cm.'},
+ {t:'esc',q:'🔥 3 kilos son ... gramos',r:['3000'],p:'1 kilo = 1000 g.'},
+ {t:'op',q:'🔥 Una botella de litro y medio tiene...',o:['150 ml','1500 ml','15 ml'],r:1,p:'1 litro = 1000 ml, y medio son 500.'},
+ {t:'esc',q:'🔥 Una cuerda mide 1 metro. Corto 40 cm. Quedan ... cm',r:['60'],p:'100 − 40.'},
+ {t:'op',q:'🔥 ¿Qué pesa MÁS?',o:['2 kg','1500 g','900 g'],r:0,p:'2 kg son 2000 g.'},
+ {t:'esc',q:'🔥 Medio metro son ... cm',r:['50']}],
+'El reloj, el calendario y el dinero':[
+ {t:'esc',q:'🔥 Las 3 y cuarto se escriben 3 : ...',r:['15'],p:'Un cuarto de hora son 15 minutos.'},
+ {t:'esc',q:'🔥 Son las 10:45. Dentro de 30 minutos serán las 11 : ...',r:['15'],p:'15 minutos hasta las 11 y 15 más.'},
+ {t:'op',q:'🔥 Tengo 2 monedas de 50 céntimos y 3 de 20. ¿Cuánto tengo?',o:['1,60 €','1,30 €','2,60 €'],r:0,p:'100 + 60 = 160 céntimos.'},
+ {t:'esc',q:'🔥 Dos semanas y 3 días son ... días',r:['17'],p:'7 + 7 + 3.'},
+ {t:'op',q:'🔥 El año normal tiene 365 días. El año bisiesto tiene...',o:['364 días','366 días','360 días'],r:1,p:'Febrero tiene un día más.'},
+ {t:'esc',q:'🔥 Pago un libro de 12 € con un billete de 20 €. Me devuelven ... €',r:['8']}],
+'Figuras, cuerpos y gráficos':[
+ {t:'esc',q:'🔥 Un cuadrado tiene el lado de 5 cm. Su contorno entero mide ... cm',r:['20'],p:'5 + 5 + 5 + 5.'},
+ {t:'esc',q:'🔥 ¿Cuántos vértices tiene un hexágono?',r:['6','seis'],p:'Tiene tantos vértices como lados.'},
+ {t:'op',q:'🔥 El cubo tiene...',o:['4 caras','6 caras','8 caras'],r:1,p:'Como un dado: 6 caras.'},
+ {t:'vf',q:'🔥 Todos los rectángulos tienen los 4 lados iguales.',r:false,p:'Solo el cuadrado los tiene iguales.'},
+ {t:'esc',q:'🔥 Tres triángulos juntos tienen ... lados en total',r:['9'],p:'3 × 3.'},
+ {t:'op',q:'🔥 En un gráfico de barras, la barra más alta indica...',o:['lo que menos hay','lo que más hay','nada'],r:1}],
+'Números ordinales y series':[
+ {t:'esc',q:'🔥 Sigue la serie: 5, 10, 15, 20, ...',r:['25']},
+ {t:'esc',q:'🔥 Serie de 3 en 3: 12, 15, 18, ...',r:['21']},
+ {t:'op',q:'🔥 Voy el 4.º de la fila y adelanto a dos. Ahora voy...',o:['2.º','6.º','3.º'],r:0,p:'Adelantas al 3.º y al 2.º.'},
+ {t:'esc',q:'🔥 Serie hacia atrás: 100, 90, 80, ...',r:['70']},
+ {t:'esc',q:'🔥 El mes 9.º del año es...',r:['septiembre','setiembre']},
+ {t:'op',q:'🔥 Sigue: 2, 4, 8, 16, ...',o:['18','32','20'],r:1,p:'Cada número es el doble del anterior.'}],
+'Sumar y restar de tres cifras':[
+ {t:'esc',q:'🔥 456 + 278 = ',r:['734']},
+ {t:'esc',q:'🔥 700 − 356 = ',r:['344']},
+ {t:'esc',q:'🔥 125 + 125 + 125 = ',r:['375']},
+ {t:'esc',q:'🔥 Un número más 240 da 500. El número es ...',r:['260'],p:'500 − 240.'},
+ {t:'op',q:'🔥 Un libro tiene 245 páginas y he leído 168. Me faltan...',o:['77 páginas','87 páginas','113 páginas'],r:0},
+ {t:'esc',q:'🔥 999 − 111 = ',r:['888']}],
+'Las tablas del 6, 7, 8 y 9':[
+ {t:'esc',q:'🔥 8 × 7 = ',r:['56']},
+ {t:'esc',q:'🔥 9 × 6 = ',r:['54']},
+ {t:'esc',q:'🔥 7 × 7 = ',r:['49']},
+ {t:'op',q:'🔥 ¿Cuál es MAYOR?',o:['6 × 8','7 × 7','9 × 5'],r:1,p:'48, 49 y 45.'},
+ {t:'esc',q:'🔥 8 × 9 = ',r:['72']},
+ {t:'esc',q:'🔥 6 filas de 7 sillas son ... sillas',r:['42']}],
+'Cálculo mental y redondeo':[
+ {t:'esc',q:'🔥 Redondea 68 a la decena más cercana',r:['70'],p:'Está más cerca de 70 que de 60.'},
+ {t:'esc',q:'🔥 Redondea 342 a la centena más cercana',r:['300'],p:'342 está más cerca de 300.'},
+ {t:'esc',q:'🔥 25 + 25 + 25 + 25 = ',r:['100']},
+ {t:'op',q:'🔥 199 + 99 es casi...',o:['300','200','400'],r:0,p:'200 + 100 = 300, y da 298.'},
+ {t:'esc',q:'🔥 40 + 60 + 30 = ',r:['130']},
+ {t:'esc',q:'🔥 El doble de 45 es...',r:['90']}],
+'Repartir: empezamos a dividir':[
+ {t:'esc',q:'🔥 24 caramelos entre 4 niños. A cada uno le tocan ...',r:['6']},
+ {t:'esc',q:'🔥 30 : 5 = ',r:['6']},
+ {t:'esc',q:'🔥 18 lápices en cajas de 6. Hacen falta ... cajas',r:['3']},
+ {t:'op',q:'🔥 Calcular 20 : 4 es lo mismo que preguntar...',o:['4 × ? = 20','20 + 4','20 − 4'],r:0},
+ {t:'esc',q:'🔥 35 : 7 = ',r:['5']},
+ {t:'esc',q:'🔥 Reparto 13 galletas entre 4 niños. Toca a 3 y sobran ...',r:['1'],p:'4 × 3 = 12, y sobra 1.'}],
+'Problemas de dos pasos':[
+ {t:'esc',q:'🔥 Compro 3 cuadernos de 4 € y pago con 20 €. Me devuelven ... €',r:['8'],p:'3 × 4 = 12, y 20 − 12 = 8.'},
+ {t:'esc',q:'🔥 Una caja tiene 6 filas de 5 huevos. Se rompen 7. Quedan ...',r:['23'],p:'30 − 7.'},
+ {t:'op',q:'🔥 Tenía 45 cromos, regalé 12 y compré 20. Ahora tengo...',o:['53 cromos','43 cromos','77 cromos'],r:0},
+ {t:'esc',q:'🔥 2 paquetes de 8 pilas. Uso 5. Quedan ...',r:['11']},
+ {t:'esc',q:'🔥 En un tren van 120 pasajeros. Bajan 45 y suben 30. Ahora van ...',r:['105']},
+ {t:'op',q:'🔥 4 amigos pagan entre todos 32 €. Cada uno pone...',o:['6 €','8 €','12 €'],r:1}],
+
+'El abecedario y las sílabas':[
+ {t:'op',q:'🔥 ¿Cuántas sílabas tiene "murciélago"?',o:['3','4','5'],r:1,p:'mur-cié-la-go.'},
+ {t:'esc',q:'🔥 Por orden alfabético, ¿cuál va primero: pera, manzana o uva?',r:['manzana']},
+ {t:'op',q:'🔥 En "árbol", la sílaba fuerte es...',o:['ár','bol','las dos'],r:0,p:'Por eso lleva tilde en la primera.'}],
+'Ortografía: ca-que-qui · za-ce-ci · ga-gue-gui':[
+ {t:'esc',q:'🔥 Escribe el plural de "pez"',r:['peces'],p:'La z se cambia por c.'},
+ {t:'op',q:'🔥 ¿Cuál está bien escrita?',o:['cigueña','cigüeña','ciguena'],r:1,p:'Lleva diéresis para que suene la u.'},
+ {t:'esc',q:'🔥 Escribe el plural de "lápiz"',r:['lápices','lapices']}],
+'Ortografía: mp y mb · r y rr · el punto':[
+ {t:'op',q:'🔥 ¿Cuál está bien escrita?',o:['enpezar','empezar','embezar'],r:1},
+ {t:'esc',q:'🔥 Antes de p y de b siempre se escribe la letra ...',r:['m','la m']},
+ {t:'op',q:'🔥 ¿En cuál suena fuerte la r con una sola letra?',o:['pera','ratón','cara'],r:1,p:'Al principio de palabra suena fuerte.'}],
+'El nombre, el adjetivo y el verbo':[
+ {t:'op',q:'🔥 En "El perro grande corre por el parque", el verbo es...',o:['perro','grande','corre'],r:2},
+ {t:'esc',q:'🔥 Escribe el adjetivo de esta frase: La casa es antigua.',r:['antigua']},
+ {t:'op',q:'🔥 "Zapato" es un nombre...',o:['propio','común','de persona'],r:1,p:'Los propios empiezan con mayúscula.'}],
+'Leo y comprendo: las alfombras de flores':[
+ {t:'op',q:'🔥 Un texto que explica paso a paso cómo se hace algo es...',o:['un cuento','unas instrucciones','una poesía'],r:1},
+ {t:'esc',q:'🔥 El personaje principal de un cuento se llama el pro...',r:['protagonista']},
+ {t:'vf',q:'🔥 Para entender un texto ayuda leerlo dos veces.',r:true}],
+'Escribo: la nota, la descripción y el cuento':[
+ {t:'op',q:'🔥 Una nota tiene que decir...',o:['solo lo importante','todo el cuento','nada'],r:0},
+ {t:'esc',q:'🔥 Muchos cuentos empiezan así: "Érase una ..."',r:['vez']},
+ {t:'vf',q:'🔥 Al describir a una persona contamos cómo es por fuera y cómo es por dentro.',r:true}],
+'El género y el número':[
+ {t:'op',q:'🔥 El femenino de "actor" es...',o:['actriz','actora','actores'],r:0},
+ {t:'esc',q:'🔥 El plural de "rey" es ...',r:['reyes']},
+ {t:'op',q:'🔥 "Mesas" es...',o:['femenino plural','masculino singular','femenino singular'],r:0}],
+'Los artículos y los determinantes':[
+ {t:'op',q:'🔥 ¿Cómo se dice bien?',o:['el agua','la agua','lo agua'],r:0,p:'Se dice el agua aunque sea femenina.'},
+ {t:'esc',q:'🔥 Completa con el artículo: ... libros son míos',r:['los']},
+ {t:'vf',q:'🔥 "Este" y "aquel" sirven para señalar.',r:true}],
+'Sinónimos, antónimos y familias':[
+ {t:'esc',q:'🔥 Escribe un sinónimo de "bonito"',r:['hermoso','lindo','precioso','guapo','bello']},
+ {t:'esc',q:'🔥 El contrario de "lleno" es ...',r:['vacío','vacio']},
+ {t:'op',q:'🔥 ¿Cuál NO es de la familia de "pan"?',o:['panadero','panadería','pana'],r:2}],
+'La oración: quién hace y qué hace':[
+ {t:'op',q:'🔥 En "Mi hermana pinta un cuadro", quién hace la acción es...',o:['mi hermana','pinta','un cuadro'],r:0},
+ {t:'esc',q:'🔥 En "Los niños juegan", ¿qué hacen? Escribe el verbo.',r:['juegan']},
+ {t:'vf',q:'🔥 Una oración empieza con mayúscula y termina en punto.',r:true}],
+'Diminutivos y aumentativos':[
+ {t:'esc',q:'🔥 El diminutivo de "pez" es ...',r:['pececito','pececillo']},
+ {t:'esc',q:'🔥 El aumentativo de "casa" es ...',r:['casón','caserón','cason','caseron']},
+ {t:'op',q:'🔥 "Perrazo" es un...',o:['aumentativo','diminutivo','sinónimo'],r:0}],
+'El diálogo y los signos ¿? ¡!':[
+ {t:'op',q:'🔥 Para escribir lo que dice un personaje se usa...',o:['la raya —','el paréntesis','las comillas dobles'],r:0},
+ {t:'esc',q:'🔥 ¿Qué signo se pone al PRINCIPIO de una pregunta?',r:['¿','el de abrir','interrogación']},
+ {t:'vf',q:'🔥 Las exclamaciones llevan signo al principio y al final.',r:true}],
+
+'O abecedario galego':[
+ {t:'op',q:'🔥 Cal está ben escrito en galego?',o:['xardín','jardín','gardín'],r:0,p:'En galego non se usa a j nas palabras propias.'},
+ {t:'esc',q:'🔥 O plural de "can" é ...',r:['cans']},
+ {t:'op',q:'🔥 O son do "ñ" en galego escríbese...',o:['nh','ñ','gn'],r:1}],
+'O artigo e o substantivo':[
+ {t:'op',q:'🔥 O artigo de "mesa" é...',o:['a','o','os'],r:0},
+ {t:'esc',q:'🔥 O plural de "luz" é ...',r:['luces']},
+ {t:'op',q:'🔥 "Manuel" é un substantivo...',o:['común','propio','colectivo'],r:1}],
+'O adxectivo e o verbo':[
+ {t:'op',q:'🔥 En "O neno corre rápido", o verbo é...',o:['neno','corre','rápido'],r:1},
+ {t:'esc',q:'🔥 Eu ... unha mazá. Escribe o verbo comer en presente.',r:['como']},
+ {t:'vf',q:'🔥 O adxectivo di como é o substantivo.',r:true}],
+'Vocabulario da escola e da casa':[
+ {t:'op',q:'🔥 Onde se garda a roupa?',o:['no armario','na neveira','no forno'],r:0},
+ {t:'esc',q:'🔥 Como se di "pizarra" en galego?',r:['encerado']},
+ {t:'esc',q:'🔥 Como se di "ventana" en galego?',r:['fiestra','ventá','xanela','venta']}],
+'Maiúsculas e signos':[
+ {t:'op',q:'🔥 Despois dun punto escríbese...',o:['minúscula','maiúscula','nada'],r:1},
+ {t:'esc',q:'🔥 Que signo se pon ao final dunha pregunta?',r:['?','interrogación','o interrogante']},
+ {t:'vf',q:'🔥 Os nomes das cidades escríbense con maiúscula.',r:true}],
+'Os pronomes persoais':[
+ {t:'op',q:'🔥 O pronome de primeira persoa do singular é...',o:['eu','ti','el'],r:0},
+ {t:'esc',q:'🔥 Nós ... amigos. Escribe o verbo ser en presente.',r:['somos']},
+ {t:'vf',q:'🔥 "Vós" é plural.',r:true}],
+'O xénero e o número':[
+ {t:'op',q:'🔥 O feminino de "can" é...',o:['cadela','cans','cana'],r:0},
+ {t:'esc',q:'🔥 O plural de "papel" é ...',r:['papeis']},
+ {t:'esc',q:'🔥 O feminino de "avó" é ...',r:['avoa']}],
+'Sinónimos e antónimos':[
+ {t:'op',q:'🔥 Un sinónimo de "axiña" é...',o:['rápido','devagar','tarde'],r:0},
+ {t:'esc',q:'🔥 O contrario de "alto" é ...',r:['baixo']},
+ {t:'esc',q:'🔥 Escribe un sinónimo de "bonito" en galego',r:['fermoso','lindo','belo']}],
+'A oración: suxeito e predicado':[
+ {t:'op',q:'🔥 En "Os nenos xogan no parque", o suxeito é...',o:['os nenos','xogan','no parque'],r:0},
+ {t:'esc',q:'🔥 En "Miña nai cociña", escribe o verbo',r:['cociña','cocina']},
+ {t:'vf',q:'🔥 O suxeito di quen fai a acción.',r:true}],
+'Contos, cantigas e refráns':[
+ {t:'op',q:'🔥 Un refrán é...',o:['unha frase curta que ensina','un conto longo','unha canción'],r:0},
+ {t:'esc',q:'🔥 Completa o refrán: A quen madruga, Deus o ...',r:['axuda']},
+ {t:'vf',q:'🔥 As cantigas cántanse.',r:true}],
+
+'Os seres vivos':[
+ {t:'op',q:'🔥 Os seres vivos nacen, crecen, reprodúcense e...',o:['morren','voan','falan'],r:0},
+ {t:'esc',q:'🔥 Un ser vivo verde que non se move do sitio é unha ...',r:['planta']},
+ {t:'vf',q:'🔥 As rochas son seres vivos.',r:false}],
+'Os animais':[
+ {t:'op',q:'🔥 Os animais que nacen dun ovo chámanse...',o:['vivíparos','ovíparos','herbívoros'],r:1},
+ {t:'esc',q:'🔥 Un animal que come só plantas é ...',r:['herbívoro']},
+ {t:'op',q:'🔥 Os mamíferos respiran por...',o:['branquias','pulmóns','pel'],r:1}],
+'As plantas':[
+ {t:'op',q:'🔥 A parte da planta que a suxeita e colle auga é...',o:['a raíz','a flor','o froito'],r:0},
+ {t:'esc',q:'🔥 Da flor nace o ...',r:['froito']},
+ {t:'vf',q:'🔥 As follas serven para respirar e fabricar alimento.',r:true}],
+'O corpo humano e os sentidos':[
+ {t:'op',q:'🔥 O sentido da lingua é...',o:['o gusto','o olfacto','o oído'],r:0},
+ {t:'esc',q:'🔥 Todos os ósos xuntos forman o ...',r:['esqueleto']},
+ {t:'op',q:'🔥 O corazón serve para...',o:['mover o sangue','respirar','dixerir'],r:0}],
+'A materia, as máquinas e o ordenador':[
+ {t:'op',q:'🔥 Unha tesoira é unha máquina...',o:['simple','complexa','eléctrica'],r:0},
+ {t:'esc',q:'🔥 A auga en estado sólido chámase ...',r:['xeo']},
+ {t:'vf',q:'🔥 O rato e o teclado son partes do ordenador.',r:true}],
+'Os hábitats: onde viven os animais':[
+ {t:'op',q:'🔥 O camelo vive no...',o:['deserto','polo','mar'],r:0},
+ {t:'esc',q:'🔥 O hábitat dos peixes é a ...',r:['auga']},
+ {t:'vf',q:'🔥 O oso polar vive nun lugar moi frío.',r:true}],
+'Coidamos o planeta: as tres erres':[
+ {t:'op',q:'🔥 As tres erres son reducir, reutilizar e...',o:['reciclar','romper','regalar'],r:0},
+ {t:'esc',q:'🔥 O papel bótase no colector de cor ...',r:['azul']},
+ {t:'esc',q:'🔥 O vidro bótase no colector de cor ...',r:['verde']}],
+
+'O tempo atmosférico':[
+ {t:'op',q:'🔥 A temperatura mídese co...',o:['termómetro','pluviómetro','reloxo'],r:0},
+ {t:'esc',q:'🔥 O aparello que mide a chuvia chámase ...',r:['pluviómetro','pluviometro']},
+ {t:'vf',q:'🔥 O vento é aire en movemento.',r:true}],
+'A paisaxe de Galicia':[
+ {t:'op',q:'🔥 Unha entrada do mar na terra en Galicia chámase...',o:['ría','illa','val'],r:0},
+ {t:'esc',q:'🔥 Como se chama a auga que corre pola terra ata o mar?',r:['río','o río']},
+ {t:'vf',q:'🔥 Galicia ten moita costa.',r:true}],
+'A auga e o aire':[
+ {t:'op',q:'🔥 Cando a auga ferve convértese en...',o:['vapor','xeo','pedra'],r:0},
+ {t:'esc',q:'🔥 Cando a auga quente sobe en forma de vapor chámase e...',r:['evaporación','evaporacion']},
+ {t:'vf',q:'🔥 O aire ocupa lugar aínda que non se vexa.',r:true}],
+'O Sol, a Terra e a Lúa':[
+ {t:'op',q:'🔥 A Terra tarda un ano en...',o:['xirar arredor do Sol','xirar sobre si mesma','chegar á Lúa'],r:0},
+ {t:'esc',q:'🔥 A Terra dá unha volta sobre si mesma en ... horas',r:['24','vinte e catro']},
+ {t:'vf',q:'🔥 A Lúa xira arredor da Terra.',r:true}],
+'Onde vivimos: aldea, vila e cidade':[
+ {t:'op',q:'🔥 O lugar onde vive máis xente é...',o:['a cidade','a vila','a aldea'],r:0},
+ {t:'esc',q:'🔥 Quen goberna un concello é o ...',r:['alcalde','alcaldesa','a alcaldesa','o alcalde']},
+ {t:'vf',q:'🔥 Nas aldeas hai menos servizos que nas cidades.',r:true}],
+'O tempo pasa':[
+ {t:'op',q:'🔥 Cen anos son un...',o:['século','decenio','milenio'],r:0},
+ {t:'esc',q:'🔥 Dez anos son unha ...',r:['década','decada','decenio']},
+ {t:'vf',q:'🔥 O pasado xa ocorreu.',r:true}],
+'Os transportes e a seguridade viaria':[
+ {t:'op',q:'🔥 O semáforo en ámbar significa...',o:['precaución','pasar rápido','non hai que mirar'],r:0},
+ {t:'esc',q:'🔥 Para cruzar a rúa hai que usar o paso de ...',r:['peóns','peons','cebra']},
+ {t:'vf',q:'🔥 No coche hai que ir sempre co cinto.',r:true}],
+'Festas e tradicións de Galicia':[
+ {t:'op',q:'🔥 O instrumento típico galego é...',o:['a gaita','o violín','a frauta'],r:0},
+ {t:'esc',q:'🔥 O 25 de xullo celébrase o Día de ...',r:['Galicia','galicia']},
+ {t:'vf',q:'🔥 O entroido é unha festa con disfraces.',r:true}],
+
+'En clase: objetos y números':[
+ {t:'op',q:'🔥 ¿Cómo se dice "goma de borrar"?',o:['rubber','ruler','rubbish'],r:0},
+ {t:'esc',q:'🔥 Escribe en inglés el número 12',r:['twelve']},
+ {t:'esc',q:'🔥 "Pencil case" significa ...',r:['estuche','el estuche']}],
+'Mi familia: family':[
+ {t:'op',q:'🔥 "Grandmother" es...',o:['abuela','tía','hermana'],r:0},
+ {t:'esc',q:'🔥 Escribe en inglés: hermano',r:['brother']},
+ {t:'esc',q:'🔥 "My parents" significa mis ...',r:['padres']}],
+'Mi cuerpo: body and face':[
+ {t:'op',q:'🔥 "Shoulder" es...',o:['hombro','rodilla','codo'],r:0},
+ {t:'esc',q:'🔥 Escribe en inglés: pierna',r:['leg']},
+ {t:'esc',q:'🔥 "Eyes" significa ...',r:['ojos','los ojos']}],
+'Los animales: animals':[
+ {t:'op',q:'🔥 "Sheep" es...',o:['oveja','cerdo','caballo'],r:0},
+ {t:'esc',q:'🔥 Escribe en inglés: pájaro',r:['bird']},
+ {t:'esc',q:'🔥 "Horse" significa ...',r:['caballo','el caballo']}],
+'La comida: food':[
+ {t:'op',q:'🔥 "Breakfast" es...',o:['desayuno','comida','cena'],r:0},
+ {t:'esc',q:'🔥 Escribe en inglés: queso',r:['cheese']},
+ {t:'esc',q:'🔥 "I am hungry" significa tengo ...',r:['hambre']}],
+'Mi casa y el tiempo: house & weather':[
+ {t:'op',q:'🔥 "It is windy" significa...',o:['hace viento','llueve','nieva'],r:0},
+ {t:'esc',q:'🔥 Escribe en inglés: cocina',r:['kitchen']},
+ {t:'esc',q:'🔥 "Bedroom" es el ...',r:['dormitorio','cuarto','habitación','habitacion']}],
+'Números y colores: numbers & colours':[
+ {t:'op',q:'🔥 "Purple" es...',o:['morado','naranja','rosa'],r:0},
+ {t:'esc',q:'🔥 Escribe en inglés el número 15',r:['fifteen']},
+ {t:'esc',q:'🔥 "Grey" significa ...',r:['gris']}],
+'Los juguetes: toys':[
+ {t:'op',q:'🔥 "Kite" es...',o:['cometa','pelota','muñeca'],r:0},
+ {t:'esc',q:'🔥 Escribe en inglés: bicicleta',r:['bike','bicycle']},
+ {t:'esc',q:'🔥 "Teddy bear" es un oso de ...',r:['peluche']}],
+'Los días de la semana: days':[
+ {t:'op',q:'🔥 "Wednesday" es...',o:['miércoles','martes','jueves'],r:0},
+ {t:'esc',q:'🔥 Escribe en inglés: viernes',r:['friday']},
+ {t:'esc',q:'🔥 El día siguiente a "Saturday" es ...',r:['sunday']}]
+};
+
+let S={};
+function marcarVisto(mid,ui,v){
+  const k=mid+'-'+ui;
+  if(E.vistos[k]===v)delete E.vistos[k];else E.vistos[k]=v;
+  guardar();unidad(mid,ui);
+}
+function unidad(mid,ui){
+  const m=MATERIAS.find(x=>x.id===mid),u=m.unis[ui];
+  const vis=E.vistos[mid+'-'+ui];
+  const duro=RETOS[u.t]||[];                       // el tema ya hecho empieza por los retos
+  S={mid,ui,i:0,ok:0,ej:E.hechas[mid+'-'+ui]?duro.concat(u.ej):u.ej.concat(duro),resp:false};
+  vista.innerHTML=`
+  <div class="tira"><button class="volver" onclick="irA('materia','${mid}')">← ${esc(m.nom)}</button>
+    <span class="eyebrow">${TRI[u.tri]}</span></div>
+  <div class="leccion">
+    <div>
+      <h1 style="font-size:clamp(21px,3.6vw,28px);margin-bottom:4px">${esc(u.t)}</h1>
+      <p style="margin:0;color:var(--tinta-2);font-size:14px">${esc(m.libro)}</p>
+    </div>
+    <div class="clase">
+      <span>¿Ya lo habéis dado en clase?</span>
+      <button class="btn sec ${vis===true?'on':''}" onclick="marcarVisto('${mid}',${ui},true)">✅ Sí, ya lo dimos</button>
+      <button class="btn sec ${vis===false?'esp':''}" onclick="marcarVisto('${mid}',${ui},false)">⏳ Todavía no</button>
+    </div>
+    ${vis===false?`<div class="adelanto"><b>⏳ Esto todavía no lo habéis dado en clase.</b> Puedes mirarlo si tienes curiosidad, pero no es tarea. El faro dejará de ponerlo en la misión de hoy hasta que lo veáis con tu maestra.</div>`:''}
+    <div class="pizarra">
+      <h3>Lo que hay que saber</h3>
+      ${u.exp}
+      <div class="ejemplo"><span class="et">Fíjate en esto</span>${esc(u.ejemplo)}
+        <button class="btn sec" style="padding:6px 12px;font-size:13px;margin-left:8px"
+          onclick="hablar(${JSON.stringify(u.ejemplo)},'${m.id==='eng'?'en-GB':'es-ES'}')">🔊 Escuchar</button></div>
+      <div class="regla"><span style="font-size:19px;line-height:1">👩‍🏫</span>
+        <span>Si en clase lo explican de otra manera, <b>la de tu maestra es la buena</b>. Aquí solo practicamos. Y si ves algo distinto, díselo a papá o mamá: se puede cambiar.</span></div>
+      <div class="folio">— 1 —</div>
+    </div>
+    ${hayExtra(m,u)?`<button class="btn oro" style="align-self:flex-start" onclick="practicaExtra('${mid}',${ui})">🎲 Más ejercicios de este tema (siempre distintos)</button>`:''}
+    <div class="hojas"><div id="zona"></div></div>
+  </div>`;
+  pregunta();
+}
+
+function pregunta(){
+  const z=$('#zona');
+  if(S.i>=S.ej.length)return resumen();
+  const q=S.ej[S.i],m=MATERIAS.find(x=>x.id===S.mid);
+  const lang=m.id==='eng'?'en-GB':'es-ES';
+  let cuerpo='';
+  if(q.t==='op')cuerpo=`<div class="ops">${q.o.map((o,i)=>`<button class="op" data-i="${i}" onclick="responde(${i})">${esc(o)}</button>`).join('')}</div>`;
+  else if(q.t==='vf')cuerpo=`<div class="ops"><button class="op" data-i="0" onclick="responde(true)">✅ Verdadero</button><button class="op" data-i="1" onclick="responde(false)">❌ Falso</button></div>`;
+  else if(q.t==='esc')cuerpo=`<div class="escribe"><input id="ent" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="Escribe aquí…" onkeydown="if(event.key==='Enter')responde(this.value)"><button class="btn" onclick="responde(document.getElementById('ent').value)">Comprobar</button></div>`;
+  else if(q.t==='par'){
+    S.izq=q.pares.map(p=>p[0]);S.der=mezclar(q.pares.map(p=>p[1]));S.sel=null;S.unidos=[];
+    cuerpo=`<div class="pares" id="pares">
+      <div class="ops">${S.izq.map((x,i)=>`<button class="op" data-l="${i}" onclick="tocaPar('l',${i})">${esc(x)}</button>`).join('')}</div>
+      <div class="ops">${S.der.map((x,i)=>`<button class="op" data-r="${i}" onclick="tocaPar('r',${i})">${esc(x)}</button>`).join('')}</div></div>`;
+  }
+  z.innerHTML=`<div class="preg">
+    <div class="progreso-preg">${S.ej.map((_,i)=>`<i class="${i<S.i?'on':i===S.i?'act':''}"></i>`).join('')}</div>
+    <div class="cnt">Pregunta ${S.i+1} de ${S.ej.length}</div>
+    <span class="q">${esc(q.q)} ${q.t!=='par'?`<button class="btn sec" style="padding:4px 10px;font-size:13px;vertical-align:middle" onclick="hablar(${JSON.stringify(q.q)},'${lang}')" aria-label="Escuchar la pregunta">🔊</button>`:''}</span>
+    ${cuerpo}
+    <div class="veredicto" id="ver"></div>
+    ${q.p?`<div class="pista" id="pista" hidden>💡 ${esc(q.p)}</div>`:''}
+    <div id="sig" style="margin-top:14px"></div>
+    <div class="folio">— ${S.i+2} —</div></div>`;
+  const e=$('#ent');if(e)e.focus();
+  S.resp=false;
+}
+
+function tocaPar(lado,i){
+  if(S.resp)return;
+  const q=S.ej[S.i];
+  if(lado==='l'){document.querySelectorAll('[data-l]').forEach(b=>b.classList.remove('sel'));
+    document.querySelector('[data-l="'+i+'"]').classList.add('sel');S.sel=i;return;}
+  if(S.sel===null)return;
+  const bueno=q.pares[S.sel][1]===S.der[i];
+  const bi=document.querySelector('[data-l="'+S.sel+'"]'),bd=document.querySelector('[data-r="'+i+'"]');
+  if(bueno){bi.classList.remove('sel');bi.classList.add('ok');bd.classList.add('ok');bi.disabled=bd.disabled=true;
+    S.unidos.push(i);
+    if(S.unidos.length===q.pares.length){S.ok++;veredicto(true,'¡Todos unidos! Muy bien.');}
+  }else{bd.classList.add('no');setTimeout(()=>bd.classList.remove('no'),600);}
+  S.sel=null;
+}
+
+function responde(v){
+  if(S.resp)return;S.resp=true;
+  const q=S.ej[S.i];let bien=false;
+  if(q.t==='op'){bien=(v===q.r);
+    document.querySelectorAll('.op').forEach((b,i)=>{b.disabled=true;if(i===q.r)b.classList.add('ok');else if(i===v)b.classList.add('no');});}
+  else if(q.t==='vf'){bien=(v===q.r);
+    document.querySelectorAll('.op').forEach((b,i)=>{b.disabled=true;const val=(i===0);
+      if(val===q.r)b.classList.add('ok');else if(val===v)b.classList.add('no');});}
+  else if(q.t==='esc'){bien=q.r.some(x=>norm(x)===norm(v));
+    const e=$('#ent');if(e){e.disabled=true;e.style.borderColor=bien?'var(--acerto)':'var(--fallo)';}}
+  if(bien)S.ok++;
+  veredicto(bien,bien?null:(q.t==='esc'?'La respuesta era: '+q.r[0]:'Mira bien la respuesta verde.'));
+}
+
+function veredicto(bien,extra){
+  S.resp=true;
+  const v=$('#ver');
+  const bravo=['¡Muy bien!','¡Genial!','¡Perfecto!','¡Lo has clavado!','¡Estupendo!'];
+  v.className='veredicto '+(bien?'si':'nn');
+  v.textContent=bien?bravo[Math.floor(Math.random()*bravo.length)]:('Casi. '+(extra||''));
+  if(bien){sumarPuntos(2);barrerFaro();E.aciertos++;}else{E.fallos++;const p=$('#pista');if(p)p.hidden=false;}
+  guardar();
+  $('#sig').innerHTML=`<button class="btn" id="bsig">${S.i+1<S.ej.length?'Siguiente pregunta →':'Terminar el tema →'}</button>`;
+  $('#bsig').onclick=()=>{S.i++;conVuelta(pregunta);};
+  $('#bsig').focus();
+}
+
+function resumen(){
+  const clave=S.mid+'-'+S.ui, nuevo=!E.hechas[clave];
+  if(nuevo){E.hechas[clave]=true;sumarPuntos(5);}
+  if(tieneReto(S.mid,S.ui)&&!E.retos[clave]){E.retos[clave]=true;sumarPuntos(5);}
+  marcarDia();guardar();
+  const m=MATERIAS.find(x=>x.id===S.mid);
+  const sig=ruta().find(x=>!listo(x.mid,x.ui)&&E.vistos[x.mid+'-'+x.ui]!==false);
+  const pc=Math.round(S.ok/S.ej.length*100);
+  if(pc>=60)confeti();
+  $('#zona').innerHTML=`<div class="preg" style="text-align:center">
+    <div style="font-size:52px;line-height:1">${pc>=80?'🏆':pc>=50?'🌟':'💪'}</div>
+    <h2 style="margin:8px 0 4px">${S.ok} de ${S.ej.length} correctas</h2>
+    <p style="color:var(--tinta-2);margin:0 0 16px">${pc>=80?'¡Te lo sabes muy bien!':pc>=50?'¡Bien! Repasa la explicación y vuelve a intentarlo.':'Vuelve a leer la explicación de arriba y prueba otra vez. ¡Se aprende así!'}</p>
+    <div style="display:flex;gap:9px;justify-content:center;flex-wrap:wrap">
+      <button class="btn oro" onclick="unidad('${S.mid}',${S.ui})">↻ Repetir</button>
+      ${GENMAT[m.unis[S.ui].t]?`<button class="btn oro" onclick="practicaExtra('${S.mid}',${S.ui})">🎲 Más ejercicios</button>`:''}
+      ${sig?`<button class="btn" onclick="irA('unidad','${sig.mid}',${sig.ui})">Paso ${sig.n}: ${esc(sig.ut)} →</button>`:''}
+      <button class="btn sec" onclick="irA('casa')">Volver al faro</button></div>
+    ${sig?`<p style="margin:14px 0 0;font-size:13px;color:var(--tinta-2)">Siguiente en la ruta · ${esc(sig.mnom)}</p>`:'<p style="margin:14px 0 0;font-size:13px;color:var(--tinta-2)">¡Has terminado toda la ruta del curso! 🎉</p>'}
+    <div class="folio">— ${S.ej.length+2} —</div></div>`;
+}
+
+/* ---------- MÁS EJERCICIOS: se inventan cada vez (Matemáticas) ---------- */
+const az=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const elige=a=>a[Math.floor(Math.random()*a.length)];
+function ops(bien,malas){
+  const set=[String(bien)];
+  malas.forEach(x=>{if(!set.includes(String(x)))set.push(String(x));});
+  const todas=mezclar(set);
+  return {o:todas,r:todas.indexOf(String(bien))};
+}
+const MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const HORAS=['doce','una','dos','tres','cuatro','cinco','seis','siete','ocho','nueve','diez','once'];
+
+const GENMAT={
+'Números hasta el 999':()=>{
+  const n=az(101,989);const c=Math.floor(n/100),d=Math.floor(n/10)%10,u=n%10;
+  return elige([
+    ()=>({t:'esc',q:`${c*100} + ${d*10} + ${u} = `,r:[String(n)],p:'Junta centenas, decenas y unidades.'}),
+    ()=>({t:'op',q:`¿Cuántas centenas tiene el número ${n}?`,...ops(c+' centenas',[d+' centenas',u+' centenas']),p:'Es la primera cifra por la izquierda.'}),
+    ()=>({t:'esc',q:`El número anterior a ${n} es...`,r:[String(n-1)]}),
+    ()=>({t:'esc',q:`El número siguiente a ${n} es...`,r:[String(n+1)]}),
+    ()=>{const m=az(101,989);return {t:'op',q:`¿Qué número es MAYOR?`,...ops(String(Math.max(n,m)),[String(Math.min(n,m))]),p:'Mira primero las centenas.'};},
+    ()=>{const p2=az(10,99)*2, i=p2+1;return {t:'op',q:'¿Cuál de estos números es PAR?',...ops(String(p2),[String(i)]),p:'Los pares acaban en 0, 2, 4, 6 u 8.'};}
+  ])();},
+'Sumar y restar llevando':()=>{
+  if(Math.random()<.5){const a=az(15,89),b=az(15,89);return {t:'esc',q:`${a} + ${b} = `,r:[String(a+b)],p:'Coloca unidades bajo unidades.'};}
+  const a=az(40,99),b=az(11,a-10);return {t:'esc',q:`${a} − ${b} = `,r:[String(a-b)],p:'Si arriba hay menos, pide prestada una decena.'};},
+'Sumar y restar de tres cifras':()=>{
+  if(Math.random()<.5){const a=az(120,499),b=az(120,399);return {t:'esc',q:`${a} + ${b} = `,r:[String(a+b)]};}
+  const a=az(300,900),b=az(120,a-50);return {t:'esc',q:`${a} − ${b} = `,r:[String(a-b)],p:'Empieza siempre por la derecha.'};},
+'Las tablas de multiplicar':()=>{
+  const a=elige([2,3,4,5,10]),b=az(1,10);
+  return elige([
+    ()=>({t:'esc',q:`${a} × ${b} = `,r:[String(a*b)]}),
+    ()=>({t:'esc',q:`El doble de ${b*2} es...`,r:[String(b*4)]}),
+    ()=>({t:'esc',q:`La mitad de ${b*2} es...`,r:[String(b)]}),
+    ()=>({t:'esc',q:`${b} cajas con ${a} lápices cada una son ... lápices`,r:[String(a*b)],p:`${b} × ${a}`})
+  ])();},
+'Las tablas del 6, 7, 8 y 9':()=>{
+  const a=elige([6,7,8,9]),b=az(1,10);
+  return elige([
+    ()=>({t:'esc',q:`${a} × ${b} = `,r:[String(a*b)],p:a===9?'En la del 9 las decenas suben y las unidades bajan.':'Piensa en la tabla.'}),
+    ()=>({t:'op',q:`¿Cuál da el mismo resultado que ${a} × ${b}?`,...ops(`${b} × ${a}`,[`${a} + ${b}`,`${a} − ${b}`])}),
+    ()=>({t:'esc',q:`${b} bolsas de ${a} caramelos son ... caramelos`,r:[String(a*b)]})
+  ])();},
+'Cálculo mental y redondeo':()=>elige([
+   ()=>{const a=az(21,79);return {t:'esc',q:`${a} + 10 = `,r:[String(a+10)],p:'Sube una decena.'};},
+   ()=>{const a=az(21,79);return {t:'esc',q:`${a} + 9 = `,r:[String(a+9)],p:'Suma 10 y quita 1.'};},
+   ()=>{const a=az(30,95);return {t:'esc',q:`${a} − 10 = `,r:[String(a-10)]};},
+   ()=>{const a=az(11,98),abajo=Math.floor(a/10)*10,arriba=abajo+10;
+        return {t:'op',q:`Redondea ${a} a la decena más cercana:`,...ops(String(a%10>=5?arriba:abajo),[String(a%10>=5?abajo:arriba)]),p:'Si acaba en 5 o más, sube.'};},
+   ()=>{const d=az(3,9)*10,e=az(1,2)*10;return {t:'esc',q:`${d} − ${e} = `,r:[String(d-e)]};}
+ ])(),
+'Números ordinales y series':()=>{
+  const paso=elige([2,3,5,10]),ini=az(1,9)*paso;
+  return elige([
+    ()=>({t:'esc',q:`Sigue la serie: ${ini}, ${ini+paso}, ${ini+paso*2}, ...`,r:[String(ini+paso*3)],p:`Va de ${paso} en ${paso}.`}),
+    ()=>({t:'esc',q:`Cuenta hacia atrás: ${ini+paso*3}, ${ini+paso*2}, ${ini+paso}, ...`,r:[String(ini)],p:`Resta ${paso} cada vez.`}),
+    ()=>{const k=az(1,10),n=['primero','segundo','tercero','cuarto','quinto','sexto','séptimo','octavo','noveno','décimo'];
+         return {t:'op',q:`El puesto ${k}.º se lee...`,...ops(n[k-1],[n[k%10],n[(k+3)%10]])};}
+  ])();},
+'Repartir: empezamos a dividir':()=>{
+  const b=az(2,5),c=az(2,10),a=b*c;
+  return elige([
+    ()=>({t:'esc',q:`${a} : ${b} = `,r:[String(c)],p:`¿Por cuánto multiplico ${b} para llegar a ${a}?`}),
+    ()=>({t:'esc',q:`${a} caramelos entre ${b} niños. ¿Cuántos toca a cada uno?`,r:[String(c)]}),
+    ()=>({t:'op',q:`Si ${b} × ${c} = ${a}, entonces ${a} : ${c} = ?`,...ops(String(b),[String(c),String(a)])})
+  ])();},
+'Problemas de dos pasos':()=>{
+  const p=az(2,6),u=az(3,9),t=p*u,extra=az(2,9);
+  return elige([
+    ()=>({t:'esc',q:`Hay ${p} mesas con ${u} sillas cada una. Se rompen ${extra}. ¿Cuántas sillas quedan?`,r:[String(t-extra)],p:`Primero ${p} × ${u}, luego resta ${extra}.`}),
+    ()=>{const din=az(15,40),pre=az(2,7),cant=az(2,4);
+         return {t:'esc',q:`Tengo ${din} €. Compro ${cant} libros de ${pre} € cada uno. ¿Cuánto me queda? (solo el número)`,r:[String(din-pre*cant)],p:`Primero ${cant} × ${pre}.`};},
+    ()=>{const a=az(10,25),b=az(5,15),tot=az(45,70);
+         return {t:'esc',q:`Leo ${a} páginas por la mañana y ${b} por la tarde. Si el libro tiene ${tot}, ¿cuántas me faltan?`,r:[String(tot-a-b)],p:`Suma las dos y resta del total.`};}
+  ])();},
+'Medir: largo, peso y capacidad':()=>elige([
+   ()=>{const m=az(2,9);return {t:'esc',q:`${m} metros son ... centímetros`,r:[String(m*100)],p:'1 metro = 100 cm.'};},
+   ()=>{const k=az(2,9);return {t:'esc',q:`${k} kilos son ... gramos`,r:[String(k*1000)],p:'1 kilo = 1000 g.'};},
+   ()=>{const o=elige([['una sandía','kilos'],['un vaso de leche','litros'],['tu mesa','metros'],['un lápiz','centímetros'],['una botella de agua','litros']]);
+        return {t:'op',q:`¿En qué medimos ${o[0]}?`,...ops(o[1],['kilos','litros','metros','centímetros'].filter(x=>x!==o[1]).slice(0,2))};},
+   ()=>{const a=az(2,9)*10,b=az(1,9);return {t:'op',q:'¿Qué es más largo?',...ops(b+' metros',[a+' centímetros']),p:`${b} metros son ${b*100} cm.`};}
+ ])(),
+'El reloj, el calendario y el dinero':()=>elige([
+   ()=>{const h=az(1,10),s=az(1,4);return {t:'esc',q:`Si son las ${h} en punto, dentro de ${s} horas serán las...`,r:[String(h+s),HORAS[(h+s)%12]]};},
+   ()=>{const i=az(0,10);return {t:'op',q:`¿Qué mes viene después de ${MESES[i]}?`,...ops(MESES[i+1],[MESES[(i+3)%12],MESES[(i+8)%12]])};},
+   ()=>{const a=az(1,9)*10,b=az(1,4)*5;return {t:'esc',q:`Una moneda de ${a} céntimos y otra de ${b}. ¿Cuántos céntimos tengo?`,r:[String(a+b)]};},
+   ()=>{const e=az(2,9);return {t:'esc',q:`${e} euros son ... céntimos`,r:[String(e*100)],p:'1 euro = 100 céntimos.'};},
+   ()=>({t:'op',q:'Cuando el minutero está en el 3, decimos que es...',...ops('y cuarto',['y media','menos cuarto'])})
+ ])(),
+'Figuras, cuerpos y gráficos':()=>{
+  const F=[['triángulo',3],['cuadrado',4],['rectángulo',4],['pentágono',5],['hexágono',6]];
+  const f=elige(F);
+  return elige([
+    ()=>({t:'esc',q:`¿Cuántos lados tiene un ${f[0]}?`,r:[String(f[1])]}),
+    ()=>({t:'esc',q:`¿Cuántos vértices tiene un ${f[0]}?`,r:[String(f[1])],p:'Tiene los mismos vértices que lados.'}),
+    ()=>{const C=[['un dado','cubo'],['una pelota','esfera'],['una lata','cilindro'],['un gorro de fiesta','cono']];const c=elige(C);
+         return {t:'op',q:`${c[0][0].toUpperCase()+c[0].slice(1)} tiene forma de...`,...ops(c[1],C.filter(x=>x[1]!==c[1]).slice(0,2).map(x=>x[1]))};}
+  ])();}
+};
+
+let X={};
+function hayExtra(m,u){return m.id==='mat'&&!!GENMAT[u.t];}
+function practicaExtra(mid,ui){
+  const m=MATERIAS.find(x=>x.id===mid),u=m.unis[ui];
+  X={mid,ui,tit:u.t,n:0,ok:0,resp:false};
+  window.scrollTo(0,0);
+  vista.innerHTML=`
+  <div class="tira"><button class="volver" onclick="irA('unidad','${mid}',${ui})">← ${esc(u.t)}</button>
+    <span class="eyebrow">Más ejercicios</span></div>
+  <div class="leccion">
+    <div><h1 style="font-size:clamp(21px,3.6vw,28px);margin-bottom:4px">🎲 ${esc(u.t)}</h1>
+    <p style="margin:0;color:var(--tinta-2);font-size:14px">Ejercicios nuevos cada vez: los números cambian siempre, así que no se pueden aprender de memoria.</p></div>
+    <div class="hojas"><div id="zona"></div></div>
+  </div>`;
+  pintaExtra();
+}
+function pintaExtra(){
+  const q=GENMAT[X.tit]();X.q=q;X.resp=false;
+  let cuerpo='';
+  if(q.t==='op')cuerpo=`<div class="ops">${q.o.map((o,i)=>`<button class="op" onclick="respondeExtra(${i})">${esc(o)}</button>`).join('')}</div>`;
+  else cuerpo=`<div class="escribe"><input id="xent" inputmode="numeric" autocomplete="off" placeholder="Escribe aquí…" onkeydown="if(event.key==='Enter')respondeExtra(this.value)"><button class="btn" onclick="respondeExtra(document.getElementById('xent').value)">Comprobar</button></div>`;
+  $('#zona').innerHTML=`<div class="preg">
+    <div class="cnt">Ejercicio ${X.n+1} · ${X.ok} acertados</div>
+    <span class="q">${esc(q.q)}</span>
+    ${cuerpo}
+    <div class="veredicto" id="ver"></div>
+    ${q.p?`<div class="pista" id="pista" hidden>💡 ${esc(q.p)}</div>`:''}
+    <div id="sig" style="margin-top:14px"></div>
+    <div class="folio">🎲 siempre distinto</div></div>`;
+  const e=$('#xent');if(e)e.focus();
+}
+function respondeExtra(v){
+  if(X.resp)return;X.resp=true;X.n++;
+  const q=X.q;let bien;
+  if(q.t==='op'){bien=(v===q.r);
+    document.querySelectorAll('.op').forEach((b,i)=>{b.disabled=true;if(i===q.r)b.classList.add('ok');else if(i===v)b.classList.add('no');});}
+  else{bien=q.r.some(x=>norm(x)===norm(v));
+    const e=$('#xent');if(e){e.disabled=true;e.style.borderColor=bien?'var(--acerto)':'var(--fallo)';}}
+  const ver=$('#ver');
+  ver.className='veredicto '+(bien?'si':'nn');
+  if(bien){X.ok++;sumarPuntos(1);barrerFaro();ver.textContent=elige(['¡Muy bien!','¡Correcto!','¡Perfecto!','¡Vas lanzado!']);}
+  else{ver.textContent='Era '+(q.t==='op'?q.o[q.r]:q.r[0])+'.';const p=$('#pista');if(p)p.hidden=false;}
+  guardar();
+  $('#sig').innerHTML=`<div style="display:flex;gap:9px;flex-wrap:wrap">
+    <button class="btn" id="xsig">Otro ejercicio 🎲</button>
+    <button class="btn sec" onclick="irA('unidad','${X.mid}',${X.ui})">Volver al tema</button></div>`;
+  $('#xsig').onclick=()=>conVuelta(pintaExtra);
+  $('#xsig').focus();
+}
+
+/* ---------- LIBROS QUE FALTAN ---------- */
+function faltan(){
+  vista.innerHTML=`
+  <div class="tira"><button class="volver" onclick="irA('casa')">← Volver</button></div>
+  <h1 style="font-size:clamp(23px,4vw,30px);margin-bottom:6px">Libros que faltan</h1>
+  <p style="color:var(--tinta-2);max-width:62ch;margin:0 0 20px">De las fotos salen seis volúmenes. Para el curso completo de 2.º faltan estos, <b>ordenados por lo pronto que hacen falta</b>. Compara siempre con la lista oficial que da el colegio en septiembre, porque cada centro elige.</p>
+  <div class="rejilla" style="grid-template-columns:repeat(auto-fill,minmax(300px,1fr));margin-bottom:22px">
+    ${FALTAN.map((f,i)=>`<div class="pendiente"><span class="ic">${i+1}️⃣</span><div>
+      <h4>${esc(f.t)}</h4><p>${esc(f.e)}</p><p>${esc(f.n)}</p>
+      <span class="meta">Hace falta en: ${esc(f.c)}</span></div></div>`).join('')}
+  </div>
+
+  <div class="tira"><span class="eyebrow">Lo que sí tienes</span></div>
+  <div class="rejilla" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr));margin-bottom:22px">
+    ${MATERIAS.filter(m=>m.tengo).map(m=>`<div class="pendiente" style="border-left-color:var(--acerto)">
+      <span class="ic">✅</span><div><h4>${esc(m.libro)}</h4><p>${esc(m.edi)} · ${m.lang}</p>
+      ${m.isbn?`<span class="meta">ISBN ${m.isbn}</span>`:''}</div></div>`).join('')}
+  </div>
+
+  <div class="rejilla r3">
+    <div class="nota"><h4>💶 Ayudas de la Xunta</h4>
+      La Xunta de Galicia da <b>vales</b> para libros y material a las familias que cumplen los requisitos de renta, y tiene el <b>Fondo Solidario de Libros de Texto</b> (libros prestados gratis). La solicitud suele abrirse en primavera para el curso siguiente. Pregunta en la secretaría del colegio o mira en <b>edu.xunta.gal</b>.</div>
+    <div class="nota" style="background:var(--mar-claro)"><h4>🛒 Dónde comprarlos</h4>
+      La librería del pueblo suele reservarte el lote entero si llevas la lista del colegio. Online: Casa del Libro, El Corte Inglés o Amazon. De segunda mano: Wallapop y Milanuncios (busca por el título exacto y el año).</div>
+    <div class="nota" style="background:var(--hueco)"><h4>⚠️ Antes de pagar</h4>
+      Comprueba que pone <b>Galicia</b> y el proyecto correcto (<b>MIRA</b> de Anaya, <b>Construyendo Mundos</b> de Santillana). Las ediciones de otras comunidades no valen aunque el título parezca igual.</div>
+  </div>`;
+}
+
+/* ---------- GUÍA FAMILIA ---------- */
+function familia(){
+  vista.innerHTML=`
+  <div class="tira"><button class="volver" onclick="irA('casa')">← Volver</button></div>
+  <h1 style="font-size:clamp(23px,4vw,30px);margin-bottom:6px">Guía para la familia</h1>
+  <p style="color:var(--tinta-2);max-width:62ch;margin:0 0 20px">Quince minutos al día valen más que dos horas el domingo. Esto es lo único que hay que hacer.</p>
+  <div class="regla" style="margin-bottom:18px"><span style="font-size:19px;line-height:1">⚠️</span>
+    <span><b>Lo más importante de toda esta ventana:</b> si el niño lee algo aquí y en clase se lo explican de otra forma, <b>vale la de la maestra</b>. Esa frase está escrita al pie de cada tema para que él la lea solo. Cuando encuentre una diferencia, que se lo diga a usted y me lo cuenta: lo corrijo y la ventana se adapta a su clase.</span></div>
+
+  <div class="rejilla r3" style="margin-bottom:18px">
+    <div class="tarjeta" style="border-left:5px solid var(--faro)"><h3 style="font-size:16px">⏳ Marque por dónde van</h3>
+      <p style="font-size:14px;color:var(--tinta-2);margin:6px 0 0">Dentro de cada tema hay dos botones: <b>«Sí, ya lo dimos»</b> y <b>«Todavía no»</b>. Con eso la misión de hoy solo le pone lo que ya ha visto en clase, y nunca va por delante de la maestra.</p></div>
+    <div class="tarjeta" style="border-left:5px solid var(--fallo)"><h3 style="font-size:16px">➕ Pregunte cómo restan</h3>
+      <p style="font-size:14px;color:var(--tinta-2);margin:6px 0 0">Hay colegios que enseñan las cuentas con el <b>método ABN</b> y otros con el <b>algoritmo de toda la vida</b> (llevando y pidiendo prestado). Aquí está el clásico. Si en su colegio usan ABN, dígamelo y reescribo las Matemáticas con ese método: mezclarlos sí que confunde de verdad.</p></div>
+    <div class="tarjeta" style="border-left:5px solid var(--mar)"><h3 style="font-size:16px">📓 El cuaderno manda</h3>
+      <p style="font-size:14px;color:var(--tinta-2);margin:6px 0 0">A las dos semanas de empezar, abra su cuaderno y compare. Es la única fuente que dice de verdad qué se está dando este curso en su clase.</p></div>
+  </div>
+
+  <div class="rejilla r3" style="margin-bottom:22px">
+    <div class="tarjeta"><h3 style="font-size:16px">1 · La misión de hoy</h3><p style="font-size:14px;color:var(--tinta-2);margin:6px 0 0">Cada día aparecen tres temas cortos en la portada. Que los haga él solo; usted solo mira.</p></div>
+    <div class="tarjeta"><h3 style="font-size:16px">2 · Fallar está bien</h3><p style="font-size:14px;color:var(--tinta-2);margin:6px 0 0">Si falla, sale una pista y puede repetir el tema las veces que quiera. Nunca se pierden puntos.</p></div>
+    <div class="tarjeta"><h3 style="font-size:16px">3 · El galego</h3><p style="font-size:14px;color:var(--tinta-2);margin:6px 0 0">Dos asignaturas son en galego. En el glosario de herramientas están las palabras traducidas al castellano y al árabe.</p></div>
+  </div>
+  <div class="nota rtl" style="max-width:70ch">
+    <h4 style="font-family:'Segoe UI',sans-serif">دليل سريع للأهل</h4>
+    <p style="margin:0 0 8px">هذه البوّابة تغطّي منهج السنة الثانية ابتدائي في غاليسيا كما هو في كتبه الحقيقية: الرياضيات واللغة الإسبانية من Santillana، والعلوم الطبيعية والاجتماعية من Anaya باللغة الغاليغية، والإنجليزية من Richmond، إضافة إلى اللغة الغاليغية (الكتاب الناقص).</p>
+    <p style="margin:0 0 8px"><b>كيف تُستعمل:</b> افتح البوّابة يومياً 15 دقيقة. في الصفحة الأولى ثلاث مهامّ قصيرة تتغيّر كل يوم. كل إجابة صحيحة تُضيء منارة الصفحة، والسلسلة 🔥 تعدّ الأيام المتتالية.</p>
+    <p style="margin:0 0 8px"><b>مادّتان بالغاليغية:</b> العلوم الطبيعية والاجتماعية تُدرَّسان بالغاليغية في غاليسيا. لهذا وضعتُ في صندوق الأدوات معجماً غاليغي ← إسباني ← عربي، حتى تستطيع مساعدته دون أن تعرف الغاليغية.</p>
+    <p style="margin:0 0 8px"><b>إذا اختلفت المعلومة عن المدرسة:</b> القاعدة مكتوبة أسفل كل درس ليقرأها بنفسه: <b>«طريقة معلّمتك هي الصحيحة»</b>. وفي كل درس زرّان: «أخذناه في الصفّ» و«لمّا بعد» — ما تضعه تحت «لمّا بعد» يختفي من مهمّة اليوم حتّى تأخذه المدرسة.</p>
+    <p style="margin:0 0 8px"><b>تنبيه مهمّ للحساب:</b> بعض المدارس في إسبانيا تعلّم الجمع والطرح 
+ بطريقة <b>ABN</b> وليس بالطريقة التقليدية. ما في البوّابة هو الطريقة التقليدية. اسأل المعلّمة وأخبرني — أعيد كتابة الرياضيات بطريقتهم، فخلط الطريقتين هو ما يربك الطفل فعلاً.</p>
+    <p style="margin:0"><b>زرّ الأدوات 🧰</b> أسفل اليمين: الساعة، النقود اليورو، جداول الضرب، لوحة المئة، الجمع والطرح، الإملاء الصوتي، مؤقّت القراءة، والمعجم.</p>
+  </div>`;
+}
+
+/* ===================== HERRAMIENTAS ===================== */
+const velo=$('#velo'),modal=$('#modal');
+function abrir(html){modal.innerHTML='<button class="cerrar" onclick="cerrar()" aria-label="Cerrar">✕</button>'+html;velo.classList.add('abierto');}
+function cerrar(){velo.classList.remove('abierto');try{speechSynthesis.cancel();}catch(e){}}
+velo.onclick=e=>{if(e.target===velo)cerrar();};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')cerrar();});
+
+const HERRAMIENTAS=[
+ {ic:'🕐',nm:'El reloj',ds:'Aprende las horas',f:'hReloj'},
+ {ic:'💶',nm:'Monedas de euro',ds:'Cuenta dinero de verdad',f:'hMonedas'},
+ {ic:'✖️',nm:'Tablas de multiplicar',ds:'Del 1 al 10, con juego',f:'hTablas'},
+ {ic:'💯',nm:'Tabla del 100',ds:'Contar de 2 en 2, de 5 en 5…',f:'hCien'},
+ {ic:'➕',nm:'Sumas y restas',ds:'Con llevadas, sin parar',f:'hCalculo'},
+ {ic:'🔊',nm:'Dictado mágico',ds:'Escucha y escribe',f:'hDictado'},
+ {ic:'⏱️',nm:'Leer en voz alta',ds:'Mide tus palabras por minuto',f:'hLectura'},
+ {ic:'🗣️',nm:'Galego ↔ Castellano',ds:'Y también en árabe',f:'hGlosario'}
+];
+$('#btn-caja').onclick=()=>abrir(`<h2>Caja de herramientas</h2>
+  <p style="margin:0;color:var(--tinta-2);font-size:14px">Ocho cacharros para practicar cuando quieras.</p>
+  <div class="herr-lista">${HERRAMIENTAS.map(h=>`<button class="herr" onclick="${h.f}()">
+    <span class="ic">${h.ic}</span><span class="nm">${h.nm}</span><span class="ds">${h.ds}</span></button>`).join('')}</div>`);
+
+/* --- Reloj --- */
+let RH=3,RM=30,RETO=null;
+function dibujaReloj(){
+  const ah=(RH%12)*30+RM*.5, am=RM*6;
+  return `<svg class="reloj" viewBox="0 0 200 200" role="img" aria-label="Reloj">
+    <circle cx="100" cy="100" r="94" fill="var(--lienzo)" stroke="var(--mar)" stroke-width="5"/>
+    ${Array.from({length:60},(_,i)=>{const a=i*6*Math.PI/180,l=i%5?4:9;
+      return `<line x1="${100+Math.sin(a)*86}" y1="${100-Math.cos(a)*86}" x2="${100+Math.sin(a)*(86-l)}" y2="${100-Math.cos(a)*(86-l)}" stroke="var(--granito)" stroke-width="${i%5?1.5:3}"/>`;}).join('')}
+    ${Array.from({length:12},(_,i)=>{const a=(i+1)*30*Math.PI/180;
+      return `<text x="${100+Math.sin(a)*68}" y="${100-Math.cos(a)*68+7}" text-anchor="middle" font-size="20" font-weight="700" font-family="Nunito,sans-serif" fill="var(--tinta)">${i+1}</text>`;}).join('')}
+    <line x1="100" y1="100" x2="${100+Math.sin(ah*Math.PI/180)*45}" y2="${100-Math.cos(ah*Math.PI/180)*45}" stroke="var(--tinta)" stroke-width="8" stroke-linecap="round"/>
+    <line x1="100" y1="100" x2="${100+Math.sin(am*Math.PI/180)*70}" y2="${100-Math.cos(am*Math.PI/180)*70}" stroke="var(--faro)" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="100" cy="100" r="6" fill="var(--tinta)"/></svg>`;
+}
+function horaEnLetras(h,m){
+  const n=['doce','una','dos','tres','cuatro','cinco','seis','siete','ocho','nueve','diez','once'];
+  const hh=n[h%12], sig=n[(h+1)%12];
+  if(m===0)return `las ${hh} en punto`;
+  if(m===15)return `las ${hh} y cuarto`;
+  if(m===30)return `las ${hh} y media`;
+  if(m===45)return `las ${sig} menos cuarto`;
+  if(m<30)return `las ${hh} y ${m}`;
+  return `las ${sig} menos ${60-m}`;
+}
+function hReloj(){
+  abrir(`<h2>El reloj</h2><p style="margin:0 0 12px;color:var(--tinta-2);font-size:14px">La aguja negra corta son las horas. La naranja larga, los minutos.</p>
+  <div class="reloj-caja"><div id="esf">${dibujaReloj()}</div>
+    <div class="marcador" id="rtxt"></div>
+    <div class="mandos">
+      <button class="btn sec" onclick="mueveReloj(-1,0)">− 1 hora</button>
+      <button class="btn sec" onclick="mueveReloj(1,0)">+ 1 hora</button>
+      <button class="btn sec" onclick="mueveReloj(0,-5)">− 5 min</button>
+      <button class="btn sec" onclick="mueveReloj(0,5)">+ 5 min</button></div>
+    <div class="mandos"><button class="btn oro" onclick="retoReloj()">🎯 Ponme un reto</button>
+      <button class="btn" id="brc" onclick="compruebaReloj()" style="display:none">Comprobar</button></div>
+    <div class="veredicto" id="rver"></div></div>`);
+  pintaReloj();
+}
+function pintaReloj(){
+  $('#esf').innerHTML=dibujaReloj();
+  $('#rtxt').textContent=RETO?('Pon: '+RETO.txt):('Son '+horaEnLetras(RH,RM));
+}
+function mueveReloj(h,m){RH=(RH+h+24)%24;RM=(RM+m+60)%60;if(m&&RM===0&&m>0)RH=(RH+1)%24;pintaReloj();}
+function retoReloj(){
+  const hh=1+Math.floor(Math.random()*12), mm=[0,15,30,45][Math.floor(Math.random()*4)];
+  RETO={h:hh,m:mm,txt:horaEnLetras(hh,mm)};RH=12;RM=0;
+  $('#brc').style.display='';$('#rver').className='veredicto';pintaReloj();
+}
+function compruebaReloj(){
+  if(!RETO)return;const v=$('#rver');
+  const bien=(RH%12===RETO.h%12)&&(RM===RETO.m);
+  v.className='veredicto '+(bien?'si':'nn');
+  v.textContent=bien?'¡Exacto! Muy bien.':'Todavía no. Recuerda: y media = minutero en el 6.';
+  if(bien){sumarPuntos(2);RETO=null;$('#brc').style.display='none';pintaReloj();}
+}
+
+/* --- Monedas --- */
+const VAL=[[1,'c'],[2,'c'],[5,'c'],[10,''],[20,''],[50,''],[100,'bi'],[200,'bi']];
+let MSUM=0,MOBJ=0;
+function hMonedas(){
+  MSUM=0;MOBJ=[35,68,125,240,90,155][Math.floor(Math.random()*6)];
+  abrir(`<h2>Monedas de euro</h2>
+  <p style="margin:0 0 6px;color:var(--tinta-2);font-size:14px">Toca las monedas hasta llegar justo a la cantidad. 1 euro = 100 céntimos.</p>
+  <div class="marcador" id="mobj">Consigue: ${(MOBJ/100).toFixed(2).replace('.',',')} €</div>
+  <div class="monedas">${VAL.map(([v,c])=>`<button class="moneda ${c}" onclick="ponMoneda(${v})">${v<100?v+'c':(v/100)+'€'}</button>`).join('')}</div>
+  <div class="marcador" id="msum">Llevas: 0,00 €</div>
+  <div class="mandos" style="justify-content:center"><button class="btn sec" onclick="MSUM=0;pintaMon()">Vaciar</button>
+    <button class="btn" onclick="compruebaMon()">Comprobar</button>
+    <button class="btn oro" onclick="hMonedas()">Otra cantidad</button></div>
+  <div class="veredicto" id="mver"></div>`);
+}
+function ponMoneda(v){MSUM+=v;pintaMon();}
+function pintaMon(){$('#msum').textContent='Llevas: '+(MSUM/100).toFixed(2).replace('.',',')+' €';}
+function compruebaMon(){
+  const v=$('#mver');const bien=MSUM===MOBJ;
+  v.className='veredicto '+(bien?'si':'nn');
+  v.textContent=bien?'¡Justo! Ni un céntimo de más.':(MSUM>MOBJ?'Te has pasado. Vacía y prueba otra vez.':'Te faltan '+((MOBJ-MSUM)/100).toFixed(2).replace('.',',')+' €.');
+  if(bien)sumarPuntos(2);
+}
+
+/* --- Tablas --- */
+let TN=2;
+function hTablas(){
+  abrir(`<h2>Tablas de multiplicar</h2>
+  <div class="mandos" style="justify-content:flex-start;margin:10px 0">
+    ${[1,2,3,4,5,6,7,8,9,10].map(n=>`<button class="btn sec" style="padding:9px 14px" onclick="TN=${n};pintaTablas()">${n}</button>`).join('')}</div>
+  <div id="tzona"></div>
+  <div style="margin-top:14px"><button class="btn oro" onclick="juegoTabla()">🎯 Jugar con la tabla del <span id="tnum">2</span></button></div>
+  <div id="tjuego"></div>`);
+  pintaTablas();
+}
+function pintaTablas(){
+  $('#tzona').innerHTML=`<div class="tabla-mult">${Array.from({length:10},(_,i)=>
+    `<div>${TN} × ${i+1} = <b style="color:var(--mar-hondo)">${TN*(i+1)}</b></div>`).join('')}</div>`;
+  $('#tnum').textContent=TN;$('#tjuego').innerHTML='';
+}
+function juegoTabla(){
+  const b=1+Math.floor(Math.random()*10);
+  $('#tjuego').innerHTML=`<div class="preg" style="margin-top:12px">
+    <span class="q">${TN} × ${b} = ?</span>
+    <div class="escribe"><input id="tent" inputmode="numeric" onkeydown="if(event.key==='Enter')compTabla(${TN*b})">
+      <button class="btn" onclick="compTabla(${TN*b})">Comprobar</button></div>
+    <div class="veredicto" id="tver"></div></div>`;
+  $('#tent').focus();
+}
+function compTabla(r){
+  const v=$('#tver'),bien=parseInt($('#tent').value,10)===r;
+  v.className='veredicto '+(bien?'si':'nn');
+  v.textContent=bien?'¡Correcto! Otra…':'Era '+r+'. Mira la tabla de arriba.';
+  if(bien){sumarPuntos(1);setTimeout(juegoTabla,700);}
+}
+
+/* --- Tabla del 100 --- */
+function hCien(){
+  abrir(`<h2>Tabla del 100</h2><p style="margin:0;color:var(--tinta-2);font-size:14px">Pulsa un salto y mira el dibujo que hacen los números.</p>
+  <div class="mandos" style="justify-content:flex-start;margin:10px 0">
+    ${[2,3,4,5,10].map(n=>`<button class="btn sec" onclick="marcaCien(${n})">De ${n} en ${n}</button>`).join('')}
+    <button class="btn sec" onclick="marcaCien(0)">Limpiar</button></div>
+  <div class="t100" id="t100">${Array.from({length:100},(_,i)=>`<span data-n="${i+1}">${i+1}</span>`).join('')}</div>`);
+}
+function marcaCien(n){
+  document.querySelectorAll('#t100 span').forEach(s=>{
+    const v=+s.dataset.n;s.classList.toggle('mk',n>0&&v%n===0);});
+}
+
+/* --- Cálculo --- */
+let CA=0,CB=0,COP='+',CRACHA=0;
+function hCalculo(){
+  abrir(`<h2>Sumas y restas</h2><p style="margin:0 0 12px;color:var(--tinta-2);font-size:14px">Con llevadas, como en clase. Acierta seguidas y sube la racha.</p>
+  <div id="czona"></div><div class="marcador" id="crac" style="font-size:16px;margin-top:10px"></div>`);
+  nuevoCalculo();
+}
+function nuevoCalculo(){
+  COP=Math.random()<.5?'+':'−';
+  if(COP==='+'){CA=10+Math.floor(Math.random()*89);CB=10+Math.floor(Math.random()*89);}
+  else{CA=30+Math.floor(Math.random()*70);CB=10+Math.floor(Math.random()*(CA-10));}
+  $('#czona').innerHTML=`<div class="preg" style="text-align:center">
+    <div style="font-family:var(--f-display);font-size:44px;font-weight:700;font-variant-numeric:tabular-nums;margin-bottom:12px">${CA} ${COP} ${CB}</div>
+    <div class="escribe" style="justify-content:center"><input id="cent" inputmode="numeric" style="max-width:150px;text-align:center" onkeydown="if(event.key==='Enter')compCalculo()">
+      <button class="btn" onclick="compCalculo()">Comprobar</button></div>
+    <div class="veredicto" id="cver"></div></div>`;
+  $('#cent').focus();$('#crac').textContent='Racha: '+CRACHA+' 🔥';
+}
+function compCalculo(){
+  const r=COP==='+'?CA+CB:CA-CB, v=$('#cver'), bien=parseInt($('#cent').value,10)===r;
+  v.className='veredicto '+(bien?'si':'nn');
+  if(bien){CRACHA++;sumarPuntos(1);v.textContent='¡Bien! Van '+CRACHA+' seguidas.';setTimeout(nuevoCalculo,750);}
+  else{CRACHA=0;v.textContent='Era '+r+'. Colócalo en columnas y no olvides la llevada.';
+    setTimeout(()=>{$('#crac').textContent='Racha: 0 🔥';},10);}
+}
+
+/* --- Dictado --- */
+let DL='es',DW='';
+function hDictado(){
+  abrir(`<h2>Dictado mágico</h2><p style="margin:0 0 12px;color:var(--tinta-2);font-size:14px">Pulsa el altavoz, escucha bien y escribe la palabra. Puedes repetirla las veces que quieras.</p>
+  <div class="mandos" style="justify-content:flex-start">
+    <button class="btn sec" onclick="DL='es';nuevaPalabra()">Castellano</button>
+    <button class="btn sec" onclick="DL='gl';nuevaPalabra()">Galego</button>
+    <button class="btn sec" onclick="DL='en';nuevaPalabra()">English</button></div>
+  <div id="dzona" style="margin-top:12px"></div>`);
+  nuevaPalabra();
+}
+function nuevaPalabra(){
+  const l=DICTADO[DL];DW=l[Math.floor(Math.random()*l.length)];
+  $('#dzona').innerHTML=`<div class="preg" style="text-align:center">
+    <button class="btn oro" style="font-size:26px;padding:18px 30px" onclick="hablar(DW,'${DL==='en'?'en-GB':'es-ES'}')">🔊 Escuchar</button>
+    <div class="escribe" style="justify-content:center;margin-top:16px"><input id="dent" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')compDictado()">
+      <button class="btn" onclick="compDictado()">Comprobar</button></div>
+    <div class="veredicto" id="dver"></div>
+    <button class="btn sec" style="margin-top:12px" onclick="nuevaPalabra()">Otra palabra →</button></div>`;
+  setTimeout(()=>{hablar(DW,DL==='en'?'en-GB':'es-ES');$('#dent').focus();},350);
+}
+function compDictado(){
+  const v=$('#dver'),bien=norm($('#dent').value)===norm(DW);
+  v.className='veredicto '+(bien?'si':'nn');
+  v.textContent=bien?'¡Perfecto! Se escribe "'+DW+'".':'Se escribe "'+DW+'". Escúchala otra vez.';
+  if(bien){sumarPuntos(2);setTimeout(nuevaPalabra,1100);}
+}
+
+/* --- Lectura --- */
+let LT=null,LS=0;
+function hLectura(){
+  abrir(`<h2>Leer en voz alta</h2>
+  <p style="margin:0 0 12px;color:var(--tinta-2);font-size:14px">Coge tu libro, dale a empezar y lee en voz alta. Al terminar, cuenta las palabras que has leído. En 2.º de Primaria lo normal es entre <b>50 y 80 palabras por minuto</b>.</p>
+  <div class="reloj-caja">
+    <div class="marcador" id="lcron" style="font-size:48px">0:00</div>
+    <div class="mandos"><button class="btn oro" id="lb" onclick="toggleLectura()">▶ Empezar</button>
+      <button class="btn sec" onclick="pararLectura()">Reiniciar</button></div>
+    <div class="escribe" style="justify-content:center"><input id="lpal" inputmode="numeric" placeholder="¿Cuántas palabras?" style="max-width:200px">
+      <button class="btn" onclick="calcPPM()">Calcular</button></div>
+    <div class="veredicto" id="lver"></div></div>`);
+}
+function toggleLectura(){
+  if(LT){clearInterval(LT);LT=null;$('#lb').textContent='▶ Seguir';return;}
+  $('#lb').textContent='⏸ Parar';
+  LT=setInterval(()=>{LS++;$('#lcron').textContent=Math.floor(LS/60)+':'+String(LS%60).padStart(2,'0');},1000);
+}
+function pararLectura(){if(LT)clearInterval(LT);LT=null;LS=0;$('#lcron').textContent='0:00';$('#lb').textContent='▶ Empezar';$('#lver').className='veredicto';}
+function calcPPM(){
+  const p=parseInt($('#lpal').value,10),v=$('#lver');
+  if(!p||!LS){v.className='veredicto nn';v.textContent='Primero lee un rato y luego escribe las palabras.';return;}
+  const ppm=Math.round(p/(LS/60));
+  v.className='veredicto '+(ppm>=50?'si':'nn');
+  v.textContent=ppm+' palabras por minuto. '+(ppm>=80?'¡Muy rápido! Cuida que se entienda bien.':ppm>=50?'Estupendo, vas justo donde toca en 2.º.':'Todavía despacito: lee un poquito cada día y subirá solo.');
+  if(ppm>=50)sumarPuntos(2);
+}
+
+/* --- Glosario --- */
+function hGlosario(){
+  abrir(`<h2>Galego ↔ Castellano</h2>
+  <p style="margin:0 0 10px;color:var(--tinta-2);font-size:14px">Las palabras de Naturais y Sociais que más se repiten. Con la traducción al árabe para casa.</p>
+  <input class="buscador" id="gq" placeholder="Busca una palabra…" oninput="filtraGlosa(this.value)">
+  <div style="max-height:52vh;overflow-y:auto"><table class="glosa"><thead><tr><th>Galego</th><th>Castellano</th><th>عربي</th><th></th></tr></thead>
+  <tbody id="gtb"></tbody></table></div>`);
+  filtraGlosa('');
+}
+function filtraGlosa(q){
+  const n=norm(q);
+  $('#gtb').innerHTML=GLOSA.filter(r=>!n||norm(r[0]).includes(n)||norm(r[1]).includes(n))
+    .map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td dir="rtl">${esc(r[2])}</td>
+      <td><button class="btn sec" style="padding:4px 9px;font-size:13px" onclick="hablar(${JSON.stringify(r[0])},'es-ES')">🔊</button></td></tr>`).join('')
+    ||'<tr><td colspan="4" class="vacio">No encuentro esa palabra.</td></tr>';
+}
+
+/* ===================== TEMA + ARRANQUE ===================== */
+$('#btn-tema').onclick=()=>{
+  const act=document.documentElement.getAttribute('data-theme');
+  const nuevo=act==='dark'?'light':act==='light'?'':'dark';
+  if(nuevo)document.documentElement.setAttribute('data-theme',nuevo);
+  else document.documentElement.removeAttribute('data-theme');
+  E.tema=nuevo;guardar();
+};
+
+function bienvenida(){
+  abrir(`<h2>¡Hola! ¿Cómo te llamas?</h2>
+  <p style="margin:0 0 14px;color:var(--tinta-2);font-size:15px">Así el faro sabrá a quién dar la bienvenida cada día.</p>
+  <div class="escribe"><input id="nom" maxlength="18" placeholder="Tu nombre" onkeydown="if(event.key==='Enter')ponNombre()">
+    <button class="btn" onclick="ponNombre()">¡Vamos!</button></div>`);
+  setTimeout(()=>$('#nom').focus(),120);
+}
+function ponNombre(){
+  const v=$('#nom').value.trim();
+  E.nombre=v||'campeón';guardar();cerrar();casa();
+}
+
+/* Las unidades del libro heredan los retos 🔥 y los ejercicios infinitos de sus temas de origen */
+Object.entries(NUEVO_MAT).forEach(([t,n])=>{
+  RETOS[t]=[].concat(...n.de.map(x=>RETOS[x]||[]));
+  const gens=n.de.map(x=>GENMAT[x]).filter(Boolean);
+  if(gens.length)GENMAT[t]=()=>gens[Math.floor(Math.random()*gens.length)]();
+});
+
+cargarLocal();
+/* Progreso: 'mat-N' antes apuntaba al tema N del orden viejo. Una unidad del libro queda hecha
+   solo si todos sus temas de origen lo estaban (y lo mismo para los retos). Se hace una sola vez. */
+if(!E.matLibro){
+  const viejo=k=>OLD_MAT.indexOf(k);
+  const nh={},nr={},nv={};
+  Object.keys(E.hechas).forEach(k=>{if(!k.startsWith('mat-'))nh[k]=E.hechas[k];});
+  Object.keys(E.retos||{}).forEach(k=>{if(!k.startsWith('mat-'))nr[k]=E.retos[k];});
+  Object.keys(E.vistos).forEach(k=>{if(!k.startsWith('mat-'))nv[k]=E.vistos[k];});
+  Object.values(NUEVO_MAT).forEach((n,i)=>{
+    const ks=n.de.map(x=>'mat-'+viejo(x));
+    if(ks.every(k=>E.hechas[k]))nh['mat-'+i]=true;
+    if(ks.every(k=>(E.retos||{})[k]))nr['mat-'+i]=true;
+    if(ks.some(k=>E.vistos[k]===true))nv['mat-'+i]=true;
+  });
+  E.hechas=nh;E.retos=nr;E.vistos=nv;E.matLibro=1;guardar();
+}
+if(E.tema)document.documentElement.setAttribute('data-theme',E.tema);
+render();
+if(!E.nombre)bienvenida();
+
+</script>
+<footer style="text-align:center;padding:18px 16px 28px;color:#888;font:13px Nunito,sans-serif">Hecho con cariño por <b>NasriTools</b> · © 2026</footer>
+</body></html>

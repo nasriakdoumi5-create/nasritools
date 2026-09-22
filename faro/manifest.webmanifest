@@ -1,0 +1,23 @@
+{
+ "name": "Faro de Estudio · NasriTools",
+ "short_name": "Mi Faro",
+ "start_url": "./",
+ "display": "standalone",
+ "background_color": "#F4F7F6",
+ "theme_color": "#1B7F87",
+ "lang": "es",
+ "icons": [
+  {
+   "src": "icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any maskable"
+  },
+  {
+   "src": "icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any maskable"
+  }
+ ]
+}
