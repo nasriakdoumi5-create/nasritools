@@ -168,7 +168,7 @@ table.glosa{width:100%;border-collapse:collapse;font-size:15px}
 .regalo.abierta .tapa-c{transform:translate(18%,-120%) rotate(28deg)}
 .regalo .caja.tiembla{animation:tiembla .5s ease-in-out 2}
 @keyframes tiembla{0%,100%{transform:rotate(0)}25%{transform:rotate(-6deg)}75%{transform:rotate(6deg)}}
-.regalo .p{position:fixed;left:0;top:0;pointer-events:none;will-change:transform;line-height:1}
+.regalo .p,.lluvia-libre .p{position:fixed;left:0;top:0;pointer-events:none;will-change:transform;line-height:1}
 .regalo .msj{position:absolute;bottom:12%;left:50%;transform:translateX(-50%);background:var(--lienzo);color:var(--tinta);
   border-radius:20px;padding:16px 22px;text-align:center;box-shadow:var(--sombra);width:min(360px,90vw);opacity:0;transition:opacity .5s}
 .regalo .msj.ver{opacity:1}
@@ -803,8 +803,17 @@ function cajaBienvenida(){const t={c:'#F48FB1',l:'#F6B940'};
    ${['⭐','🌹','✨','🌸'].map((e,i)=>`<span class="sube" style="--dx:${[-30,24,-10,34][i]}px;animation-delay:${i*1.05}s">${e}</span>`).join('')}</button>`;}
 function lluviaBienvenida(){const r=document.createElement('div');r.className='lluvia-libre';document.body.appendChild(r);
   const b=$('.bienvenida').getBoundingClientRect();r.innerHTML=`<div class="caja" style="position:fixed;left:${b.left}px;top:${b.top}px;width:${b.width}px;height:${b.height}px"></div>`;
-  if(!matchMedia('(prefers-reduced-motion: reduce)').matches)lluvia(r,{p:['🌹','🌸','🌷','⭐','🌟','✨','💖']});
-  hablar('¡Bienvenida, '+E.nombre+'!');setTimeout(()=>r.remove(),6000);}
+  if(!matchMedia('(prefers-reduced-motion: reduce)').matches)caer(r,['🌹','🌸','🌷','⭐','🌟','✨','💖']);
+  setTimeout(()=>r.remove(),11000);}
+/* Lluvia desde arriba: cada rosa o estrella sale de un sitio distinto, a su ritmo, y cae meciéndose hasta abajo. */
+function caer(r,set){const W=innerWidth,H=innerHeight;
+  const ps=Array.from({length:70},()=>{const e=document.createElement('span');e.className='p';e.textContent=set[az(0,set.length-1)];
+    e.style.fontSize=az(18,40)+'px';r.appendChild(e);
+    return {e,x:Math.random()*W,y:-40-Math.random()*H*.6,vy:2.2+Math.random()*2.8,fase:Math.random()*6.3,amp:12+Math.random()*28,rot:Math.random()*360,vr:(Math.random()-.5)*3};});
+  let t=0;(function paso(){t++;let vivos=0;
+    for(const p of ps){if(p.y>H+50)continue;vivos++;p.y+=p.vy;p.rot+=p.vr;
+      p.e.style.transform=`translate(${p.x+Math.sin(p.fase+t/35)*p.amp}px,${p.y}px) rotate(${p.rot}deg)`;}
+    if(vivos&&r.isConnected)requestAnimationFrame(paso);})();}
 function miniCaja(key,abierta){const t=tema(key);
   return `<span class="mini-caja ${abierta?'abierta':'cerrada'}" title="${abierta?'Regalo abierto':'Termina la lección para abrirlo'}">${cajaSVG(t)}${abierta?`<span class="asoma">${t.p[0]}</span>`:'<span class="candado">🔒</span>'}</span>`;}
 function regalo(key){
