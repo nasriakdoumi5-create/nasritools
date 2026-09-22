@@ -587,8 +587,11 @@ function inicio(){callar();
   <h2 class="titulo-sec">Caja de herramientas <small>para practicar cuando quieras</small></h2>
   <div class="herrs">${HERR.map(h=>`<button class="herr" onclick="${h.f}()"><span class="ic">${h.ic}</span><span class="nm">${h.nm}</span><span class="ds">${h.ds}</span></button>`).join('')}</div>
   <h2 class="titulo-sec">Mi libro digital</h2>
-  <div class="hoy"><span class="flor">💻</span><div class="txt"><b>Aula Virtual Santillana</b><span>Los cuatro libros son de Santillana. Con el código de licencia (dentro de la tapa o del colegio) se ven en el ordenador.</span></div>
-  <a class="btn lila" href="https://aulavirtual.santillana.es" target="_blank" rel="noopener">Abrir</a></div>`;
+  <div class="hoy"><span class="flor">💻</span><div class="txt"><b>Aula Virtual Santillana</b><span>Tus cuatro libros, página por página, igual que en clase.</span>
+  <ol class="nota" style="margin:8px 0 0;padding-left:18px"><li>Pulsa «Abrir» y entra con el <b>usuario y la contraseña que da el colegio</b> (no vienen en el libro: pídelos a la tutora).</li>
+  <li>Dentro, si tenéis un <b>código de licencia</b> (a veces en la primera página del libro), añádelo desde tu cuenta.</li>
+  <li>Si los libros son de segunda mano, el código ya suele estar usado: el colegio puede dar uno nuevo.</li></ol></div>
+  <a class="btn lila" href="https://av.santillana.es/av/login/auth" target="_blank" rel="noopener">Abrir</a></div>`;
 }
 function siguiente(){
   for(const t of [triActual(),1,2,3])for(const m of MATERIAS)for(let i=0;i<m.unis.length;i++)if(m.unis[i].tri===t&&!listo(m.id,i))return {m,u:m.unis[i],i};
@@ -747,7 +750,7 @@ $('#btn-familia').onclick=()=>abrir(`<div class="ar"><h2>دليل العائلة
  <ul><li>تضغط على «Hoy toca» فيظهر لها الدرس المناسب للفصل الحالي.</li><li>تقرأ الشرح (أو تضغط 🔊 لتسمعه)، ثم تحلّ 6 تمارين.</li><li>إذا أجابت عن 4 من 6 أو أكثر، يُحسب الدرس منتهياً وتنمو «حديقتها».</li><li>بعدها تجرّب «التحدّي 🔥» لنجوم إضافية.</li></ul>
  <p><b>أدوات إضافية:</b> جدول الضرب، والإملاء بالنبرات، والقراءة بصوت عالٍ (تقيس عدد الكلمات في الدقيقة؛ المطلوب في الرابعة نحو 90–110)، وقاموس إسباني↔عربي لمصطلحات الدروس.</p>
  <p><b>ملاحظة:</b> كتاب العلوم الاجتماعية طبعة إقليم مورسيا، لذلك فيه نهر Segura وMar Menor وCartagena. إن كانت المدرسة في منطقة أخرى، فقارنوا الدروس بما يُدرَّس في الصف.</p>
- <p><b>الكتاب الرقمي:</b> من «Mi libro digital» تفتحون Aula Virtual Santillana برمز الترخيص الموجود داخل غلاف الكتاب أو من المدرسة. الكتب المستعملة غالباً رمزها مستهلك.</p>
+ <p><b>الكتاب الرقمي:</b> من «Mi libro digital» تفتحون Aula Virtual Santillana باسم المستخدم وكلمة المرور اللذين تعطيهما المدرسة (ليسا في الكتاب، اطلبوهما من المعلّمة). الكتب المستعملة غالباً رمز ترخيصها مستهلك، والمدرسة تستطيع إعطاء رمز جديد.</p>
  <p class="nota">التقدّم يُحفظ تلقائياً. الدروس والتمارين مكتوبة خصيصاً لهذه البوّابة على منهج السنة الرابعة، وليست نسخة من صفحات الكتب.</p></div>`);
 
 /* ============ TEMA + ARRANQUE ============ */
